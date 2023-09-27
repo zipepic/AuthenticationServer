@@ -2,13 +2,16 @@ package com.example.authenticationserver.util;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.util.*;
+//TODO (1) create the ability to generate different jwt tokens (content and validity period) (2) put the secret in properties
 
 public class JwtTokenUtils {
-
+  @Value("${app.secret}")
+  private static String secret;
   private static final Key secretKey;
   private static final long expiration = 86400000 * 7; // 7 days
 
@@ -28,7 +31,7 @@ public class JwtTokenUtils {
   }
 
   private static Key generateSecretKey() {
-    byte[] secretKeyBytes = Base64.getDecoder().decode("aM7l+SXuEgqITZT5JI9uZK9IRcuIMk9ww2K1udnSk1U="); // Замените на ваш реальный секретный ключ
+    byte[] secretKeyBytes = Base64.getDecoder().decode(secret);
     return new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS256.getJcaName());
   }
 }

@@ -2,7 +2,9 @@ package com.example.authenticationserver.query.api.event;
 
 import com.example.authenticationserver.query.api.data.ApplicationEntity;
 import com.example.authenticationserver.query.api.data.ApplicationRepository;
+import com.project.core.commands.LoginApplicationCommand;
 import com.project.core.events.ApplicationCreatedEvent;
+import com.project.core.events.ApplicationLoggedInEvent;
 import com.project.core.events.ApplicationRegisteredEvent;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.beans.BeanUtils;
@@ -33,6 +35,24 @@ public class ApplicationEventHandler {
       ApplicationEntity applicationEntity = optionalApplicationEntity.get();
       applicationEntity.setCode(event.getCode());
       applicationRepository.save(applicationEntity);
+    }else {
+      throw new IllegalArgumentException("Not found");
+    }
+  }
+  @EventHandler
+  public void handle(ApplicationLoggedInEvent event){
+
+    Optional<ApplicationEntity> optionalApplicationEntity =
+      applicationRepository.findById(event.getClientId());
+
+    if(optionalApplicationEntity.isPresent()){
+
+      ApplicationEntity applicationEntity = optionalApplicationEntity.get();
+      applicationEntity
+        .setRefreshToken(event.getRefreshToken());
+      applicationRepository
+        .save(applicationEntity);
+
     }else {
       throw new IllegalArgumentException("Not found");
     }

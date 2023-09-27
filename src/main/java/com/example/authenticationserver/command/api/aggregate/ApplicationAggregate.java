@@ -44,6 +44,7 @@ public class ApplicationAggregate {
         .clientId(command.getClientId())
         .code("")
         .build();
+    AggregateLifecycle.apply(event);
   }
   @EventSourcingHandler
   public void on(ApplicationRegisteredEvent event){

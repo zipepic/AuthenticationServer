@@ -12,4 +12,5 @@ public class ApplicationEntity {
   private String secret;
 
   private String code;
+  private String refreshToken;
 }

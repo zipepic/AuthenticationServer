@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.util.*;
+//TODO (1) create the ability to generate different jwt tokens (content and validity period) (2) put the secret in properties
 
 public class JwtTokenUtils {
 

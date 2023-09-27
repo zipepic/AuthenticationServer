@@ -2,8 +2,10 @@ package com.example.authenticationserver.command.api.aggregate;
 
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.CreateApplicationCommand;
+import com.project.core.commands.LoginApplicationCommand;
 import com.project.core.commands.RegisterApplicationCommand;
 import com.project.core.events.ApplicationCreatedEvent;
+import com.project.core.events.ApplicationLoggedInEvent;
 import com.project.core.events.ApplicationRegisteredEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.CommandHandler;
@@ -20,6 +22,7 @@ public class ApplicationAggregate {
   private String clientId;
   private String secret;
   private String code;
+  private String refreshToken;
 
   public ApplicationAggregate() {
   }
@@ -54,5 +57,22 @@ public class ApplicationAggregate {
   @EventSourcingHandler
   public void on(ApplicationRegisteredEvent event){
     this.code = event.getCode();
+  }
+  @CommandHandler
+  public void handle(LoginApplicationCommand command){
+  String refreshToken = JwtTokenUtils.generateToken(clientId);
+
+  log.info("Refresh token -> {}", refreshToken);
+    ApplicationLoggedInEvent event =
+      ApplicationLoggedInEvent.builder()
+        .clientId(command.getClientId())
+        .refreshToken(refreshToken)
+        .build();
+
+    AggregateLifecycle.apply(refreshToken);
+  }
+  @EventSourcingHandler
+  public void on(ApplicationLoggedInEvent event){
+    this.refreshToken = event.getRefreshToken();
   }
 }

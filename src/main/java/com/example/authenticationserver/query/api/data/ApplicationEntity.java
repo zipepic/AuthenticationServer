@@ -10,5 +10,4 @@ public class ApplicationEntity {
   @Id
   private String clientId;
   private String secret;
-  private String code;
 }

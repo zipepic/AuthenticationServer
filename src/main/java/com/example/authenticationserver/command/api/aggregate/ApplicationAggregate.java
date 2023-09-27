@@ -1,5 +1,6 @@
 package com.example.authenticationserver.command.api.aggregate;
 
+import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.CreateApplicationCommand;
 import com.project.core.commands.RegisterApplicationCommand;
 import com.project.core.events.ApplicationCreatedEvent;
@@ -39,10 +40,14 @@ public class ApplicationAggregate {
   }
   @CommandHandler
   public void handle(RegisterApplicationCommand command){
+    String code = JwtTokenUtils.generateToken(command.getClientId());
+
+    log.info(code);
+
     ApplicationRegisteredEvent event =
       ApplicationRegisteredEvent.builder()
         .clientId(command.getClientId())
-        .code("")
+        .code(code)
         .build();
     AggregateLifecycle.apply(event);
   }

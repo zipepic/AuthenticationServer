@@ -14,18 +14,17 @@ public class JwtTokenUtils {
   @Value("${app.secret:#{null}}")
   private static String secret;
   private static final Key secretKey;
-  private static final long expiration = 86400000 * 7; // 7 days
 
   static {
     secretKey = generateSecretKey();
   }
 
-  public static String generateToken(String clientId) {
+  public static String generateToken(String clientId, long expiration) {
     Map<String, Object> claims = new HashMap<>();
     String code = Jwts.builder()
       .setSubject(clientId)
       .setIssuedAt(new Date())
-      .setExpiration(new Date(System.currentTimeMillis() + 86400000 * 7))//week
+      .setExpiration(new Date(System.currentTimeMillis() + expiration))//week
       .signWith(secretKey)
       .compact();
     return code;

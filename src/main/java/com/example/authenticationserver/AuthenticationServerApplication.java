@@ -2,8 +2,10 @@ package com.example.authenticationserver;
 
 import com.project.core.commands.CreateApplicationCommand;
 import com.project.core.commands.CreateUserProfileCommand;
+import com.project.core.commands.LoginApplicationCommand;
 import com.project.core.commands.RegisterApplicationCommand;
 import com.project.core.events.ApplicationCreatedEvent;
+import com.project.core.events.ApplicationLoggedInEvent;
 import com.project.core.events.UserProfileCreatedEvent;
 import com.thoughtworks.xstream.XStream;
 import org.springframework.boot.SpringApplication;
@@ -27,6 +29,8 @@ public class AuthenticationServerApplication {
     xStream.allowTypeHierarchy(CreateApplicationCommand.class);
     xStream.allowTypeHierarchy(RegisterApplicationCommand.class);
     xStream.allowTypeHierarchy(ApplicationCreatedEvent.class);
+    xStream.allowTypeHierarchy(LoginApplicationCommand.class);
+    xStream.allowTypeHierarchy(ApplicationLoggedInEvent.class);
     return xStream;
   }
   @Bean

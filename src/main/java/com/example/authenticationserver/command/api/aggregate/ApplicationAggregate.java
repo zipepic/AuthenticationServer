@@ -43,7 +43,7 @@ public class ApplicationAggregate {
   }
   @CommandHandler
   public void handle(RegisterApplicationCommand command){
-    String code = JwtTokenUtils.generateToken(command.getClientId());
+    String code = JwtTokenUtils.generateToken(command.getClientId(),86400000);
 
     log.info(code);
 
@@ -60,7 +60,7 @@ public class ApplicationAggregate {
   }
   @CommandHandler
   public void handle(LoginApplicationCommand command){
-  String refreshToken = JwtTokenUtils.generateToken(clientId);
+  String refreshToken = JwtTokenUtils.generateToken(clientId,86400000 * 7);
 
   log.info("Refresh token -> {}", refreshToken);
     ApplicationLoggedInEvent event =

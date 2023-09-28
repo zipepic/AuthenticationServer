@@ -1,7 +1,9 @@
 package com.example.authenticationserver.command.api.controller;
 
+import com.example.authenticationserver.command.api.restmodel.ApplicationCreateRestModel;
 import com.example.authenticationserver.command.api.restmodel.ApplicationLoginRestModel;
 import com.example.authenticationserver.command.api.restmodel.ApplicationRegistrationRestModel;
+import com.project.core.commands.CreateApplicationCommand;
 import com.project.core.commands.LoginApplicationCommand;
 import com.project.core.commands.RegisterApplicationCommand;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -43,6 +45,15 @@ public class ApplicationController {
         .redirectUrl(model.getRedirectUrl())
         .build();
 
+    return commandGateway.sendAndWait(command);
+  }
+  @PostMapping("/create")
+  public String create(@RequestBody ApplicationCreateRestModel model){
+    CreateApplicationCommand command =
+      CreateApplicationCommand.builder()
+        .clientId(model.getClientId())
+        .secret(model.getSecret())
+        .build();
     return commandGateway.sendAndWait(command);
   }
 }

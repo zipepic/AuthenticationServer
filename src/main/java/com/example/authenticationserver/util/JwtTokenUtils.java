@@ -11,7 +11,7 @@ import java.util.*;
 //Pull Request
 
 public class JwtTokenUtils {
-  @Value("${app.secret}")
+  @Value("${app.secret:#{null}}")
   private static String secret;
   private static final Key secretKey;
   private static final long expiration = 86400000 * 7; // 7 days
@@ -32,6 +32,9 @@ public class JwtTokenUtils {
   }
 
   private static Key generateSecretKey() {
+    if(secret == null){
+      throw new IllegalArgumentException("Secret is null");
+    }
     byte[] secretKeyBytes = Base64.getDecoder().decode(secret);
     return new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS256.getJcaName());
   }

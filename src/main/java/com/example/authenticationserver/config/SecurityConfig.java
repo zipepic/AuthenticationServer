@@ -6,7 +6,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
-import java.util.Arrays;
 
 @Configuration
 public class SecurityConfig {
@@ -15,6 +14,7 @@ public class SecurityConfig {
       http.csrf(csrf -> csrf.disable())
         .formLogin(formLogin -> formLogin.disable())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
         .authorizeHttpRequests(auth ->
           auth
             .anyRequest().permitAll()

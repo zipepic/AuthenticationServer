@@ -14,6 +14,8 @@ import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
+import java.util.HashMap;
+
 
 @Aggregate
 @Slf4j
@@ -43,7 +45,7 @@ public class ApplicationAggregate {
   }
   @CommandHandler
   public void handle(RegisterApplicationCommand command){
-    String code = JwtTokenUtils.generateToken(command.getClientId(),86400000);
+    String code = JwtTokenUtils.generateToken(command.getClientId(),86400000,new HashMap<>());
 
     log.info(code);
 
@@ -60,7 +62,7 @@ public class ApplicationAggregate {
   }
   @CommandHandler
   public void handle(LoginApplicationCommand command){
-  String refreshToken = JwtTokenUtils.generateToken(clientId,86400000 * 7);
+  String refreshToken = JwtTokenUtils.generateToken(clientId,86400000 * 7,new HashMap<>());
 
   log.info("Refresh token -> {}", refreshToken);
     ApplicationLoggedInEvent event =

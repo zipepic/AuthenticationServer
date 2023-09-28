@@ -19,10 +19,10 @@ public class JwtTokenUtils {
     secretKey = generateSecretKey();
   }
 
-  public static String generateToken(String clientId, long expiration) {
-    Map<String, Object> claims = new HashMap<>();
+  public static String generateToken(String clientId, long expiration, HashMap<String,String> claims) {
     String code = Jwts.builder()
       .setSubject(clientId)
+      .setClaims(claims)
       .setIssuedAt(new Date())
       .setExpiration(new Date(System.currentTimeMillis() + expiration))//week
       .signWith(secretKey)

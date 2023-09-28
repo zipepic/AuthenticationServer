@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.util.*;
-//TODO (1) create the ability to generate different jwt tokens (content and validity period) (2) put the secret in properties
-//Pull Request
 
 public class JwtTokenUtils {
   @Value("${app.secret:#{null}}")

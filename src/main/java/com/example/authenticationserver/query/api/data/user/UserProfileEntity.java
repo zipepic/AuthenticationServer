@@ -1,4 +1,4 @@
-package com.example.authenticationserver.query.api.data;
+package com.example.authenticationserver.query.api.data.user;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

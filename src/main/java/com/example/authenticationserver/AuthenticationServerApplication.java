@@ -1,5 +1,6 @@
 package com.example.authenticationserver;
 
+import com.example.authenticationserver.command.api.restmodel.TokenSummary;
 import com.project.core.commands.CreateApplicationCommand;
 import com.project.core.commands.CreateUserProfileCommand;
 import com.project.core.commands.LoginApplicationCommand;
@@ -33,6 +34,7 @@ public class AuthenticationServerApplication {
     xStream.allowTypeHierarchy(LoginApplicationCommand.class);
     xStream.allowTypeHierarchy(ApplicationLoggedInEvent.class);
     xStream.allowTypeHierarchy(ApplicationRegisteredEvent.class);
+    xStream.allowTypeHierarchy(TokenSummary.class);
     return xStream;
   }
   @Bean

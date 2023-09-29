@@ -1,5 +1,6 @@
 package com.example.authenticationserver.command.api.controller;
 
+import com.example.authenticationserver.command.api.restmodel.TokenSummary;
 import com.example.authenticationserver.command.api.restmodel.application.ApplicationCreateRestModel;
 import com.example.authenticationserver.command.api.restmodel.application.ApplicationLoginRestModel;
 import com.example.authenticationserver.command.api.restmodel.application.ApplicationRegistrationRestModel;
@@ -38,7 +39,7 @@ public class ApplicationController {
     return commandGateway.sendAndWait(command);
   }
   @PostMapping("/login")
-  public String login(@RequestBody ApplicationLoginRestModel model){
+  public TokenSummary login(@RequestBody ApplicationLoginRestModel model){
     LoginApplicationCommand command =
       LoginApplicationCommand.builder()
         .clientId(model.getClientId())

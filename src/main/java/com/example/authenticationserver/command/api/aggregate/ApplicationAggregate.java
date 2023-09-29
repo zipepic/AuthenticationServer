@@ -1,5 +1,6 @@
 package com.example.authenticationserver.command.api.aggregate;
 
+import com.example.authenticationserver.command.api.restmodel.TokenSummary;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.CreateApplicationCommand;
 import com.project.core.commands.LoginApplicationCommand;
@@ -51,7 +52,7 @@ public class ApplicationAggregate {
     this.secret = event.getSecret();
   }
   @CommandHandler
-  public void handle(RegisterApplicationCommand command){
+  public String handle(RegisterApplicationCommand command){
 
     String code = jwtTokenUtils.generateToken(clientId,60000,new HashMap<>());
 
@@ -63,13 +64,14 @@ public class ApplicationAggregate {
         .code(code)
         .build();
     AggregateLifecycle.apply(event);
+    return code;
   }
   @EventSourcingHandler
   public void on(ApplicationRegisteredEvent event){
     this.code = event.getCode();
   }
   @CommandHandler
-  public void handle(LoginApplicationCommand command){
+  public TokenSummary handle(LoginApplicationCommand command){
   String refreshToken = jwtTokenUtils.generateToken(clientId,86400000 * 7,new HashMap<>());
 
   if(passwordEncoder.matches(command.getCode(),this.code) || command.getCode() == null){
@@ -88,6 +90,10 @@ public class ApplicationAggregate {
         .build();
 
     AggregateLifecycle.apply(refreshToken);
+    return TokenSummary.builder()
+      .accessToken("")
+      .refreshToken(refreshToken)
+      .build();
   }
   @EventSourcingHandler
   public void on(ApplicationLoggedInEvent event){

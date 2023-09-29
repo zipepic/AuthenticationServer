@@ -1,8 +1,8 @@
 package com.example.authenticationserver.command.api.controller;
 
-import com.example.authenticationserver.command.api.restmodel.ApplicationCreateRestModel;
-import com.example.authenticationserver.command.api.restmodel.ApplicationLoginRestModel;
-import com.example.authenticationserver.command.api.restmodel.ApplicationRegistrationRestModel;
+import com.example.authenticationserver.command.api.restmodel.application.ApplicationCreateRestModel;
+import com.example.authenticationserver.command.api.restmodel.application.ApplicationLoginRestModel;
+import com.example.authenticationserver.command.api.restmodel.application.ApplicationRegistrationRestModel;
 import com.project.core.commands.CreateApplicationCommand;
 import com.project.core.commands.LoginApplicationCommand;
 import com.project.core.commands.RegisterApplicationCommand;

@@ -1,6 +1,6 @@
 package com.example.authenticationserver.command.api.controller;
 
-import com.example.authenticationserver.command.api.restmodel.UserProfileRestModel;
+import com.example.authenticationserver.command.api.restmodel.user.UserProfileRestModel;
 import com.project.core.commands.CreateUserProfileCommand;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;

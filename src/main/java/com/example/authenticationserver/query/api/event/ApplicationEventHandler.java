@@ -1,8 +1,7 @@
 package com.example.authenticationserver.query.api.event;
 
-import com.example.authenticationserver.query.api.data.ApplicationEntity;
-import com.example.authenticationserver.query.api.data.ApplicationRepository;
-import com.project.core.commands.LoginApplicationCommand;
+import com.example.authenticationserver.query.api.data.application.ApplicationEntity;
+import com.example.authenticationserver.query.api.data.application.ApplicationRepository;
 import com.project.core.events.ApplicationCreatedEvent;
 import com.project.core.events.ApplicationLoggedInEvent;
 import com.project.core.events.ApplicationRegisteredEvent;

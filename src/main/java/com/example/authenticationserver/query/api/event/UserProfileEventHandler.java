@@ -1,7 +1,7 @@
 package com.example.authenticationserver.query.api.event;
 
-import com.example.authenticationserver.query.api.data.UserProfileEntity;
-import com.example.authenticationserver.query.api.data.UserProfileRepository;
+import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
+import com.example.authenticationserver.query.api.data.user.UserProfileRepository;
 import com.project.core.events.UserProfileCreatedEvent;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.beans.BeanUtils;

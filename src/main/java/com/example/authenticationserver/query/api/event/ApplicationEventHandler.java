@@ -15,45 +15,40 @@ import java.util.Optional;
 @Component
 public class ApplicationEventHandler {
   private final ApplicationRepository applicationRepository;
+
   @Autowired
   public ApplicationEventHandler(ApplicationRepository applicationRepository) {
     this.applicationRepository = applicationRepository;
   }
 
   @EventHandler
-  public void on(ApplicationCreatedEvent event){
+  public void on(ApplicationCreatedEvent event) {
     ApplicationEntity applicationEntity = new ApplicationEntity();
-    BeanUtils.copyProperties(event,applicationEntity);
+    BeanUtils.copyProperties(event, applicationEntity);
     applicationRepository.save(applicationEntity);
   }
+
   @EventHandler
-  public void handle(ApplicationRegisteredEvent event){
-    Optional<ApplicationEntity> optionalApplicationEntity =
-      applicationRepository.findById(event.getClientId());
-    if(optionalApplicationEntity.isPresent()){
+  public void handle(ApplicationRegisteredEvent event) {
+    Optional<ApplicationEntity> optionalApplicationEntity = applicationRepository.findById(event.getClientId());
+    if (optionalApplicationEntity.isPresent()) {
       ApplicationEntity applicationEntity = optionalApplicationEntity.get();
       applicationEntity.setCode(event.getCode());
       applicationRepository.save(applicationEntity);
-    }else {
-      throw new IllegalArgumentException("Not found");
+    } else {
+      throw new IllegalArgumentException("Application not found");
     }
   }
+
   @EventHandler
-  public void handle(ApplicationLoggedInEvent event){
-
-    Optional<ApplicationEntity> optionalApplicationEntity =
-      applicationRepository.findById(event.getClientId());
-
-    if(optionalApplicationEntity.isPresent()){
-
+  public void handle(ApplicationLoggedInEvent event) {
+    Optional<ApplicationEntity> optionalApplicationEntity = applicationRepository.findById(event.getClientId());
+    if (optionalApplicationEntity.isPresent()) {
       ApplicationEntity applicationEntity = optionalApplicationEntity.get();
-      applicationEntity
-        .setRefreshToken(event.getRefreshToken());
-      applicationRepository
-        .save(applicationEntity);
-
-    }else {
-      throw new IllegalArgumentException("Not found");
+      applicationEntity.setRefreshToken(event.getRefreshToken());
+      applicationRepository.save(applicationEntity);
+    } else {
+      throw new IllegalArgumentException("Application not found");
     }
   }
 }

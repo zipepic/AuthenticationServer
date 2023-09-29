@@ -1,6 +1,7 @@
 package com.example.authenticationserver.util;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,7 @@ public class JwtTokenUtils {
   private final String secret;
   private final Key secretKey;
 
-  public JwtTokenUtils(@Value("${app.secret:#{null}}") String secret) {
+  public JwtTokenUtils(@NonNull @Value("${app.secret:#{null}}") String secret) {
     this.secret = secret;
     this.secretKey = generateSecretKey(secret);
   }
@@ -25,7 +26,7 @@ public class JwtTokenUtils {
       .setSubject(clientId)
       .setClaims(claims)
       .setIssuedAt(new Date())
-      .setExpiration(new Date(System.currentTimeMillis() + expiration)) // week
+      .setExpiration(new Date(System.currentTimeMillis() + expiration))
       .signWith(secretKey)
       .compact();
     return code;
@@ -41,9 +42,6 @@ public class JwtTokenUtils {
   }
 
   private Key generateSecretKey(String secret) {
-    if (secret == null) {
-      throw new IllegalArgumentException("Secret is null");
-    }
     byte[] secretKeyBytes = Base64.getDecoder().decode(secret);
     return new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS256.getJcaName());
   }

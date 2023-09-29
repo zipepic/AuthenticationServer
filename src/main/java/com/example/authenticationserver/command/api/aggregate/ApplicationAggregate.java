@@ -64,6 +64,9 @@ public class ApplicationAggregate {
   public void handle(LoginApplicationCommand command){
   String refreshToken = JwtTokenUtils.generateToken(clientId,86400000 * 7,new HashMap<>());
 
+  if(command.getCode() != this.code || command.getCode() == null){
+    throw new IllegalArgumentException("Login failed");
+  }
   log.info("Refresh token -> {}", refreshToken);
     ApplicationLoggedInEvent event =
       ApplicationLoggedInEvent.builder()

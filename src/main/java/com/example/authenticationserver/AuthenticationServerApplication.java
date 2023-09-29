@@ -6,6 +6,7 @@ import com.project.core.commands.LoginApplicationCommand;
 import com.project.core.commands.RegisterApplicationCommand;
 import com.project.core.events.ApplicationCreatedEvent;
 import com.project.core.events.ApplicationLoggedInEvent;
+import com.project.core.events.ApplicationRegisteredEvent;
 import com.project.core.events.UserProfileCreatedEvent;
 import com.thoughtworks.xstream.XStream;
 import org.springframework.boot.SpringApplication;
@@ -31,6 +32,7 @@ public class AuthenticationServerApplication {
     xStream.allowTypeHierarchy(ApplicationCreatedEvent.class);
     xStream.allowTypeHierarchy(LoginApplicationCommand.class);
     xStream.allowTypeHierarchy(ApplicationLoggedInEvent.class);
+    xStream.allowTypeHierarchy(ApplicationRegisteredEvent.class);
     return xStream;
   }
   @Bean

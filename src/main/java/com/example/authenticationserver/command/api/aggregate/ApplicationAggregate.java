@@ -13,6 +13,8 @@ import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashMap;
 
@@ -25,8 +27,13 @@ public class ApplicationAggregate {
   private String secret;
   private String code;
   private String refreshToken;
+  @Autowired
+  private JwtTokenUtils jwtTokenUtils;
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
   public ApplicationAggregate() {
+    jwtTokenUtils = null;
   }
   @CommandHandler
   public ApplicationAggregate(CreateApplicationCommand command){
@@ -45,9 +52,10 @@ public class ApplicationAggregate {
   }
   @CommandHandler
   public void handle(RegisterApplicationCommand command){
-    String code = JwtTokenUtils.generateToken(command.getClientId(),86400000,new HashMap<>());
 
-    log.info(code);
+    String code = jwtTokenUtils.generateToken(clientId,60000,new HashMap<>());
+
+    log.info("Code -> {}", code);
 
     ApplicationRegisteredEvent event =
       ApplicationRegisteredEvent.builder()
@@ -62,12 +70,17 @@ public class ApplicationAggregate {
   }
   @CommandHandler
   public void handle(LoginApplicationCommand command){
-  String refreshToken = JwtTokenUtils.generateToken(clientId,86400000 * 7,new HashMap<>());
+  String refreshToken = jwtTokenUtils.generateToken(clientId,86400000 * 7,new HashMap<>());
 
-  if(command.getCode() != this.code || command.getCode() == null){
+  if(passwordEncoder.matches(command.getCode(),this.code) || command.getCode() == null){
     throw new IllegalArgumentException("Login failed");
   }
+  if(!jwtTokenUtils.validateToken(command.getCode())){
+    throw new IllegalArgumentException("Invalid code");
+  }
+
   log.info("Refresh token -> {}", refreshToken);
+
     ApplicationLoggedInEvent event =
       ApplicationLoggedInEvent.builder()
         .clientId(command.getClientId())

@@ -13,6 +13,7 @@ public class UserProfileEntity {
   private String userId;
   private String userName;
   private String passwordHash;
+  private String code;
   private String userStatus;
   private Date createdAt;
   private Date lastUpdatedAt;

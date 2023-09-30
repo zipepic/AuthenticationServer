@@ -23,6 +23,7 @@ import java.util.UUID;
 
 @Aggregate
 @Slf4j
+//TODO refactoring this class(delete unused code)
 public class ApplicationAggregate {
   @AggregateIdentifier
   private String clientId;

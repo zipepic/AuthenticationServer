@@ -1,14 +1,11 @@
 package com.example.authenticationserver;
 
 import com.example.authenticationserver.command.api.restmodel.TokenSummary;
-import com.project.core.commands.CreateApplicationCommand;
-import com.project.core.commands.CreateUserProfileCommand;
-import com.project.core.commands.LoginApplicationCommand;
-import com.project.core.commands.RegisterApplicationCommand;
-import com.project.core.events.ApplicationCreatedEvent;
-import com.project.core.events.ApplicationLoggedInEvent;
-import com.project.core.events.ApplicationRegisteredEvent;
-import com.project.core.events.UserProfileCreatedEvent;
+import com.project.core.commands.*;
+import com.project.core.events.*;
+import com.project.core.queries.CheckLoginDataQuery;
+import com.project.core.queries.FindUserIdByOneTimeCodeQuery;
+import com.project.core.queries.FindUserIdByUserNameQuery;
 import com.thoughtworks.xstream.XStream;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -35,6 +32,12 @@ public class AuthenticationServerApplication {
     xStream.allowTypeHierarchy(ApplicationLoggedInEvent.class);
     xStream.allowTypeHierarchy(ApplicationRegisteredEvent.class);
     xStream.allowTypeHierarchy(TokenSummary.class);
+    xStream.allowTypeHierarchy(FindUserIdByUserNameQuery.class);
+    xStream.allowTypeHierarchy(GenerateOneTimeCodeUserProfileCommand.class);
+    xStream.allowTypeHierarchy(OneTimeCodeUserProfileGeneratedEvent.class);
+    xStream.allowTypeHierarchy(UseOneTimeCodeCommand.class);
+    xStream.allowTypeHierarchy(CheckLoginDataQuery.class);
+    xStream.allowTypeHierarchy(FindUserIdByOneTimeCodeQuery.class);
     return xStream;
   }
   @Bean

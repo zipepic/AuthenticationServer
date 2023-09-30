@@ -45,7 +45,7 @@ public class UserViewController {
       return "login";
     }
   }
-
+//TODO validate user
   private boolean isValidUser(String username, String password) {
 
     return true;

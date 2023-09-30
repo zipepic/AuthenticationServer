@@ -3,6 +3,7 @@ package com.example.authenticationserver.command.api.aggregate;
 import com.example.authenticationserver.command.api.restmodel.TokenSummary;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.CreateApplicationCommand;
+import com.project.core.commands.GenerateOneTimeCodeUserProfileCommand;
 import com.project.core.commands.LoginApplicationCommand;
 import com.project.core.commands.RegisterApplicationCommand;
 import com.project.core.events.ApplicationCreatedEvent;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 @Aggregate
 @Slf4j
@@ -25,7 +27,6 @@ public class ApplicationAggregate {
   @AggregateIdentifier
   private String clientId;
   private String secret;
-  private String code;
   private String refreshToken;
 
   @Autowired
@@ -69,16 +70,12 @@ public class ApplicationAggregate {
 
   @EventSourcingHandler
   public void on(ApplicationRegisteredEvent event) {
-    this.code = event.getCode();
+
   }
 
   @CommandHandler
   public TokenSummary handle(LoginApplicationCommand command) {
     String refreshToken = jwtTokenUtils.generateToken(clientId, 86400000 * 7, new HashMap<>());
-
-    if (command.getCode() == null || !passwordEncoder.matches(command.getCode(), this.code)) {
-      throw new IllegalArgumentException("Login failed");
-    }
 
     if (!jwtTokenUtils.validateToken(command.getCode())) {
       throw new IllegalArgumentException("Invalid code");
@@ -102,4 +99,5 @@ public class ApplicationAggregate {
   public void on(ApplicationLoggedInEvent event) {
     this.refreshToken = event.getRefreshToken();
   }
+
 }

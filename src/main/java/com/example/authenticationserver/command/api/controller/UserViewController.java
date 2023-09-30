@@ -1,11 +1,15 @@
 package com.example.authenticationserver.command.api.controller;
 
+import com.project.core.commands.CreateUserProfileCommand;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.Banner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.util.UUID;
 
@@ -13,6 +17,8 @@ import java.util.UUID;
 @Controller
 @RequestMapping("/login")
 public class UserViewController {
+
+
   @GetMapping
   public String showLoginForm(@RequestParam("client_id") String clientId,
                               @RequestParam("response_type") String responseType,
@@ -45,9 +51,11 @@ public class UserViewController {
       return "login";
     }
   }
+
 //TODO validate user
   private boolean isValidUser(String username, String password) {
 
     return true;
   }
+
 }

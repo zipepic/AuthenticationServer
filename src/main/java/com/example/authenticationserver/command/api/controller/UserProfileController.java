@@ -1,9 +1,12 @@
 package com.example.authenticationserver.command.api.controller;
 
 import com.example.authenticationserver.command.api.restmodel.TokenSummary;
+import com.project.core.commands.UseAuthorizationCodeCommand;
 import com.project.core.commands.user.UseOneTimeCodeCommand;
 import com.project.core.queries.app.CheckLoginDataQuery;
 import com.project.core.queries.user.FindUserIdByOneTimeCodeQuery;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,7 @@ public class UserProfileController {
                                      @RequestParam String client_secret,
                                      @RequestParam String code,
                                      @RequestParam String redirect_uri){
+
     CheckLoginDataQuery loginDataQuery =
       CheckLoginDataQuery.builder()
         .clientId(client_id)
@@ -45,6 +49,13 @@ public class UserProfileController {
         .build();
     String userId = queryGateway.query(findUserQuery, String.class).join();
 
+    UseAuthorizationCodeCommand commandCode =
+      UseAuthorizationCodeCommand.builder()
+        .userId(userId)
+        .code(code)
+        .build();
+    commandGateway.sendAndWait(commandCode);
+
     UseOneTimeCodeCommand command =
       UseOneTimeCodeCommand.builder()
         .userId(userId)
@@ -52,5 +63,7 @@ public class UserProfileController {
         .build();
 
     return commandGateway.sendAndWait(command);
+
+
   }
 }

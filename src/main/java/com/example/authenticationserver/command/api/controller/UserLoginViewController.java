@@ -1,8 +1,11 @@
 package com.example.authenticationserver.command.api.controller;
 
+import com.project.core.commands.GenerateAuthorizationCodeCommand;
 import com.project.core.commands.user.GenerateOneTimeCodeUserProfileCommand;
 import com.project.core.queries.user.FindUserIdByUserNameQuery;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
@@ -11,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @Controller
@@ -49,8 +53,8 @@ public class UserLoginViewController {
                       @RequestParam("state") String state,
                       @RequestParam("scope") String scope,
                       @RequestParam("redirect_url") String redirectUrl,
-                      HttpServletResponse response) {
-
+                      HttpSession session){
+    try {
     FindUserIdByUserNameQuery query =
       FindUserIdByUserNameQuery.builder()
         .userName(username)
@@ -64,12 +68,28 @@ public class UserLoginViewController {
         .passwordHash(password)
         .build();
 
-    try {
+
       String code = commandGateway.sendAndWait(command);
+      GenerateAuthorizationCodeCommand codeCommand =
+        GenerateAuthorizationCodeCommand.builder()
+          .code(code)
+          .userId(userId)
+          .clientId(clientId)
+          .scope(scope)
+          .sessionId(session.getId())
+          .build();
+      commandGateway.sendAndWait(codeCommand);
       return "redirect:" + redirectUrl + "?state=" + state + "&code=" + code;
     }
     catch (Exception e){
-      return "login";
+      UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/login")
+        .queryParam("client_id", clientId)
+        .queryParam("response_type", responseType)
+        .queryParam("state", state)
+        .queryParam("scope", scope)
+        .queryParam("redirect_url", redirectUrl);
+
+      return "redirect:" + builder.toUriString();
     }
 
   }

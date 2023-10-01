@@ -24,9 +24,6 @@ public class UserProfileAggregate {
   private Date createdAt;
   private Date lastUpdatedAt;
   private Date deleteAt;
-  @Autowired
-  private PasswordEncoder passwordEncoder;
-
   public UserProfileAggregate() {
   }
   @CommandHandler

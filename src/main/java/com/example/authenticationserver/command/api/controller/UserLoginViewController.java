@@ -1,10 +1,7 @@
 package com.example.authenticationserver.command.api.controller;
 
 import com.project.core.commands.GenerateAuthorizationCodeCommand;
-import com.project.core.commands.user.GenerateOneTimeCodeUserProfileCommand;
 import com.project.core.queries.user.FindUserIdByUserNameQuery;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -62,23 +59,14 @@ public class UserLoginViewController {
 
     String userId = queryGateway.query(query, String.class).join();
 
-    GenerateOneTimeCodeUserProfileCommand command =
-      GenerateOneTimeCodeUserProfileCommand.builder()
-        .userId(userId)
-        .passwordHash(password)
-        .build();
-
-
-      String code = commandGateway.sendAndWait(command);
       GenerateAuthorizationCodeCommand codeCommand =
         GenerateAuthorizationCodeCommand.builder()
-          .code(code)
           .userId(userId)
           .clientId(clientId)
           .scope(scope)
           .sessionId(session.getId())
           .build();
-      commandGateway.sendAndWait(codeCommand);
+      String code = commandGateway.sendAndWait(codeCommand);
       return "redirect:" + redirectUrl + "?state=" + state + "&code=" + code;
     }
     catch (Exception e){

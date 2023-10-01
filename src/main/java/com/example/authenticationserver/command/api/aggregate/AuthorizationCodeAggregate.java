@@ -12,6 +12,7 @@ import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Aggregate
 public class AuthorizationCodeAggregate {
@@ -28,12 +29,11 @@ public class AuthorizationCodeAggregate {
   }
   @CommandHandler
   public AuthorizationCodeAggregate(GenerateAuthorizationCodeCommand command){
-    if(this.status != null && !this.status.equals("USED")){
-      throw new IllegalStateException("Authorization code already generated");
-    }
+    String code = UUID.randomUUID().toString();
+
     AuthorizationCodeGeneratedEvent event =
       AuthorizationCodeGeneratedEvent.builder()
-        .code(command.getCode())
+        .code(code)
         .userId(command.getUserId())
         .clientId(command.getClientId())
         .expiresAt(new Date(System.currentTimeMillis() + 60000))
@@ -55,11 +55,23 @@ public class AuthorizationCodeAggregate {
   }
   @CommandHandler
   public TokenSummary handle(UseAuthorizationCodeCommand command){
+    if(this.status.equals("USED")){
+      throw new IllegalStateException("Authorization code already used");
+    }
     AggregateLifecycle.apply(AuthorizationCodeUsedEvent.builder()
       .code(command.getCode())
       .status("USED")
       .build());
+
     return TokenSummary.builder()
+      .access_token("access_token")
+      .expires_in(60000)
+      .refresh_expires_in(60000*7)
+      .refresh_token("refresh_token")
+      .token_type("bearer")
+      .id_token("id_token")
+      .not_before_policy("not_before_policy")
+      .session_state(this.sessionId)
       .scope(this.scope)
       .build();
   }

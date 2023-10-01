@@ -11,6 +11,4 @@ public class ApplicationEntity {
   private String clientId;
   private String secret;
 
-  private String code;
-  private String refreshToken;
 }

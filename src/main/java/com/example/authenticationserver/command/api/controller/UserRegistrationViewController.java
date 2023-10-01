@@ -1,6 +1,6 @@
 package com.example.authenticationserver.command.api.controller;
 
-import com.project.core.commands.CreateUserProfileCommand;
+import com.project.core.commands.user.CreateUserProfileCommand;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,11 +15,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.UUID;
 @Controller
 @RequestMapping("/registration")
-public class UserRegistrationController {
+public class UserRegistrationViewController {
   private final CommandGateway commandGateway;
   private final PasswordEncoder passwordEncoder;
   @Autowired
-  public UserRegistrationController(CommandGateway commandGateway, PasswordEncoder passwordEncoder) {
+  public UserRegistrationViewController(CommandGateway commandGateway, PasswordEncoder passwordEncoder) {
     this.commandGateway = commandGateway;
     this.passwordEncoder = passwordEncoder;
   }

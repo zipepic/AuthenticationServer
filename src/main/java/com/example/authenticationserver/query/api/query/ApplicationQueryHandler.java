@@ -2,7 +2,7 @@ package com.example.authenticationserver.query.api.query;
 
 import com.example.authenticationserver.query.api.data.application.ApplicationEntity;
 import com.example.authenticationserver.query.api.data.application.ApplicationRepository;
-import com.project.core.queries.CheckLoginDataQuery;
+import com.project.core.queries.app.CheckLoginDataQuery;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;

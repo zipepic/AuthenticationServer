@@ -1,9 +1,9 @@
 package com.example.authenticationserver.command.api.controller;
 
 import com.example.authenticationserver.command.api.restmodel.TokenSummary;
-import com.project.core.commands.UseOneTimeCodeCommand;
-import com.project.core.queries.CheckLoginDataQuery;
-import com.project.core.queries.FindUserIdByOneTimeCodeQuery;
+import com.project.core.commands.user.UseOneTimeCodeCommand;
+import com.project.core.queries.app.CheckLoginDataQuery;
+import com.project.core.queries.user.FindUserIdByOneTimeCodeQuery;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,5 +53,4 @@ public class UserProfileController {
 
     return commandGateway.sendAndWait(command);
   }
-
-  }
+}

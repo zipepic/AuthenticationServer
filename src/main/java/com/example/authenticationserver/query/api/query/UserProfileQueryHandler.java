@@ -2,8 +2,8 @@ package com.example.authenticationserver.query.api.query;
 
 import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
 import com.example.authenticationserver.query.api.data.user.UserProfileRepository;
-import com.project.core.queries.FindUserIdByOneTimeCodeQuery;
-import com.project.core.queries.FindUserIdByUserNameQuery;
+import com.project.core.queries.user.FindUserIdByOneTimeCodeQuery;
+import com.project.core.queries.user.FindUserIdByUserNameQuery;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

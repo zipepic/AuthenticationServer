@@ -1,10 +1,14 @@
 package com.example.authenticationserver;
 
 import com.example.authenticationserver.command.api.restmodel.TokenSummary;
+import com.project.core.commands.GenerateAuthorizationCodeCommand;
+import com.project.core.commands.UseAuthorizationCodeCommand;
 import com.project.core.commands.app.CreateApplicationCommand;
 import com.project.core.commands.user.CreateUserProfileCommand;
 import com.project.core.commands.user.GenerateOneTimeCodeUserProfileCommand;
 import com.project.core.commands.user.UseOneTimeCodeCommand;
+import com.project.core.events.AuthorizationCodeGeneratedEvent;
+import com.project.core.events.AuthorizationCodeUsedEvent;
 import com.project.core.events.user.OneTimeCodeUserProfileGeneratedEvent;
 import com.project.core.events.user.UserProfileCreatedEvent;
 import com.project.core.events.app.ApplicationCreatedEvent;
@@ -28,18 +32,29 @@ public class AuthenticationServerApplication {
   @Bean
   public XStream xStream() {
     XStream xStream = new XStream();
-    xStream.allowTypeHierarchy(CreateUserProfileCommand.class);
-    xStream.allowTypeHierarchy(UserProfileCreatedEvent.class);
-    xStream.allowTypeHierarchy(CreateApplicationCommand.class);
-    xStream.allowTypeHierarchy(ApplicationCreatedEvent.class);
-    xStream.allowTypeHierarchy(TokenSummary.class);
-    xStream.allowTypeHierarchy(FindUserIdByUserNameQuery.class);
-    xStream.allowTypeHierarchy(GenerateOneTimeCodeUserProfileCommand.class);
-    xStream.allowTypeHierarchy(OneTimeCodeUserProfileGeneratedEvent.class);
-    xStream.allowTypeHierarchy(UseOneTimeCodeCommand.class);
-    xStream.allowTypeHierarchy(CheckLoginDataQuery.class);
-    xStream.allowTypeHierarchy(FindUserIdByOneTimeCodeQuery.class);
+    registerClasses(xStream,
+      CreateUserProfileCommand.class,
+      UserProfileCreatedEvent.class,
+      CreateApplicationCommand.class,
+      ApplicationCreatedEvent.class,
+      TokenSummary.class,
+      FindUserIdByUserNameQuery.class,
+      GenerateOneTimeCodeUserProfileCommand.class,
+      OneTimeCodeUserProfileGeneratedEvent.class,
+      UseOneTimeCodeCommand.class,
+      CheckLoginDataQuery.class,
+      FindUserIdByOneTimeCodeQuery.class,
+      GenerateAuthorizationCodeCommand.class,
+      UseAuthorizationCodeCommand.class,
+      AuthorizationCodeGeneratedEvent.class,
+      AuthorizationCodeUsedEvent.class);
     return xStream;
+  }
+
+  private void registerClasses(XStream xStream, Class<?>... classes) {
+    for (Class<?> clazz : classes) {
+      xStream.allowTypeHierarchy(clazz);
+    }
   }
   @Bean
   public PasswordEncoder passwordEncoder() {

@@ -1,12 +1,11 @@
 package com.example.authenticationserver.command.api.aggregate;
 
 import com.example.authenticationserver.command.api.restmodel.TokenSummary;
-import com.project.core.commands.CreateUserProfileCommand;
-import com.project.core.commands.GenerateOneTimeCodeUserProfileCommand;
-import com.project.core.commands.UseOneTimeCodeCommand;
-import com.project.core.events.ApplicationRegisteredEvent;
-import com.project.core.events.OneTimeCodeUserProfileGeneratedEvent;
-import com.project.core.events.UserProfileCreatedEvent;
+import com.project.core.commands.user.CreateUserProfileCommand;
+import com.project.core.commands.user.GenerateOneTimeCodeUserProfileCommand;
+import com.project.core.commands.user.UseOneTimeCodeCommand;
+import com.project.core.events.user.OneTimeCodeUserProfileGeneratedEvent;
+import com.project.core.events.user.UserProfileCreatedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
@@ -60,7 +59,7 @@ public class UserProfileAggregate {
     if(!passwordEncoder.matches(command.getPasswordHash(), this.passwordHash)){
       throw new IllegalArgumentException("Password is not correct");
     }
-    //TODO implement code generation with JWT
+    // TODO implement code generation with JWT
     String code = UUID.randomUUID().toString();
 
     log.info("Code -> {}", code);
@@ -84,7 +83,7 @@ public class UserProfileAggregate {
       .code(null)
       .build();
     AggregateLifecycle.apply(event);
-    //TODO implement token generation
+    // TODO implement token generation
     return TokenSummary.builder()
       .access_token("access_token")
       .expires_in(60000)

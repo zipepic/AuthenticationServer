@@ -1,7 +1,7 @@
 package com.example.authenticationserver.command.api.controller;
 
-import com.project.core.commands.GenerateOneTimeCodeUserProfileCommand;
-import com.project.core.queries.FindUserIdByUserNameQuery;
+import com.project.core.commands.user.GenerateOneTimeCodeUserProfileCommand;
+import com.project.core.queries.user.FindUserIdByUserNameQuery;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Controller
 @RequestMapping("/login")
-public class UserViewController {
+public class UserLoginViewController {
   private final QueryGateway queryGateway;
   private final PasswordEncoder passwordEncoder;
   private final CommandGateway commandGateway;
   @Autowired
-  public UserViewController(QueryGateway queryGateway, PasswordEncoder passwordEncoder, CommandGateway commandGateway) {
+  public UserLoginViewController(QueryGateway queryGateway, PasswordEncoder passwordEncoder, CommandGateway commandGateway) {
     this.queryGateway = queryGateway;
     this.passwordEncoder = passwordEncoder;
     this.commandGateway = commandGateway;
@@ -39,7 +39,7 @@ public class UserViewController {
     model.addAttribute("scope", scope);
     model.addAttribute("redirect_url", redirectUrl);
 
-    return "login"; // Это имя вашего HTML-шаблона
+    return "login";
   }
   @PostMapping
   public String login(@RequestParam("username") String username,
@@ -50,6 +50,7 @@ public class UserViewController {
                       @RequestParam("scope") String scope,
                       @RequestParam("redirect_url") String redirectUrl,
                       HttpServletResponse response) {
+
     FindUserIdByUserNameQuery query =
       FindUserIdByUserNameQuery.builder()
         .userName(username)
@@ -63,20 +64,13 @@ public class UserViewController {
         .passwordHash(password)
         .build();
 
-    String code = commandGateway.sendAndWait(command);
-
-    if (isValidUser(username, password)) {
+    try {
+      String code = commandGateway.sendAndWait(command);
       return "redirect:" + redirectUrl + "?state=" + state + "&code=" + code;
-    } else {
-
+    }
+    catch (Exception e){
       return "login";
     }
+
   }
-
-//TODO validate user
-  private boolean isValidUser(String username, String password) {
-
-    return true;
-  }
-
 }

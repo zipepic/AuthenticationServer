@@ -54,7 +54,7 @@ public class AuthorizationCodeAggregate {
     this.sessionId = event.getSessionId();
   }
   @CommandHandler
-  public TokenSummary handle(UseAuthorizationCodeCommand command){
+  public String handle(UseAuthorizationCodeCommand command){
     if(this.status.equals("USED")){
       throw new IllegalStateException("Authorization code already used");
     }
@@ -63,17 +63,18 @@ public class AuthorizationCodeAggregate {
       .status("USED")
       .build());
 
-    return TokenSummary.builder()
-      .access_token("access_token")
-      .expires_in(60000)
-      .refresh_expires_in(60000*7)
-      .refresh_token("refresh_token")
-      .token_type("bearer")
-      .id_token("id_token")
-      .not_before_policy("not_before_policy")
-      .session_state(this.sessionId)
-      .scope(this.scope)
-      .build();
+//    return TokenSummary.builder()
+//      .access_token("access_token")
+//      .expires_in(60000)
+//      .refresh_expires_in(60000*7)
+//      .refresh_token("refresh_token")
+//      .token_type("bearer")
+//      .id_token("id_token")
+//      .not_before_policy("not_before_policy")
+//      .session_state(this.sessionId)
+//      .scope(this.scope)
+//      .build();
+    return this.userId;
   }
   @EventSourcingHandler
   public void on(AuthorizationCodeUsedEvent event){

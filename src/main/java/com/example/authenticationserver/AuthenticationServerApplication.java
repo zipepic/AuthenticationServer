@@ -2,11 +2,13 @@ package com.example.authenticationserver;
 
 import com.example.authenticationserver.command.api.restmodel.TokenSummary;
 import com.project.core.commands.GenerateAuthorizationCodeCommand;
+import com.project.core.commands.GenerateTokenCommand;
 import com.project.core.commands.UseAuthorizationCodeCommand;
 import com.project.core.commands.app.CreateApplicationCommand;
 import com.project.core.commands.user.CreateUserProfileCommand;
 import com.project.core.events.AuthorizationCodeGeneratedEvent;
 import com.project.core.events.AuthorizationCodeUsedEvent;
+import com.project.core.events.TokenGeneratedEvent;
 import com.project.core.events.user.UserProfileCreatedEvent;
 import com.project.core.events.app.ApplicationCreatedEvent;
 import com.project.core.queries.app.CheckLoginDataQuery;
@@ -39,7 +41,9 @@ public class AuthenticationServerApplication {
       GenerateAuthorizationCodeCommand.class,
       UseAuthorizationCodeCommand.class,
       AuthorizationCodeGeneratedEvent.class,
-      AuthorizationCodeUsedEvent.class);
+      AuthorizationCodeUsedEvent.class,
+      GenerateTokenCommand.class,
+      TokenGeneratedEvent.class);
     return xStream;
   }
 

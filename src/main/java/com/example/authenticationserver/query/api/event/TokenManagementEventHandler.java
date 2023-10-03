@@ -2,7 +2,7 @@ package com.example.authenticationserver.query.api.event;
 
 import com.example.authenticationserver.query.api.data.TokenEntity;
 import com.example.authenticationserver.query.api.data.TokenRepository;
-import com.project.core.events.TokenGeneratedEvent;
+import com.project.core.events.token.TokenGeneratedEvent;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;

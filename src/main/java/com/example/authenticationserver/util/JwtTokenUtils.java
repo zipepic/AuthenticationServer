@@ -3,7 +3,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
@@ -11,25 +11,22 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 
-@Component
 public class JwtTokenUtils {
-  private final String secret;
-  private final Key secretKey;
+  private static Key secretKey;
 
-  public JwtTokenUtils(@NonNull @Value("${app.secret:#{null}}") String secret) {
-    this.secret = secret;
-    this.secretKey = generateSecretKey(secret);
+  public JwtTokenUtils(Key secretKey) {
+    this.secretKey = secretKey;
   }
 
-  public String generateToken(String clientId, long expiration, HashMap<String, String> claims) {
-    String code = Jwts.builder()
-      .setSubject(clientId)
-      .setClaims(claims)
+  public static String generateToken(String issuer, long expiration, HashMap<String, String> claims) {
+    return Jwts.builder()
       .setIssuedAt(new Date())
+      .setSubject("sub")
+      .setIssuer(issuer)
+      .setClaims(claims)
       .setExpiration(new Date(System.currentTimeMillis() + expiration))
       .signWith(secretKey)
       .compact();
-    return code;
   }
 
   public boolean validateToken(String token) {
@@ -39,11 +36,6 @@ public class JwtTokenUtils {
     } catch (Exception e) {
       return false;
     }
-  }
-
-  private Key generateSecretKey(String secret) {
-    byte[] secretKeyBytes = Base64.getDecoder().decode(secret);
-    return new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS256.getJcaName());
   }
 }
 

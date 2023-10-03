@@ -1,8 +1,8 @@
 package com.example.authenticationserver.command.api.controller;
 
-import com.example.authenticationserver.command.api.restmodel.TokenSummary;
-import com.project.core.commands.GenerateTokenCommand;
-import com.project.core.commands.UseAuthorizationCodeCommand;
+import com.example.authenticationserver.command.api.restmodel.TokenInfo;
+import com.project.core.commands.token.GenerateTokenCommand;
+import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.queries.app.CheckLoginDataQuery;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
@@ -27,7 +27,7 @@ public class UserProfileController {
   }
 
   @PostMapping("/token")
-  public TokenSummary generateTokens(@RequestParam String grant_type,
+  public String generateTokens(@RequestParam String grant_type,
                                      @RequestParam String client_id,
                                      @RequestParam String client_secret,
                                      @RequestParam String code,
@@ -38,6 +38,7 @@ public class UserProfileController {
         .clientId(client_id)
         .secret(client_secret)
         .build();
+
     boolean applicationIsPresent = queryGateway.query(loginDataQuery, Boolean.class).join();
     if(!applicationIsPresent)
       throw new RuntimeException("Application is not present");
@@ -46,15 +47,19 @@ public class UserProfileController {
       UseAuthorizationCodeCommand.builder()
         .code(code)
         .build();
-    String userName = commandGateway.sendAndWait(command);
+
+    TokenInfo tokenInfo = commandGateway.sendAndWait(command);
+
     String tokenId = UUID.randomUUID().toString();
+
     GenerateTokenCommand generateTokenCommand =
       GenerateTokenCommand.builder()
         .tokenId(tokenId)
-        .userId(userName)
-        .clientId(client_id)
-        .scope("read")
+        .userId(tokenInfo.getUserId())
+        .clientId(tokenInfo.getClientId())
+        .scope(tokenInfo.getScope())
         .build();
-    return commandGateway.sendAndWait(command);
+
+    return commandGateway.sendAndWait(generateTokenCommand);
   }
 }

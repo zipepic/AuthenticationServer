@@ -28,8 +28,7 @@ public class UserProfileAggregate {
   }
   @CommandHandler
   public UserProfileAggregate(CreateUserProfileCommand command){
-    UserProfileCreatedEvent event =
-      UserProfileCreatedEvent.builder()
+    var event = UserProfileCreatedEvent.builder()
         .userId(command.getUserId())
         .userName(command.getUserName())
         .passwordHash(command.getPasswordHash())

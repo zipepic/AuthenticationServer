@@ -1,16 +1,14 @@
 package com.example.authenticationserver.util;
+import com.project.core.commands.ResourceServerDTO;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 
-import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
-
+import java.util.List;
+import java.util.stream.Collectors;
+@Slf4j
 public class JwtTokenUtils {
   private static Key secretKey;
 
@@ -19,10 +17,12 @@ public class JwtTokenUtils {
   }
 
   public static String generateToken(String issuer, long expiration, HashMap<String, String> claims) {
+    //TODO fix token generation
+    claims.put("x","x");
     return Jwts.builder()
       .setIssuedAt(new Date())
       .setSubject("sub")
-      .setIssuer(issuer)
+      .setIssuer("iss")
       .setClaims(claims)
       .setExpiration(new Date(System.currentTimeMillis() + expiration))
       .signWith(secretKey)
@@ -36,6 +36,13 @@ public class JwtTokenUtils {
     } catch (Exception e) {
       return false;
     }
+  }
+  public static List<String> generateTokenForResourceServices(List<ResourceServerDTO> resourceServerDTOList){
+    List<String> tokens = resourceServerDTOList.stream()
+      .map(dto -> generateToken(dto.getResourceServerName(), 60000, new HashMap<>()))
+      .collect(Collectors.toList());
+
+    return tokens;
   }
 }
 

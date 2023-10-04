@@ -32,7 +32,7 @@ public class TokenManagementAggregate {
   @CommandHandler
   public TokenManagementAggregate(GenerateTokenCommand command){
 
-    var claims = new HashMap<String,String>();
+    var claims = new HashMap<String,Object>();
     claims.put("userId",command.getUserId());
     claims.put("scope",command.getScope());
 

@@ -1,7 +1,7 @@
 package com.example.authenticationserver.query.api.event;
 
-import com.example.authenticationserver.query.api.data.ResourceServerEntity;
-import com.example.authenticationserver.query.api.data.ResourceServerRepository;
+import com.example.authenticationserver.query.api.data.resourceserver.ResourceServerEntity;
+import com.example.authenticationserver.query.api.data.resourceserver.ResourceServerRepository;
 import com.project.core.events.ResourceServerCreatedEvent;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.beans.BeanUtils;

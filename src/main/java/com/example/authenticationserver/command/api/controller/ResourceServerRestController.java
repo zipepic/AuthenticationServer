@@ -1,7 +1,6 @@
 package com.example.authenticationserver.command.api.controller;
 
 import com.example.authenticationserver.command.api.restmodel.ResourceServerCreateRestModel;
-import com.example.authenticationserver.query.api.data.ResourceServerEntity;
 import com.example.authenticationserver.query.api.dto.TokenDTO;
 import com.project.core.commands.CreateResourceServerCommand;
 import com.project.core.queries.FetchResourceServersQuery;

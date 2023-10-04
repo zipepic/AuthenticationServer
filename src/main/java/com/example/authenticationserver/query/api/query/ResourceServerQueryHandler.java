@@ -1,8 +1,8 @@
 package com.example.authenticationserver.query.api.query;
 
-import com.example.authenticationserver.query.api.data.ResourceServerEntity;
-import com.example.authenticationserver.query.api.data.ResourceServerRepository;
-import com.example.authenticationserver.query.api.dto.ResourceServerDTO;
+import com.example.authenticationserver.query.api.data.resourceserver.ResourceServerEntity;
+import com.example.authenticationserver.query.api.data.resourceserver.ResourceServerRepository;
+import com.project.core.commands.ResourceServerDTO;
 import com.project.core.queries.FetchResourceServersQuery;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.beans.BeanUtils;

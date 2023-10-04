@@ -1,11 +1,14 @@
 package com.example.authenticationserver.command.api.controller;
 
 import com.example.authenticationserver.command.api.restmodel.application.ApplicationCreateRestModel;
+import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.app.CreateApplicationCommand;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/app")

@@ -1,17 +1,15 @@
 package com.example.authenticationserver.command.api.aggregate;
 
-import com.example.authenticationserver.query.api.dto.ResourceServerDTO;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.token.GenerateTokenCommand;
 import com.project.core.events.token.TokenGeneratedEvent;
+import com.project.core.queries.FetchResourceServersQuery;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -33,24 +31,26 @@ public class TokenManagementAggregate {
   }
   @CommandHandler
   public TokenManagementAggregate(GenerateTokenCommand command){
+
     var claims = new HashMap<String,String>();
     claims.put("userId",command.getUserId());
     claims.put("scope",command.getScope());
-    List<String> list = new ArrayList<>();
-    list.add("jwt1");
-    list.add("jwt2");
+
+    List<String> accessTokens = JwtTokenUtils.generateTokenForResourceServices(command.getResourceServerDTOList());
+
     var event = TokenGeneratedEvent.builder()
         .tokenId(command.getTokenId())
         .userId(command.getUserId())
         .clientId(command.getClientId())
         .scope(command.getScope())
         .tokenType("bearer")
-        .accessToken(list)
+        .accessToken(accessTokens)
         .expires_in(60000)
         .refreshToken(JwtTokenUtils.generateToken("AuthServer",60000,claims))
         .refresh_expires_in(600000)
         .status("CREATED")
         .build();
+
     AggregateLifecycle.apply(event);
   }
   @EventSourcingHandler

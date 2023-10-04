@@ -2,8 +2,8 @@ package com.example.authenticationserver;
 
 import com.example.authenticationserver.command.api.restmodel.TokenInfo;
 import com.example.authenticationserver.command.api.restmodel.TokenSummary;
-import com.example.authenticationserver.query.api.data.TokenEntity;
-import com.example.authenticationserver.query.api.dto.ResourceServerDTO;
+import com.example.authenticationserver.query.api.data.token.TokenEntity;
+import com.project.core.commands.ResourceServerDTO;
 import com.example.authenticationserver.query.api.dto.TokenDTO;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.CreateResourceServerCommand;

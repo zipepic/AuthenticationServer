@@ -1,4 +1,4 @@
-package com.example.authenticationserver.query.api.data;
+package com.example.authenticationserver.query.api.data.resourceserver;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

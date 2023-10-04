@@ -1,4 +1,4 @@
-package com.example.authenticationserver.query.api.data;
+package com.example.authenticationserver.query.api.data.token;
 
 import jakarta.persistence.*;
 import lombok.Data;

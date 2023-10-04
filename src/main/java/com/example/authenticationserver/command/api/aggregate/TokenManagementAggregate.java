@@ -66,4 +66,5 @@ public class TokenManagementAggregate {
     this.scope = event.getScope();
     this.status = event.getStatus();
   }
+  //TODO add validation token
 }

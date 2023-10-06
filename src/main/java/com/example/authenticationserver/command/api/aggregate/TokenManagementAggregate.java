@@ -2,6 +2,7 @@ package com.example.authenticationserver.command.api.aggregate;
 
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.token.GenerateTokenCommand;
+import com.project.core.commands.token.RefreshTokenCommand;
 import com.project.core.events.token.TokenGeneratedEvent;
 import com.project.core.queries.FetchResourceServersQuery;
 import org.axonframework.commandhandling.CommandHandler;
@@ -66,5 +67,13 @@ public class TokenManagementAggregate {
     this.scope = event.getScope();
     this.status = event.getStatus();
   }
-  //TODO add validation token
+
+
+  @CommandHandler()
+  public void on(RefreshTokenCommand command){
+    if(!JwtTokenUtils.validateToken(command.getRefreshToken())){
+      throw new IllegalStateException("Refresh token is not valid");
+    }
+    //TODO create refreshing token
+  }
 }

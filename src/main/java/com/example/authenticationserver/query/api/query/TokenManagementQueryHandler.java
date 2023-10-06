@@ -1,5 +1,6 @@
 package com.example.authenticationserver.query.api.query;
 
+import com.example.authenticationserver.query.api.data.token.AccessToken;
 import com.example.authenticationserver.query.api.data.token.TokenEntity;
 import com.example.authenticationserver.query.api.data.token.TokenRepository;
 import com.example.authenticationserver.query.api.dto.TokenDTO;
@@ -11,7 +12,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class TokenManagementQueryHandler {
@@ -29,6 +32,12 @@ public class TokenManagementQueryHandler {
      TokenEntity tokenEntity = tokenEntityOptional.get();
      TokenDTO tokenDTO = new TokenDTO();
      BeanUtils.copyProperties(tokenEntity,tokenDTO);
+     List<String> accessTokenStrings = tokenEntity.getAccessTokens()
+       .stream()
+       .map(AccessToken::getAccessToken)
+       .collect(Collectors.toList());
+
+     tokenDTO.setAccessToken(accessTokenStrings);
      return tokenDTO;
    }else {
      throw new IllegalArgumentException("Token not found");

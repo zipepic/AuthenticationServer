@@ -20,6 +20,7 @@ import com.project.core.events.user.UserProfileCreatedEvent;
 import com.project.core.events.app.ApplicationCreatedEvent;
 import com.project.core.queries.FetchResourceServersQuery;
 import com.project.core.queries.FetchTokensByTokenId;
+import com.project.core.queries.ValidateTokenQuery;
 import com.project.core.queries.app.CheckLoginDataQuery;
 import com.project.core.queries.user.FindUserIdByUserNameQuery;
 import com.thoughtworks.xstream.XStream;
@@ -66,7 +67,8 @@ public class AuthenticationServerApplication {
       ResourceServerDTO.class,
       FetchTokensByTokenId.class,
       TokenDTO.class,
-      TokenEntity.class);
+      TokenEntity.class,
+      ValidateTokenQuery.class);
     return xStream;
   }
 

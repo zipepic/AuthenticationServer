@@ -24,9 +24,11 @@ public class JwtTokenUtils {
     return jwt.compact();
   }
 
-  public boolean validateToken(String token) {
+  public static boolean validateToken(String token) {
     try {
-      Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+      Jwts.parser()
+        .setSigningKey(secretKey)
+        .parse(token);
       return true;
     } catch (Exception e) {
       return false;

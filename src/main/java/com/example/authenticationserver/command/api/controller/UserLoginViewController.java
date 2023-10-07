@@ -21,6 +21,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Controller
 @RequestMapping("/login")
 public class UserLoginViewController {
+  //TODO Add the ability to log in without additional parameters
   private final QueryGateway queryGateway;
   private final PasswordEncoder passwordEncoder;
   private final CommandGateway commandGateway;

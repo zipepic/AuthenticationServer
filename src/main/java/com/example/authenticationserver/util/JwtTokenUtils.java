@@ -19,11 +19,12 @@ public class JwtTokenUtils {
     this.secretKey = secretKey;
   }
 
-  public static String generateToken(String issuer, long expiration, HashMap<String, Object> claims) {
+  public static String generateToken(String issuer, long expiration, HashMap<String, Object> claims, String subject) {
     var jwt = Jwts.builder()
       .setIssuedAt(new Date())
       .setIssuer(issuer)
       .addClaims(claims)
+      .setSubject(subject) // user id
       .setExpiration(new Date(System.currentTimeMillis() + expiration))
       .signWith(secretKey);
     return jwt.compact();
@@ -39,9 +40,16 @@ public class JwtTokenUtils {
       return false;
     }
   }
-  public static List<String> generateTokenForResourceServices(List<ResourceServerDTO> resourceServerDTOList){
+  public static String getUserName(String token){
+    return Jwts.parser()
+      .setSigningKey(secretKey)
+      .parseClaimsJws(token)
+      .getBody()
+      .getSubject();
+  }
+  public static List<String> generateTokenForResourceServices(List<ResourceServerDTO> resourceServerDTOList,String subject){
     List<String> tokens = resourceServerDTOList.stream()
-      .map(dto -> generateToken(dto.getResourceServerName(), 60000,new HashMap<>()))
+      .map(dto -> generateToken(dto.getResourceServerName(), 60000,new HashMap<>(),subject))
       .collect(Collectors.toList());
 
     return tokens;

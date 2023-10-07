@@ -1,12 +1,16 @@
 package com.example.authenticationserver.command.api.controller;
 
+import com.example.authenticationserver.security.AuthUserProfileProviderImpl;
+import com.example.authenticationserver.security.UserProfileDetails;
+import com.example.authenticationserver.service.UserProfileDetailsService;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
-import com.project.core.queries.user.FindUserIdByUserNameQuery;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,11 +24,15 @@ public class UserLoginViewController {
   private final QueryGateway queryGateway;
   private final PasswordEncoder passwordEncoder;
   private final CommandGateway commandGateway;
+  private final UserProfileDetailsService userProfileDetailsService;
+  private final AuthUserProfileProviderImpl authUserProfileProvider;
   @Autowired
-  public UserLoginViewController(QueryGateway queryGateway, PasswordEncoder passwordEncoder, CommandGateway commandGateway) {
+  public UserLoginViewController(QueryGateway queryGateway, PasswordEncoder passwordEncoder, CommandGateway commandGateway, UserProfileDetailsService userProfileDetailsService, AuthUserProfileProviderImpl authUserProfileProvider) {
     this.queryGateway = queryGateway;
     this.passwordEncoder = passwordEncoder;
     this.commandGateway = commandGateway;
+    this.userProfileDetailsService = userProfileDetailsService;
+    this.authUserProfileProvider = authUserProfileProvider;
   }
 
   @GetMapping
@@ -52,20 +60,17 @@ public class UserLoginViewController {
                       @RequestParam("redirect_url") String redirectUrl,
                       HttpSession session){
     try {
-    FindUserIdByUserNameQuery query =
-      FindUserIdByUserNameQuery.builder()
-        .userName(username)
-        .build();
+      var auth = authUserProfileProvider.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
-    String userId = queryGateway.query(query, String.class).join();
+      UserProfileDetails userProfileDetails = (UserProfileDetails) auth.getPrincipal();
 
-      GenerateAuthorizationCodeCommand codeCommand =
-        GenerateAuthorizationCodeCommand.builder()
-          .userId(userId)
+      var codeCommand = GenerateAuthorizationCodeCommand.builder()
+          .userId(userProfileDetails.getUserProfileEntity().getUserId())
           .clientId(clientId)
           .scope(scope)
           .sessionId(session.getId())
           .build();
+
       String code = commandGateway.sendAndWait(codeCommand);
       return "redirect:" + redirectUrl + "?state=" + state + "&code=" + code;
     }
@@ -75,7 +80,8 @@ public class UserLoginViewController {
         .queryParam("response_type", responseType)
         .queryParam("state", state)
         .queryParam("scope", scope)
-        .queryParam("redirect_url", redirectUrl);
+        .queryParam("redirect_url", redirectUrl)
+        .queryParam("error", "Invalid username or password");
 
       return "redirect:" + builder.toUriString();
     }

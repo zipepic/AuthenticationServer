@@ -3,6 +3,7 @@ package com.example.authenticationserver.command.api.service;
 import com.project.core.commands.user.CreateUserProfileCommand;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,4 +32,9 @@ public class UserProfileCommandService {
 
     return commandGateway.send(command);
   }
+  @PreAuthorize("hasRole('ROLE_USER')")
+  public void on(){
+
+  }
+
   }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -18,6 +19,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
   private final AuthUserProfileProviderImpl authUserProfileProvider;
@@ -36,7 +38,7 @@ public class SecurityConfig {
     http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     http.authorizeHttpRequests(authorize ->
         authorize
-          .requestMatchers(new AntPathRequestMatcher("/security/**")).hasRole("USER")
+//          .requestMatchers(new AntPathRequestMatcher("/security/**")).hasRole("USER")
           .anyRequest().permitAll())
       .httpBasic(Customizer.withDefaults());
     http.addFilterBefore(new JwtFilter(userProfileDetailsService), UsernamePasswordAuthenticationFilter.class);

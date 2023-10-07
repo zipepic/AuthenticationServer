@@ -1,6 +1,6 @@
 package com.example.authenticationserver.security;
 
-import com.example.authenticationserver.query.api.service.UserProfileDetailsService;
+import com.example.authenticationserver.service.UserProfileDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;

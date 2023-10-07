@@ -1,6 +1,6 @@
 package com.example.authenticationserver.config;
 
-import com.example.authenticationserver.query.api.service.UserProfileDetailsService;
+import com.example.authenticationserver.service.UserProfileDetailsService;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

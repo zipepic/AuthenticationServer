@@ -3,6 +3,7 @@ package com.example.authenticationserver;
 import com.example.authenticationserver.command.api.restmodel.TokenInfo;
 import com.example.authenticationserver.command.api.restmodel.TokenSummary;
 import com.example.authenticationserver.query.api.data.token.TokenEntity;
+import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
 import com.project.core.commands.ResourceServerDTO;
 import com.example.authenticationserver.query.api.dto.TokenDTO;
 import com.example.authenticationserver.util.JwtTokenUtils;
@@ -22,6 +23,8 @@ import com.project.core.queries.FetchResourceServersQuery;
 import com.project.core.queries.FetchTokensByTokenId;
 import com.project.core.queries.ValidateTokenQuery;
 import com.project.core.queries.app.CheckLoginDataQuery;
+import com.project.core.queries.user.FetchUserProfileByUserIdQuery;
+import com.project.core.queries.user.FetchUserProfileByUserNameQuery;
 import com.project.core.queries.user.FindUserIdByUserNameQuery;
 import com.thoughtworks.xstream.XStream;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -68,7 +71,10 @@ public class AuthenticationServerApplication {
       FetchTokensByTokenId.class,
       TokenDTO.class,
       TokenEntity.class,
-      ValidateTokenQuery.class);
+      UserProfileEntity.class,
+      ValidateTokenQuery.class,
+      FetchUserProfileByUserIdQuery.class,
+      FetchUserProfileByUserNameQuery.class);
     return xStream;
   }
 

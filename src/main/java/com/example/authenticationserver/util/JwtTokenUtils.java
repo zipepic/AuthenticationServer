@@ -5,6 +5,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,29 +13,43 @@ import java.util.List;
 import java.util.stream.Collectors;
 @Slf4j
 public class JwtTokenUtils {
-  private static final Key secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+  private static Key secretKey;
 
-  public static String generateToken(String issuer, long expiration, HashMap<String, Object> claims) {
+  public JwtTokenUtils(SecretKeySpec secretKey) {
+    this.secretKey = secretKey;
+  }
+
+  public static String generateToken(String issuer, long expiration, HashMap<String, Object> claims, String subject) {
     var jwt = Jwts.builder()
       .setIssuedAt(new Date())
       .setIssuer(issuer)
       .addClaims(claims)
+      .setSubject(subject) // user id
       .setExpiration(new Date(System.currentTimeMillis() + expiration))
       .signWith(secretKey);
     return jwt.compact();
   }
 
-  public boolean validateToken(String token) {
+  public static boolean validateToken(String token) {
     try {
-      Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+      Jwts.parser()
+        .setSigningKey(secretKey)
+        .parse(token);
       return true;
     } catch (Exception e) {
       return false;
     }
   }
-  public static List<String> generateTokenForResourceServices(List<ResourceServerDTO> resourceServerDTOList){
+  public static String getUserName(String token){
+    return Jwts.parser()
+      .setSigningKey(secretKey)
+      .parseClaimsJws(token)
+      .getBody()
+      .getSubject();
+  }
+  public static List<String> generateTokenForResourceServices(List<ResourceServerDTO> resourceServerDTOList,String subject){
     List<String> tokens = resourceServerDTOList.stream()
-      .map(dto -> generateToken(dto.getResourceServerName(), 60000,new HashMap<>()))
+      .map(dto -> generateToken(dto.getResourceServerName(), 60000,new HashMap<>(),subject))
       .collect(Collectors.toList());
 
     return tokens;

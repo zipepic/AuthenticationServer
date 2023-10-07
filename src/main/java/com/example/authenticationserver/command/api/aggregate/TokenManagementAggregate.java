@@ -2,6 +2,7 @@ package com.example.authenticationserver.command.api.aggregate;
 
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.token.GenerateTokenCommand;
+import com.project.core.commands.token.RefreshTokenCommand;
 import com.project.core.events.token.TokenGeneratedEvent;
 import com.project.core.queries.FetchResourceServersQuery;
 import org.axonframework.commandhandling.CommandHandler;
@@ -33,10 +34,10 @@ public class TokenManagementAggregate {
   public TokenManagementAggregate(GenerateTokenCommand command){
 
     var claims = new HashMap<String,Object>();
-    claims.put("userId",command.getUserId());
     claims.put("scope",command.getScope());
 
-    List<String> accessTokens = JwtTokenUtils.generateTokenForResourceServices(command.getResourceServerDTOList());
+    List<String> accessTokens = JwtTokenUtils
+      .generateTokenForResourceServices(command.getResourceServerDTOList(),command.getUserId());
 
     var event = TokenGeneratedEvent.builder()
         .tokenId(command.getTokenId())
@@ -46,7 +47,7 @@ public class TokenManagementAggregate {
         .tokenType("bearer")
         .accessToken(accessTokens)
         .expires_in(60000)
-        .refreshToken(JwtTokenUtils.generateToken("AuthServer",60000,claims))
+        .refreshToken(JwtTokenUtils.generateToken("AuthServer",600000,claims,command.getUserId()))
         .refresh_expires_in(600000)
         .status("CREATED")
         .build();
@@ -65,5 +66,14 @@ public class TokenManagementAggregate {
     this.refresh_expires_in = event.getRefresh_expires_in();
     this.scope = event.getScope();
     this.status = event.getStatus();
+  }
+
+
+  @CommandHandler()
+  public void on(RefreshTokenCommand command){
+    if(!JwtTokenUtils.validateToken(command.getRefreshToken())){
+      throw new IllegalStateException("Refresh token is not valid");
+    }
+    //TODO create refreshing token
   }
 }

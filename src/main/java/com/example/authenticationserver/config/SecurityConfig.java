@@ -36,7 +36,7 @@ public class SecurityConfig {
     http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     http.authorizeHttpRequests(authorize ->
         authorize
-          .requestMatchers(new AntPathRequestMatcher("/security/**")).authenticated()
+          .requestMatchers(new AntPathRequestMatcher("/security/**")).hasRole("USER")
           .anyRequest().permitAll())
       .httpBasic(Customizer.withDefaults());
     http.addFilterBefore(new JwtFilter(userProfileDetailsService), UsernamePasswordAuthenticationFilter.class);

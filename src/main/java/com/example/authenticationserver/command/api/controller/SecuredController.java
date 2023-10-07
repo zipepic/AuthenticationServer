@@ -14,4 +14,9 @@ public class SecuredController {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     return authentication.getName();
   }
+  @GetMapping("/profile")
+  public String userprofile(){
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    return authentication.getName();
+  }
 }

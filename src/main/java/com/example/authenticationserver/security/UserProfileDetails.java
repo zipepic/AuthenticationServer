@@ -3,9 +3,12 @@ package com.example.authenticationserver.security;
 import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Collections;
+
 @Getter
 public class UserProfileDetails implements UserDetails {
   private final UserProfileEntity userProfileEntity;
@@ -16,7 +19,7 @@ public class UserProfileDetails implements UserDetails {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return null;
+    return Collections.singletonList(new SimpleGrantedAuthority(this.userProfileEntity.getRole()));
   }
 
   @Override

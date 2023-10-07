@@ -33,6 +33,7 @@ public class UserProfileAggregate {
         .userName(command.getUserName())
         .passwordHash(command.getPasswordHash())
         .userStatus("CREATED")
+        .role("ROLE_USER")
         .createdAt(new Date())
         .build();
     AggregateLifecycle.apply(event);

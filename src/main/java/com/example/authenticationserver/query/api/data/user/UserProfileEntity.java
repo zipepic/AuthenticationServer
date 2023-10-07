@@ -14,6 +14,7 @@ public class UserProfileEntity {
   private String userName;
   private String passwordHash;
   private String userStatus;
+  private String role;
   private Date createdAt;
   private Date lastUpdatedAt;
   private Date deleteAt;

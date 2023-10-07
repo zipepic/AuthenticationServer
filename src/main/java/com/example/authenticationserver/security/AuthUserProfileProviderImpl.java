@@ -34,7 +34,7 @@ public class AuthUserProfileProviderImpl implements AuthenticationProvider {
     if(!passwordEncoder.matches(password, userDetails.getPassword())){
       throw new BadCredentialsException("Invalid password");
     }
-    return new UsernamePasswordAuthenticationToken(userDetails, password, Collections.emptyList());
+    return new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
   }
 
   @Override

@@ -81,8 +81,8 @@
       <input type="password" id="password" name="password" required>
     </div>
     <button type="submit" class="login-button">Войти</button>
-    <div th:if="${error}" class="error-message">
-      <p th:text="${error}"></p>
+    <div th:if="${param.error}" class="error-message">
+      <p th:text="${param.error}"></p>
     </div>
   </form>
   <p>Нет аккаунта? <a th:href="@{/registration(client_id=${client_id}, response_type=${response_type}, state=${state}, scope=${scope}, redirect_url=${redirect_url})}">Зарегистрироваться</a></p>

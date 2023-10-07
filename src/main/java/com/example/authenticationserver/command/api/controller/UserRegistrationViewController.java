@@ -1,8 +1,10 @@
 package com.example.authenticationserver.command.api.controller;
 
+import com.example.authenticationserver.command.api.service.UserProfileCommandService;
 import com.project.core.commands.user.CreateUserProfileCommand;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,13 +18,12 @@ import java.util.UUID;
 @Controller
 @RequestMapping("/registration")
 public class UserRegistrationViewController {
-  private final CommandGateway commandGateway;
-  private final PasswordEncoder passwordEncoder;
+  private final UserProfileCommandService userProfileCommandService;
   @Autowired
-  public UserRegistrationViewController(CommandGateway commandGateway, PasswordEncoder passwordEncoder) {
-    this.commandGateway = commandGateway;
-    this.passwordEncoder = passwordEncoder;
+  public UserRegistrationViewController(UserProfileCommandService userProfileCommandService) {
+    this.userProfileCommandService = userProfileCommandService;
   }
+
   @GetMapping
   public String showRegistrationForm(@RequestParam("client_id") String clientId,
                                      @RequestParam("response_type") String responseType,
@@ -46,15 +47,8 @@ public class UserRegistrationViewController {
                        @RequestParam("state") String state,
                        @RequestParam("scope") String scope,
                        @RequestParam("redirect_url") String redirectUrl) {
-    UUID uuid = UUID.randomUUID();
-    CreateUserProfileCommand command =
-      CreateUserProfileCommand.builder()
-        .userId(uuid.toString())
-        .userName(username)
-        .passwordHash(passwordEncoder.encode(password))
-        .build();
 
-    commandGateway.sendAndWait(command);
+    userProfileCommandService.register(new UsernamePasswordAuthenticationToken(username, password)).join();
 
     UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/login")
       .queryParam("client_id", clientId)

@@ -32,8 +32,8 @@ public class UserProfileAggregate {
         .userId(command.getUserId())
         .userName(command.getUserName())
         .passwordHash(command.getPasswordHash())
-        .userStatus(command.getUserStatus())
-        .createdAt(command.getCreatedAt())
+        .userStatus("CREATED")
+        .createdAt(new Date())
         .build();
     AggregateLifecycle.apply(event);
   }

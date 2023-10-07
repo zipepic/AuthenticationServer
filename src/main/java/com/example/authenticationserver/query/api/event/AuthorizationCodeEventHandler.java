@@ -1,7 +1,7 @@
 package com.example.authenticationserver.query.api.event;
 
-import com.project.core.events.AuthorizationCodeGeneratedEvent;
-import com.project.core.events.AuthorizationCodeUsedEvent;
+import com.project.core.events.code.AuthorizationCodeGeneratedEvent;
+import com.project.core.events.code.AuthorizationCodeUsedEvent;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.stereotype.Component;
 

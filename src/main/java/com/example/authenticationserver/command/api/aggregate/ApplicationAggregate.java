@@ -21,7 +21,7 @@ public class ApplicationAggregate {
 
   @CommandHandler
   public ApplicationAggregate(CreateApplicationCommand command) {
-    ApplicationCreatedEvent event = ApplicationCreatedEvent.builder()
+    var event = ApplicationCreatedEvent.builder()
       .clientId(command.getClientId())
       .secret(command.getSecret())
       .build();

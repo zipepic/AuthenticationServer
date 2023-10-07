@@ -1,13 +1,19 @@
 package com.example.authenticationserver.command.api.controller;
 
-import com.example.authenticationserver.command.api.restmodel.TokenSummary;
-import com.project.core.commands.UseAuthorizationCodeCommand;
+import com.example.authenticationserver.command.api.restmodel.TokenInfo;
+import com.project.core.commands.ResourceServerDTO;
+import com.project.core.commands.token.GenerateTokenCommand;
+import com.project.core.commands.code.UseAuthorizationCodeCommand;
+import com.project.core.queries.FetchResourceServersQuery;
 import com.project.core.queries.app.CheckLoginDataQuery;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/user")
@@ -24,7 +30,7 @@ public class UserProfileController {
   }
 
   @PostMapping("/token")
-  public TokenSummary generateTokens(@RequestParam String grant_type,
+  public String generateTokens(@RequestParam String grant_type,
                                      @RequestParam String client_id,
                                      @RequestParam String client_secret,
                                      @RequestParam String code,
@@ -35,6 +41,7 @@ public class UserProfileController {
         .clientId(client_id)
         .secret(client_secret)
         .build();
+
     boolean applicationIsPresent = queryGateway.query(loginDataQuery, Boolean.class).join();
     if(!applicationIsPresent)
       throw new RuntimeException("Application is not present");
@@ -44,6 +51,26 @@ public class UserProfileController {
         .code(code)
         .build();
 
-    return commandGateway.sendAndWait(command);
+    TokenInfo tokenInfo = commandGateway.sendAndWait(command);
+
+
+
+    var queryResourceSever = FetchResourceServersQuery.builder().build();
+
+    List<ResourceServerDTO> resourceServerDTOList =
+      queryGateway.query(queryResourceSever, List.class).join();
+
+    String tokenId = UUID.randomUUID().toString();
+
+    GenerateTokenCommand generateTokenCommand =
+      GenerateTokenCommand.builder()
+        .tokenId(tokenId)
+        .userId(tokenInfo.getUserId())
+        .clientId(tokenInfo.getClientId())
+        .scope(tokenInfo.getScope())
+        .resourceServerDTOList(resourceServerDTOList)
+        .build();
+
+    return commandGateway.sendAndWait(generateTokenCommand);
   }
 }

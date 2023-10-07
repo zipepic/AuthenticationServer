@@ -1,6 +1,6 @@
 package com.example.authenticationserver.command.api.controller;
 
-import com.project.core.commands.GenerateAuthorizationCodeCommand;
+import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import com.project.core.queries.user.FindUserIdByUserNameQuery;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;

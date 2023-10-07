@@ -1,22 +1,40 @@
 package com.example.authenticationserver;
 
+import com.example.authenticationserver.command.api.restmodel.TokenInfo;
 import com.example.authenticationserver.command.api.restmodel.TokenSummary;
-import com.project.core.commands.GenerateAuthorizationCodeCommand;
-import com.project.core.commands.UseAuthorizationCodeCommand;
+import com.example.authenticationserver.query.api.data.token.TokenEntity;
+import com.project.core.commands.ResourceServerDTO;
+import com.example.authenticationserver.query.api.dto.TokenDTO;
+import com.example.authenticationserver.util.JwtTokenUtils;
+import com.project.core.commands.CreateResourceServerCommand;
+import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
+import com.project.core.commands.token.GenerateTokenCommand;
+import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.commands.app.CreateApplicationCommand;
 import com.project.core.commands.user.CreateUserProfileCommand;
-import com.project.core.events.AuthorizationCodeGeneratedEvent;
-import com.project.core.events.AuthorizationCodeUsedEvent;
+import com.project.core.events.ResourceServerCreatedEvent;
+import com.project.core.events.code.AuthorizationCodeGeneratedEvent;
+import com.project.core.events.code.AuthorizationCodeUsedEvent;
+import com.project.core.events.token.TokenGeneratedEvent;
 import com.project.core.events.user.UserProfileCreatedEvent;
 import com.project.core.events.app.ApplicationCreatedEvent;
+import com.project.core.queries.FetchResourceServersQuery;
+import com.project.core.queries.FetchTokensByTokenId;
+import com.project.core.queries.ValidateTokenQuery;
 import com.project.core.queries.app.CheckLoginDataQuery;
 import com.project.core.queries.user.FindUserIdByUserNameQuery;
 import com.thoughtworks.xstream.XStream;
+import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.NonNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
 
 @SpringBootApplication
 public class AuthenticationServerApplication {
@@ -39,7 +57,18 @@ public class AuthenticationServerApplication {
       GenerateAuthorizationCodeCommand.class,
       UseAuthorizationCodeCommand.class,
       AuthorizationCodeGeneratedEvent.class,
-      AuthorizationCodeUsedEvent.class);
+      AuthorizationCodeUsedEvent.class,
+      GenerateTokenCommand.class,
+      TokenGeneratedEvent.class,
+      TokenInfo.class,
+      CreateResourceServerCommand.class,
+      ResourceServerCreatedEvent.class,
+      FetchResourceServersQuery.class,
+      ResourceServerDTO.class,
+      FetchTokensByTokenId.class,
+      TokenDTO.class,
+      TokenEntity.class,
+      ValidateTokenQuery.class);
     return xStream;
   }
 
@@ -51,5 +80,12 @@ public class AuthenticationServerApplication {
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  public static JwtTokenUtils jwtTokenUtils(@NonNull @Value("${app.secret:#{null}}") String secret) {
+    byte[] secretKeyBytes = Base64.getDecoder().decode(secret);
+    var secretKey = new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS256.getJcaName());
+    return new JwtTokenUtils(secretKey);
   }
 }

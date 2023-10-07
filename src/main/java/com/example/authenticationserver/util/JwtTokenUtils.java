@@ -5,6 +5,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,7 +13,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 @Slf4j
 public class JwtTokenUtils {
-  private static final Key secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+  private static Key secretKey;
+
+  public JwtTokenUtils(SecretKeySpec secretKey) {
+    this.secretKey = secretKey;
+  }
 
   public static String generateToken(String issuer, long expiration, HashMap<String, Object> claims) {
     var jwt = Jwts.builder()

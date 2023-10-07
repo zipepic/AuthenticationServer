@@ -82,10 +82,10 @@ public class AuthenticationServerApplication {
     return new BCryptPasswordEncoder();
   }
 
-//  @Bean
-//  public static JwtTokenUtils jwtTokenUtils(@NonNull @Value("${app.secret:#{null}}") String secret) {
-//    byte[] secretKeyBytes = Base64.getDecoder().decode(secret);
-//    var secretKey = new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS256.getJcaName());
-//    return new JwtTokenUtils(secretKey);
-//  }
+  @Bean
+  public static JwtTokenUtils jwtTokenUtils(@NonNull @Value("${app.secret:#{null}}") String secret) {
+    byte[] secretKeyBytes = Base64.getDecoder().decode(secret);
+    var secretKey = new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS256.getJcaName());
+    return new JwtTokenUtils(secretKey);
+  }
 }

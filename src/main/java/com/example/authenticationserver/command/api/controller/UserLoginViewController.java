@@ -72,7 +72,12 @@ public class UserLoginViewController {
           .build();
 
       String code = commandGateway.sendAndWait(codeCommand);
-      return "redirect:" + redirectUrl + "?state=" + state + "&code=" + code;
+
+      UriComponentsBuilder builder = UriComponentsBuilder.fromPath(redirectUrl)
+        .queryParam("state", state)
+        .queryParam("code", code);
+
+      return "redirect:" + builder.toUriString();
     }
     catch (Exception e){
       UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/login")
@@ -85,6 +90,5 @@ public class UserLoginViewController {
 
       return "redirect:" + builder.toUriString();
     }
-
   }
 }

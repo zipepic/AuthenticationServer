@@ -1,11 +1,12 @@
 package com.example.authenticationserver.security;
 
 import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-
+@Getter
 public class UserProfileDetails implements UserDetails {
   private final UserProfileEntity userProfileEntity;
 
@@ -46,8 +47,5 @@ public class UserProfileDetails implements UserDetails {
   @Override
   public boolean isEnabled() {
     return true;
-  }
-  public UserProfileEntity getUserProfileEntity(){
-    return this.userProfileEntity;
   }
 }

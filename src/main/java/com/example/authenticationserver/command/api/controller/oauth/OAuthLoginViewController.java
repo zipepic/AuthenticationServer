@@ -1,14 +1,13 @@
 package com.example.authenticationserver.command.api.controller.oauth;
 
+import com.example.authenticationserver.command.api.service.UserProfileCommandService;
 import com.example.authenticationserver.security.AuthUserProfileProviderImpl;
 import com.example.authenticationserver.security.UserProfileDetails;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import jakarta.servlet.http.HttpSession;
 import org.axonframework.commandhandling.gateway.CommandGateway;
-import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,11 +22,12 @@ import java.util.concurrent.CompletableFuture;
 @RequestMapping("/login/oauth2/authorization")
 public class OAuthLoginViewController {
   private final CommandGateway commandGateway;
-  private final AuthUserProfileProviderImpl authUserProfileProvider;
+  private final UserProfileCommandService userProfileCommandService;
+
   @Autowired
-  public OAuthLoginViewController(CommandGateway commandGateway, AuthUserProfileProviderImpl authUserProfileProvider) {
+  public OAuthLoginViewController(CommandGateway commandGateway, UserProfileCommandService userProfileCommandService) {
     this.commandGateway = commandGateway;
-    this.authUserProfileProvider = authUserProfileProvider;
+    this.userProfileCommandService = userProfileCommandService;
   }
 
   @GetMapping
@@ -55,9 +55,8 @@ public class OAuthLoginViewController {
                       @RequestParam("redirect_url") String redirectUrl,
                       HttpSession session) {
     try {
-      var auth = authUserProfileProvider.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-
-      UserProfileDetails userProfileDetails = (UserProfileDetails) auth.getPrincipal();
+      UserProfileDetails userProfileDetails
+        = userProfileCommandService.authenticationUser(new UsernamePasswordAuthenticationToken(username,password));
 
       var codeCommand = GenerateAuthorizationCodeCommand.builder()
         .userId(userProfileDetails.getUserProfileEntity().getUserId())
@@ -70,7 +69,7 @@ public class OAuthLoginViewController {
 
       UriComponentsBuilder builder = UriComponentsBuilder.fromPath(redirectUrl)
         .queryParam("state", state)
-        .queryParam("code", code.get());
+        .queryParam("code", code.join());
 
       return "redirect:" + builder.toUriString();
     } catch (Exception e) {

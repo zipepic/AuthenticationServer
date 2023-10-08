@@ -33,9 +33,6 @@ public class TokenManagementAggregate {
   @CommandHandler
   public TokenManagementAggregate(GenerateTokenCommand command){
 
-    var claims = new HashMap<String,Object>();
-    claims.put("scope",command.getScope());
-
     List<String> accessTokens = JwtTokenUtils
       .generateTokenForResourceServices(command.getResourceServerDTOList(),command.getUserId());
 
@@ -47,7 +44,8 @@ public class TokenManagementAggregate {
         .tokenType("bearer")
         .accessToken(accessTokens)
         .expires_in(60000)
-        .refreshToken(JwtTokenUtils.generateToken("AuthServer",600000,claims,command.getUserId()))
+        .refreshToken(JwtTokenUtils
+          .generateToken("AuthServer",600000,null,command.getUserId()))
         .refresh_expires_in(600000)
         .status("CREATED")
         .build();

@@ -4,8 +4,9 @@ import com.example.authenticationserver.command.api.restmodel.TokenInfo;
 import com.example.authenticationserver.command.api.restmodel.TokenSummary;
 import com.example.authenticationserver.query.api.data.token.TokenEntity;
 import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
+import com.example.authenticationserver.query.api.dto.TokenAuthorizationCodeDTO;
 import com.project.core.commands.ResourceServerDTO;
-import com.example.authenticationserver.query.api.dto.TokenDTO;
+import com.example.authenticationserver.query.api.dto.TokenManagementDTO;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.CreateResourceServerCommand;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
@@ -69,12 +70,13 @@ public class AuthenticationServerApplication {
       FetchResourceServersQuery.class,
       ResourceServerDTO.class,
       FetchTokensByTokenId.class,
-      TokenDTO.class,
+      TokenManagementDTO.class,
       TokenEntity.class,
       UserProfileEntity.class,
       ValidateTokenQuery.class,
       FetchUserProfileByUserIdQuery.class,
-      FetchUserProfileByUserNameQuery.class);
+      FetchUserProfileByUserNameQuery.class,
+      TokenAuthorizationCodeDTO.class);
     return xStream;
   }
 

@@ -1,6 +1,7 @@
 package com.example.authenticationserver.command.api.aggregate;
 
 import com.example.authenticationserver.command.api.restmodel.TokenInfo;
+import com.example.authenticationserver.query.api.dto.TokenAuthorizationCodeDTO;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
@@ -11,13 +12,14 @@ import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 import java.util.UUID;
 
 @Aggregate
-public class AuthorizationCodeAggregate {
+public class AuthorizationCodeFlowAggregate {
+  private final static Integer ACCESS_EXPIRATION_TIME = 60_000;
+  private final static Integer REFRESH_EXPIRATION_TIME = 6_000_000;
   @AggregateIdentifier
   private String code;
   private String userId;
@@ -27,10 +29,10 @@ public class AuthorizationCodeAggregate {
   private String status;
   private String sessionId;
 
-  public AuthorizationCodeAggregate() {
+  public AuthorizationCodeFlowAggregate() {
   }
   @CommandHandler
-  public AuthorizationCodeAggregate(GenerateAuthorizationCodeCommand command){
+  public AuthorizationCodeFlowAggregate(GenerateAuthorizationCodeCommand command){
     String code = UUID.randomUUID().toString();
 
     var event = AuthorizationCodeGeneratedEvent.builder()
@@ -55,7 +57,7 @@ public class AuthorizationCodeAggregate {
     this.sessionId = event.getSessionId();
   }
   @CommandHandler
-  public TokenInfo handle(UseAuthorizationCodeCommand command){
+  public TokenAuthorizationCodeDTO handle(UseAuthorizationCodeCommand command){
     if(this.status.equals("USED")){
       throw new IllegalStateException("Authorization code already used");
     }
@@ -63,13 +65,16 @@ public class AuthorizationCodeAggregate {
       .code(command.getCode())
       .status("USED")
       .build();
+
     AggregateLifecycle.apply(event);
 
-    return TokenInfo.builder()
-        .userId(this.userId)
-        .clientId(this.clientId)
-        .scope(this.scope)
-        .build();
+    return TokenAuthorizationCodeDTO.builder()
+      .accessToken(JwtTokenUtils.generateToken(this.clientId,ACCESS_EXPIRATION_TIME,null,this.userId))
+      .expiresIn(ACCESS_EXPIRATION_TIME)
+      .refreshToken(JwtTokenUtils.generateToken(this.clientId,REFRESH_EXPIRATION_TIME,null,this.userId))
+      .refreshExpiresIn(REFRESH_EXPIRATION_TIME)
+      .tokenType("Bearer")
+      .build();
   }
   @EventSourcingHandler
   public void on(AuthorizationCodeUsedEvent event){

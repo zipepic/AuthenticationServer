@@ -17,6 +17,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.concurrent.CompletableFuture;
+
 @Slf4j
 @Controller
 @RequestMapping("/login")
@@ -51,7 +53,7 @@ public class UserLoginViewController {
 
     return "login";
   }
-  @PostMapping
+  @PostMapping(params = {"username", "password", "client_id", "response_type", "state", "scope", "redirect_url"})
   public String login(@RequestParam("username") String username,
                       @RequestParam("password") String password,
                       @RequestParam("client_id") String clientId,
@@ -59,28 +61,27 @@ public class UserLoginViewController {
                       @RequestParam("state") String state,
                       @RequestParam("scope") String scope,
                       @RequestParam("redirect_url") String redirectUrl,
-                      HttpSession session){
+                      HttpSession session) {
     try {
       var auth = authUserProfileProvider.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
       UserProfileDetails userProfileDetails = (UserProfileDetails) auth.getPrincipal();
 
       var codeCommand = GenerateAuthorizationCodeCommand.builder()
-          .userId(userProfileDetails.getUserProfileEntity().getUserId())
-          .clientId(clientId)
-          .scope(scope)
-          .sessionId(session.getId())
-          .build();
+        .userId(userProfileDetails.getUserProfileEntity().getUserId())
+        .clientId(clientId)
+        .scope(scope)
+        .sessionId(session.getId())
+        .build();
 
-      String code = commandGateway.sendAndWait(codeCommand);
+      CompletableFuture<String> code = commandGateway.send(codeCommand);
 
       UriComponentsBuilder builder = UriComponentsBuilder.fromPath(redirectUrl)
         .queryParam("state", state)
-        .queryParam("code", code);
+        .queryParam("code", code.get());
 
       return "redirect:" + builder.toUriString();
-    }
-    catch (Exception e){
+    } catch (Exception e) {
       UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/login")
         .queryParam("client_id", clientId)
         .queryParam("response_type", responseType)
@@ -92,4 +93,23 @@ public class UserLoginViewController {
       return "redirect:" + builder.toUriString();
     }
   }
+//  @PostMapping
+//  public String loginWithoutParams(@RequestParam("username") String username,
+//                                   @RequestParam("password") String password) {
+//    try {
+//      var auth = authUserProfileProvider.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+//
+//      UserProfileDetails userProfileDetails = (UserProfileDetails) auth.getPrincipal();
+//
+//      UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/security/user")
+//        .queryParam("error", "Invalid username or password");
+//
+//      return "redirect:" + builder.toUriString();
+//    } catch (Exception e) {
+//      UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/login")
+//        .queryParam("error", "Invalid username or password");
+//
+//      return "redirect:" + builder.toUriString();
+//    }
+//  }
 }

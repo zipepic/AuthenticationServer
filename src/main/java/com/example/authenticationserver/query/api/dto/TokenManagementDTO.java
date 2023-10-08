@@ -1,12 +1,11 @@
 package com.example.authenticationserver.query.api.dto;
 
-import jakarta.persistence.ElementCollection;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class TokenDTO {
+public class TokenManagementDTO {
   private String tokenId;
   private String userId;
   private String clientId;

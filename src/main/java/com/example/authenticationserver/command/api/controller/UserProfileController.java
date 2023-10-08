@@ -1,6 +1,7 @@
 package com.example.authenticationserver.command.api.controller;
 
 import com.example.authenticationserver.command.api.restmodel.TokenInfo;
+import com.example.authenticationserver.query.api.dto.TokenAuthorizationCodeDTO;
 import com.project.core.commands.ResourceServerDTO;
 import com.project.core.commands.token.GenerateTokenCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
@@ -30,7 +31,7 @@ public class UserProfileController {
   }
 
   @PostMapping("/token")
-  public String generateTokens(@RequestParam String grant_type,
+  public TokenAuthorizationCodeDTO generateTokens(@RequestParam String grant_type,
                                      @RequestParam String client_id,
                                      @RequestParam String client_secret,
                                      @RequestParam String code,
@@ -51,26 +52,6 @@ public class UserProfileController {
         .code(code)
         .build();
 
-    TokenInfo tokenInfo = commandGateway.sendAndWait(command);
-
-
-
-    var queryResourceSever = FetchResourceServersQuery.builder().build();
-
-    List<ResourceServerDTO> resourceServerDTOList =
-      queryGateway.query(queryResourceSever, List.class).join();
-
-    String tokenId = UUID.randomUUID().toString();
-
-    GenerateTokenCommand generateTokenCommand =
-      GenerateTokenCommand.builder()
-        .tokenId(tokenId)
-        .userId(tokenInfo.getUserId())
-        .clientId(tokenInfo.getClientId())
-        .scope(tokenInfo.getScope())
-        .resourceServerDTOList(resourceServerDTOList)
-        .build();
-
-    return commandGateway.sendAndWait(generateTokenCommand);
+    return commandGateway.sendAndWait(command);
   }
 }

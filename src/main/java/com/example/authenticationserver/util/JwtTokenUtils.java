@@ -2,7 +2,6 @@ package com.example.authenticationserver.util;
 import com.example.authenticationserver.query.api.dto.TokenAuthorizationCodeDTO;
 import com.project.core.commands.ResourceServerDTO;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -16,6 +15,7 @@ import java.util.stream.Collectors;
 public class JwtTokenUtils {
   //TODO refracting this
   private static Key secretKey;
+  private final static String ISSUER = "http://localhost:8080";
 
   public JwtTokenUtils(SecretKeySpec secretKey) {
     this.secretKey = secretKey;
@@ -27,12 +27,14 @@ public class JwtTokenUtils {
       .setIssuer(issuer)
       .addClaims(claims)
       .setSubject(subject) // user id
-      .setExpiration(new Date(System.currentTimeMillis() + expiration))
-      .signWith(secretKey);
-    return jwt.compact();
+      .setExpiration(new Date(System.currentTimeMillis() + expiration));
+      return signAndCompactWithDefaults(jwt);
   }
-  public static String lightGenerateToken(JwtBuilder jwt) {
-    return jwt.signWith(secretKey).compact();
+  public static String signAndCompactWithDefaults(JwtBuilder jwt) {
+    return jwt
+      .setIssuer(ISSUER)
+      .setIssuedAt(new Date())
+      .signWith(secretKey).compact();
   }
   public static Claims extractClaims(String token) {
     try {
@@ -44,11 +46,10 @@ public class JwtTokenUtils {
       throw new IllegalArgumentException("Invalid token");
     }
   }
-  public static String lightGenerateTokenWithClaims(Claims claims){
-    return Jwts.builder()
-      .setClaims(claims)
-      .signWith(secretKey)
-      .compact();
+  public static String generateTokenWithClaims(Claims claims){
+    var jwt = Jwts.builder()
+      .setClaims(claims);
+      return signAndCompactWithDefaults(jwt);
   }
   public static TokenAuthorizationCodeDTO refresh(String token) {
     Claims claims = extractClaims(token);
@@ -62,10 +63,10 @@ public class JwtTokenUtils {
     Claims accessTokenClaims = claims
       .setExpiration(new Date(System.currentTimeMillis() + exprirationAccessToken));
     return TokenAuthorizationCodeDTO.builder()
-      .accessToken(lightGenerateTokenWithClaims(accessTokenClaims))
+      .accessToken(generateTokenWithClaims(accessTokenClaims))
       .expiresIn((int) exprirationAccessToken)
       .refreshExpiresIn((int) expirationRefreshToken)
-      .refreshToken(lightGenerateTokenWithClaims(refreshTokenClaims))
+      .refreshToken(generateTokenWithClaims(refreshTokenClaims))
       .tokenType(claims.get("type",String.class))
       .build();
   }
@@ -78,13 +79,6 @@ public class JwtTokenUtils {
     } catch (Exception e) {
       return false;
     }
-  }
-  public static String getUserName(String token){
-    return Jwts.parser()
-      .setSigningKey(secretKey)
-      .parseClaimsJws(token)
-      .getBody()
-      .getSubject();
   }
   public static List<String> generateTokenForResourceServices(List<ResourceServerDTO> resourceServerDTOList,String subject){
     List<String> tokens = resourceServerDTOList.stream()

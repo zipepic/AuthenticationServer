@@ -4,14 +4,14 @@ import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.token.GenerateTokenCommand;
 import com.project.core.commands.token.RefreshTokenCommand;
 import com.project.core.events.token.TokenGeneratedEvent;
-import com.project.core.queries.FetchResourceServersQuery;
+import io.jsonwebtoken.Jwts;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
 
 @Aggregate
@@ -36,6 +36,10 @@ public class TokenManagementAggregate {
     List<String> accessTokens = JwtTokenUtils
       .generateTokenForResourceServices(command.getResourceServerDTOList(),command.getUserId());
 
+    var refreshToken = Jwts.builder()
+      .setSubject(command.getUserId())
+      .setExpiration(new Date(System.currentTimeMillis() + 600000));
+
     var event = TokenGeneratedEvent.builder()
         .tokenId(command.getTokenId())
         .userId(command.getUserId())
@@ -44,8 +48,7 @@ public class TokenManagementAggregate {
         .tokenType("bearer")
         .accessToken(accessTokens)
         .expires_in(60000)
-        .refreshToken(JwtTokenUtils
-          .generateToken("AuthServer",600000,null,command.getUserId()))
+        .refreshToken(JwtTokenUtils.signAndCompactWithDefaults(refreshToken))
         .refresh_expires_in(600000)
         .status("CREATED")
         .build();

@@ -1,13 +1,11 @@
 package com.example.authenticationserver.command.api.aggregate;
 
-import com.example.authenticationserver.command.api.restmodel.TokenInfo;
 import com.example.authenticationserver.query.api.dto.TokenAuthorizationCodeDTO;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.events.code.AuthorizationCodeGeneratedEvent;
 import com.project.core.events.code.AuthorizationCodeUsedEvent;
-import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
@@ -23,7 +21,7 @@ import java.util.UUID;
 public class AuthorizationCodeFlowAggregate {
   private final static Integer ACCESS_EXPIRATION_TIME = 60_000;
   private final static Integer REFRESH_EXPIRATION_TIME = 6_000_000;
-  private final static String ISSUER = "http://localhost:8080";
+
   @AggregateIdentifier
   private String code;
   private String userId;
@@ -93,11 +91,10 @@ public class AuthorizationCodeFlowAggregate {
     claims.put("type", "Bearer");
     var jwt = Jwts.builder()
       .setIssuedAt(new Date())
-      .setIssuer(ISSUER)
       .setExpiration(new Date(System.currentTimeMillis() + expiration))
       .setSubject(this.userId)
       .addClaims(claims);
 
-    return JwtTokenUtils.lightGenerateToken(jwt);
+    return JwtTokenUtils.signAndCompactWithDefaults(jwt);
   }
 }

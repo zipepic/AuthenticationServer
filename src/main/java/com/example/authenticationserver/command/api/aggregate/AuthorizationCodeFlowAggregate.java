@@ -6,6 +6,7 @@ import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.events.code.AuthorizationCodeGeneratedEvent;
 import com.project.core.events.code.AuthorizationCodeUsedEvent;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
@@ -15,6 +16,7 @@ import org.axonframework.spring.stereotype.Aggregate;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Aggregate
@@ -73,9 +75,11 @@ public class AuthorizationCodeFlowAggregate {
 
 
     return TokenAuthorizationCodeDTO.builder()
-      .accessToken(generateToken(ACCESS_EXPIRATION_TIME))
+      .accessToken(JwtTokenUtils.signAndCompactWithDefaults(generateToken(ACCESS_EXPIRATION_TIME)))
       .expiresIn(ACCESS_EXPIRATION_TIME)
-      .refreshToken(generateToken(REFRESH_EXPIRATION_TIME))
+      .refreshToken(JwtTokenUtils
+        .signAndCompactWithDefaults(generateToken(ACCESS_EXPIRATION_TIME)
+          .addClaims(Map.of("token_type","refresh_token"))))
       .refreshExpiresIn(REFRESH_EXPIRATION_TIME)
       .tokenType("Bearer")
       .build();
@@ -85,16 +89,14 @@ public class AuthorizationCodeFlowAggregate {
     this.status = event.getStatus();
   }
 
-  private String generateToken(long expiration) {
+  private JwtBuilder generateToken(long expiration) {
     var claims = new HashMap<String,Object>();
     claims.put("scope",this.scope);
     claims.put("type", "Bearer");
-    var jwt = Jwts.builder()
+    return Jwts.builder()
       .setIssuedAt(new Date())
       .setExpiration(new Date(System.currentTimeMillis() + expiration))
       .setSubject(this.userId)
       .addClaims(claims);
-
-    return JwtTokenUtils.signAndCompactWithDefaults(jwt);
   }
 }

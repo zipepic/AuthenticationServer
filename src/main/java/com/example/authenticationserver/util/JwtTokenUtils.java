@@ -53,15 +53,29 @@ public class JwtTokenUtils {
   }
   public static TokenAuthorizationCodeDTO refresh(String token) {
     Claims claims = extractClaims(token);
+
+    if(!isRefreshToken(claims))
+      throw new IllegalArgumentException("Invalid token");
+
     long expirationRefreshToken = Duration.between(claims.getIssuedAt().toInstant(),
         claims.getExpiration().toInstant())
       .toMillis();
     long exprirationAccessToken = expirationRefreshToken/10;
-    claims.setIssuedAt(new Date());
-    Claims refreshTokenClaims = claims
+
+    Claims refreshTokenClaims = Jwts.claims();
+    refreshTokenClaims.putAll(claims);
+
+    refreshTokenClaims
       .setExpiration(new Date(System.currentTimeMillis() + expirationRefreshToken));
-    Claims accessTokenClaims = claims
+
+    Claims accessTokenClaims = Jwts.claims();
+    accessTokenClaims.putAll(claims);
+
+    accessTokenClaims
       .setExpiration(new Date(System.currentTimeMillis() + exprirationAccessToken));
+
+    accessTokenClaims.remove("token_type");
+
     return TokenAuthorizationCodeDTO.builder()
       .accessToken(generateTokenWithClaims(accessTokenClaims))
       .expiresIn((int) exprirationAccessToken)
@@ -87,7 +101,10 @@ public class JwtTokenUtils {
 
     return tokens;
   }
-
+  public static boolean isRefreshToken(Claims claims) {
+    String tokenType = (String) claims.get("token_type");
+    return "refresh_token".equals(tokenType);
+  }
 }
 
 

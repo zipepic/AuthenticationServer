@@ -1,8 +1,10 @@
 package com.example.authenticationserver.command.api.controller.oauth;
 
 import com.example.authenticationserver.query.api.dto.TokenAuthorizationCodeDTO;
+import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.queries.app.CheckLoginDataQuery;
+import io.jsonwebtoken.Claims;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,5 +47,11 @@ public class OAuthRestController {
         .build();
 
     return commandGateway.sendAndWait(command);
+  }
+  @PostMapping("/refresh_token")
+  public TokenAuthorizationCodeDTO refreshToken(@RequestParam String client_id,
+                                                @RequestParam String client_secret,
+                                                @RequestParam String refresh_token){
+    return JwtTokenUtils.refresh(refresh_token);
   }
 }

@@ -29,29 +29,4 @@ public class UserProfileController {
     this.queryGateway = queryGateway;
     this.passwordEncoder = passwordEncoder;
   }
-
-  @PostMapping("/token")
-  public TokenAuthorizationCodeDTO generateTokens(@RequestParam String grant_type,
-                                     @RequestParam String client_id,
-                                     @RequestParam String client_secret,
-                                     @RequestParam String code,
-                                     @RequestParam String redirect_uri){
-
-    CheckLoginDataQuery loginDataQuery =
-      CheckLoginDataQuery.builder()
-        .clientId(client_id)
-        .secret(client_secret)
-        .build();
-
-    boolean applicationIsPresent = queryGateway.query(loginDataQuery, Boolean.class).join();
-    if(!applicationIsPresent)
-      throw new RuntimeException("Application is not present");
-
-    UseAuthorizationCodeCommand command =
-      UseAuthorizationCodeCommand.builder()
-        .code(code)
-        .build();
-
-    return commandGateway.sendAndWait(command);
-  }
 }

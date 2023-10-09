@@ -8,7 +8,7 @@ import com.example.authenticationserver.query.api.dto.TokenAuthorizationCodeDTO;
 import com.project.core.commands.ResourceServerDTO;
 import com.example.authenticationserver.query.api.dto.TokenManagementDTO;
 import com.example.authenticationserver.util.JwtTokenUtils;
-import com.project.core.commands.CreateResourceServerCommand;
+import com.project.core.commands.resourceserver.CreateResourceServerCommand;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import com.project.core.commands.token.GenerateTokenCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;

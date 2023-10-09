@@ -1,6 +1,6 @@
 package com.example.authenticationserver.command.api.aggregate;
 
-import com.project.core.commands.CreateResourceServerCommand;
+import com.project.core.commands.resourceserver.CreateResourceServerCommand;
 import com.project.core.events.ResourceServerCreatedEvent;
 import lombok.NoArgsConstructor;
 import org.axonframework.commandhandling.CommandHandler;

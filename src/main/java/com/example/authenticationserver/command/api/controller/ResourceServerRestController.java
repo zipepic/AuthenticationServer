@@ -2,7 +2,7 @@ package com.example.authenticationserver.command.api.controller;
 
 import com.example.authenticationserver.command.api.restmodel.ResourceServerCreateRestModel;
 import com.example.authenticationserver.query.api.dto.TokenManagementDTO;
-import com.project.core.commands.CreateResourceServerCommand;
+import com.project.core.commands.resourceserver.CreateResourceServerCommand;
 import com.project.core.queries.FetchResourceServersQuery;
 import com.project.core.queries.FetchTokensByTokenId;
 import org.axonframework.commandhandling.gateway.CommandGateway;

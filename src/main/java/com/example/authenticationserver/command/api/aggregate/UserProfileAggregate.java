@@ -2,6 +2,7 @@ package com.example.authenticationserver.command.api.aggregate;
 
 import com.example.authenticationserver.command.api.restmodel.TokenSummary;
 import com.example.authenticationserver.query.api.dto.TokenAuthorizationCodeDTO;
+import com.example.authenticationserver.query.api.dto.TokenDTO;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.user.CreateUserProfileCommand;
 import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
@@ -62,7 +63,7 @@ public class UserProfileAggregate {
   }
 
   @CommandHandler
-  public TokenSummary handle(GenerateRefreshTokenForUserProfileCommand command) {
+  public TokenDTO handle(GenerateRefreshTokenForUserProfileCommand command) {
     var refreshToken = Jwts.builder()
       .setSubject(command.getUserId())
       .setExpiration(new Date(System.currentTimeMillis() + REFRESH_EXPIRATION_TIME))
@@ -81,11 +82,11 @@ public class UserProfileAggregate {
     AggregateLifecycle.apply(event);
 
     return TokenSummary.builder()
-      .access_token(JwtTokenUtils.signAndCompactWithDefaults(accessToken))
-      .expires_in(ACCESS_EXPIRATION_TIME)
-      .refresh_expires_in(REFRESH_EXPIRATION_TIME)
-      .refresh_token(signRefreshToken)
-      .token_type("Bearer")
+      .accessToken(JwtTokenUtils.signAndCompactWithDefaults(accessToken))
+      .expiresIn(ACCESS_EXPIRATION_TIME)
+      .refreshExpiresIn(REFRESH_EXPIRATION_TIME)
+      .refreshToken(signRefreshToken)
+      .tokenType("Bearer")
       .build();
   }
 
@@ -94,7 +95,17 @@ public class UserProfileAggregate {
     this.refreshToken = event.getRefreshToken();
   }
   @CommandHandler
-  public TokenAuthorizationCodeDTO handle(RefreshAccessTokenForUserProfileCommand command){
-    return JwtTokenUtils.refresh(command.getRefreshToken());
+  public TokenDTO handle(RefreshAccessTokenForUserProfileCommand command){
+    TokenDTO tokenDTO = JwtTokenUtils.refresh(command.getRefreshToken());
+
+    var event = RefreshTokenForUserProfileGeneratedEvent.builder()
+      .userId(command.getUserId())
+      .refreshToken(tokenDTO.getRefreshToken())
+      .build();
+
+    AggregateLifecycle.apply(event);
+
+    return tokenDTO;
   }
+
 }

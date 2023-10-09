@@ -3,6 +3,7 @@ package com.example.authenticationserver.command.api.controller.auth;
 import com.example.authenticationserver.command.api.restmodel.TokenSummary;
 import com.example.authenticationserver.command.api.service.UserProfileCommandService;
 import com.example.authenticationserver.query.api.dto.TokenAuthorizationCodeDTO;
+import com.example.authenticationserver.query.api.dto.TokenDTO;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
 import com.project.core.events.user.RefreshAccessTokenForUserProfileCommand;
@@ -25,7 +26,7 @@ public class LoginRestController {
     this.userProfileCommandService = userProfileCommandService;
   }
   @PostMapping("/login")
-  public TokenSummary login(@RequestParam String username,
+  public TokenDTO login(@RequestParam String username,
                             @RequestParam String password){
     var userDetails = userProfileCommandService.authenticationUser(new UsernamePasswordAuthenticationToken(username,password));
 
@@ -36,7 +37,7 @@ public class LoginRestController {
     return commandGateway.sendAndWait(command);
   }
   @PostMapping("/refresh")
-  public TokenAuthorizationCodeDTO refresh(@RequestParam String refreshToken){
+  public TokenDTO refresh(@RequestParam String refreshToken){
     String userId = JwtTokenUtils.extractClaims(refreshToken).getSubject();
     var command = RefreshAccessTokenForUserProfileCommand.builder()
         .userId(userId)

@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class TokenAuthorizationCodeDTO {
+public class TokenAuthorizationCodeDTO implements TokenDTO {
   private String accessToken;
   private Integer expiresIn;
   private Integer refreshExpiresIn;

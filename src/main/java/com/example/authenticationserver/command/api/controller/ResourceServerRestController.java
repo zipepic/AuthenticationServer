@@ -1,8 +1,8 @@
 package com.example.authenticationserver.command.api.controller;
 
 import com.example.authenticationserver.command.api.restmodel.ResourceServerCreateRestModel;
-import com.example.authenticationserver.query.api.dto.TokenDTO;
-import com.project.core.commands.CreateResourceServerCommand;
+import com.example.authenticationserver.query.api.dto.TokenManagementDTO;
+import com.project.core.commands.resourceserver.CreateResourceServerCommand;
 import com.project.core.queries.FetchResourceServersQuery;
 import com.project.core.queries.FetchTokensByTokenId;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -39,11 +39,11 @@ public class ResourceServerRestController {
     return queryGateway.query(query, List.class).join();
   }
   @GetMapping("/token")
-  public TokenDTO getToken(@RequestParam String tokenId){
+  public TokenManagementDTO getToken(@RequestParam String tokenId){
     FetchTokensByTokenId query = FetchTokensByTokenId.builder()
       .tokenId(tokenId)
       .build();
 
-    return queryGateway.query(query, TokenDTO.class).join();
+    return queryGateway.query(query, TokenManagementDTO.class).join();
   }
 }

@@ -58,7 +58,7 @@
 <body>
 <div class="login-container">
   <h2>Вход</h2>
-  <form action="/login" method="post">
+  <form action="/login/oauth2/authorization" method="post">
     <div class="form-group">
       <label>Одобрить Scope:</label>
       <div th:each="s : ${scope}">
@@ -85,7 +85,7 @@
       <p th:text="${param.error}"></p>
     </div>
   </form>
-  <p>Нет аккаунта? <a th:href="@{/registration(client_id=${client_id}, response_type=${response_type}, state=${state}, scope=${scope}, redirect_url=${redirect_url})}">Зарегистрироваться</a></p>
+  <p>Нет аккаунта? <a th:href="@{/registration/oauth2/authorization(client_id=${client_id}, response_type=${response_type}, state=${state}, scope=${scope}, redirect_url=${redirect_url})}">Зарегистрироваться</a></p>
 </div>
 </body>
 </html>

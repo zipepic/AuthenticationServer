@@ -3,7 +3,7 @@ package com.example.authenticationserver.query.api.query;
 import com.example.authenticationserver.query.api.data.token.AccessToken;
 import com.example.authenticationserver.query.api.data.token.TokenEntity;
 import com.example.authenticationserver.query.api.data.token.TokenRepository;
-import com.example.authenticationserver.query.api.dto.TokenDTO;
+import com.example.authenticationserver.query.api.dto.TokenManagementDTO;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.queries.FetchTokensByTokenId;
 import com.project.core.queries.ValidateTokenQuery;
@@ -25,20 +25,20 @@ public class TokenManagementQueryHandler {
   }
 
   @QueryHandler
-  public TokenDTO on(FetchTokensByTokenId query){
+  public TokenManagementDTO on(FetchTokensByTokenId query){
    Optional<TokenEntity> tokenEntityOptional =
      tokenRepository.findById(query.getTokenId());
    if(tokenEntityOptional.isPresent()){
      TokenEntity tokenEntity = tokenEntityOptional.get();
-     TokenDTO tokenDTO = new TokenDTO();
-     BeanUtils.copyProperties(tokenEntity,tokenDTO);
+     TokenManagementDTO tokenManagementDTO = new TokenManagementDTO();
+     BeanUtils.copyProperties(tokenEntity, tokenManagementDTO);
      List<String> accessTokenStrings = tokenEntity.getAccessTokens()
        .stream()
        .map(AccessToken::getAccessToken)
        .collect(Collectors.toList());
 
-     tokenDTO.setAccessToken(accessTokenStrings);
-     return tokenDTO;
+     tokenManagementDTO.setAccessToken(accessTokenStrings);
+     return tokenManagementDTO;
    }else {
      throw new IllegalArgumentException("Token not found");
    }

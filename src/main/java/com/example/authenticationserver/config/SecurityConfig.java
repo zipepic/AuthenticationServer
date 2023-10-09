@@ -1,7 +1,7 @@
 package com.example.authenticationserver.config;
 
-import com.example.authenticationserver.service.UserProfileDetailsService;
 import com.example.authenticationserver.security.AuthUserProfileProviderImpl;
+import com.example.authenticationserver.service.UserProfileDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

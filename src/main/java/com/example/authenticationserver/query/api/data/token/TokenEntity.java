@@ -15,7 +15,6 @@ public class TokenEntity implements Serializable {
   private String userId;
   private String clientId;
   private String tokenType;
-  //TODO fix this(returning null)
   @OneToMany(mappedBy = "tokenEntity", cascade = CascadeType.ALL)
   private List<AccessToken> accessTokens;
   private Integer expires_in;

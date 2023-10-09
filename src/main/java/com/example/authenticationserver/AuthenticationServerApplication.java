@@ -14,10 +14,12 @@ import com.project.core.commands.token.GenerateTokenCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.commands.app.CreateApplicationCommand;
 import com.project.core.commands.user.CreateUserProfileCommand;
+import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
 import com.project.core.events.ResourceServerCreatedEvent;
 import com.project.core.events.code.AuthorizationCodeGeneratedEvent;
 import com.project.core.events.code.AuthorizationCodeUsedEvent;
 import com.project.core.events.token.TokenGeneratedEvent;
+import com.project.core.events.user.RefreshTokenForUserProfileGeneratedEvent;
 import com.project.core.events.user.UserProfileCreatedEvent;
 import com.project.core.events.app.ApplicationCreatedEvent;
 import com.project.core.queries.FetchResourceServersQuery;
@@ -76,7 +78,9 @@ public class AuthenticationServerApplication {
       ValidateTokenQuery.class,
       FetchUserProfileByUserIdQuery.class,
       FetchUserProfileByUserNameQuery.class,
-      TokenAuthorizationCodeDTO.class);
+      TokenAuthorizationCodeDTO.class,
+      GenerateRefreshTokenForUserProfileCommand.class,
+      RefreshTokenForUserProfileGeneratedEvent.class);
     return xStream;
   }
 

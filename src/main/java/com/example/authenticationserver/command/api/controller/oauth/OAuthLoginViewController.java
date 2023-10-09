@@ -1,7 +1,6 @@
 package com.example.authenticationserver.command.api.controller.oauth;
 
 import com.example.authenticationserver.command.api.service.UserProfileCommandService;
-import com.example.authenticationserver.security.AuthUserProfileProviderImpl;
 import com.example.authenticationserver.security.UserProfileDetails;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import jakarta.servlet.http.HttpSession;

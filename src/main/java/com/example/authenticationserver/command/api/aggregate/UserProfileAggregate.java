@@ -1,9 +1,11 @@
 package com.example.authenticationserver.command.api.aggregate;
 
 import com.example.authenticationserver.command.api.restmodel.TokenSummary;
+import com.example.authenticationserver.query.api.dto.TokenAuthorizationCodeDTO;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.user.CreateUserProfileCommand;
 import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
+import com.project.core.events.user.RefreshAccessTokenForUserProfileCommand;
 import com.project.core.events.user.RefreshTokenForUserProfileGeneratedEvent;
 import com.project.core.events.user.UserProfileCreatedEvent;
 import io.jsonwebtoken.Jwts;
@@ -15,6 +17,7 @@ import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import java.util.Date;
+import java.util.Map;
 
 @Slf4j
 @Aggregate
@@ -62,7 +65,8 @@ public class UserProfileAggregate {
   public TokenSummary handle(GenerateRefreshTokenForUserProfileCommand command) {
     var refreshToken = Jwts.builder()
       .setSubject(command.getUserId())
-      .setExpiration(new Date(System.currentTimeMillis() + REFRESH_EXPIRATION_TIME));
+      .setExpiration(new Date(System.currentTimeMillis() + REFRESH_EXPIRATION_TIME))
+      .addClaims(Map.of("token_type","refresh_token"));
     String signRefreshToken = JwtTokenUtils.signAndCompactWithDefaults(refreshToken);
 
     var accessToken = Jwts.builder()
@@ -88,5 +92,9 @@ public class UserProfileAggregate {
   @EventSourcingHandler
   public void on(RefreshTokenForUserProfileGeneratedEvent event) {
     this.refreshToken = event.getRefreshToken();
+  }
+  @CommandHandler
+  public TokenAuthorizationCodeDTO handle(RefreshAccessTokenForUserProfileCommand command){
+    return JwtTokenUtils.refresh(command.getRefreshToken());
   }
 }

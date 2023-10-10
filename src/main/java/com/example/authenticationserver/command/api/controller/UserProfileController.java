@@ -2,6 +2,7 @@ package com.example.authenticationserver.command.api.controller;
 
 import com.example.authenticationserver.command.api.restmodel.TokenInfo;
 import com.example.authenticationserver.query.api.dto.TokenAuthorizationCodeDTO;
+import com.example.authenticationserver.security.UserProfileDetails;
 import com.project.core.commands.ResourceServerDTO;
 import com.project.core.commands.token.GenerateTokenCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
@@ -10,6 +11,7 @@ import com.project.core.queries.app.CheckLoginDataQuery;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,5 +30,9 @@ public class UserProfileController {
     this.commandGateway = commandGateway;
     this.queryGateway = queryGateway;
     this.passwordEncoder = passwordEncoder;
+  }
+  @GetMapping("/profile")
+  public String userprofile(@AuthenticationPrincipal UserProfileDetails userProfileDetails){
+    return userProfileDetails.getUserProfileEntity().toString();
   }
 }

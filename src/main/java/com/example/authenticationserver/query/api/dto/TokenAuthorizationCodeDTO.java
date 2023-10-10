@@ -11,4 +11,5 @@ public class TokenAuthorizationCodeDTO implements TokenDTO {
   private Integer refreshExpiresIn;
   private String refreshToken;
   private String tokenType;
+  private String tokenId;
 }

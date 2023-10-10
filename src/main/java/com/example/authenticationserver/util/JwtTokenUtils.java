@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 @Slf4j
 public class JwtTokenUtils {
@@ -36,23 +37,20 @@ public class JwtTokenUtils {
       .setIssuedAt(new Date())
       .signWith(secretKey).compact();
   }
-  public static Claims extractClaims(String token) {
-    try {
+  public static Claims extractClaims(String token) throws IllegalArgumentException {
       return Jwts.parser()
         .setSigningKey(secretKey)
         .parseClaimsJws(token)
         .getBody();
-    } catch (JwtException e) {
-      throw new IllegalArgumentException("Invalid token");
-    }
   }
   public static String generateTokenWithClaims(Claims claims){
     var jwt = Jwts.builder()
       .setClaims(claims);
       return signAndCompactWithDefaults(jwt);
   }
-  public static TokenAuthorizationCodeDTO refresh(String token) {
-    Claims claims = extractClaims(token);
+  public static TokenAuthorizationCodeDTO refresh(Claims claims) {
+
+    UUID tokenId = UUID.randomUUID();
 
     if(!isRefreshToken(claims))
       throw new IllegalArgumentException("Invalid token");
@@ -66,7 +64,7 @@ public class JwtTokenUtils {
     refreshTokenClaims.putAll(claims);
 
     refreshTokenClaims
-      .setExpiration(new Date(System.currentTimeMillis() + expirationRefreshToken));
+      .setExpiration(new Date(System.currentTimeMillis() + expirationRefreshToken)).setId(tokenId.toString());
 
     Claims accessTokenClaims = Jwts.claims();
     accessTokenClaims.putAll(claims);
@@ -82,6 +80,7 @@ public class JwtTokenUtils {
       .refreshExpiresIn((int) expirationRefreshToken)
       .refreshToken(generateTokenWithClaims(refreshTokenClaims))
       .tokenType(claims.get("type",String.class))
+      .tokenId(tokenId.toString())
       .build();
   }
   public static boolean validateToken(String token) {
@@ -92,6 +91,15 @@ public class JwtTokenUtils {
       return true;
     } catch (Exception e) {
       return false;
+    }
+  }
+  public static void checkTokenSignature(String token) throws IllegalArgumentException{
+    try {
+      Jwts.parser()
+        .setSigningKey(secretKey)
+        .parse(token);
+    } catch (Exception e) {
+      throw new IllegalArgumentException("Invalid token");
     }
   }
   public static List<String> generateTokenForResourceServices(List<ResourceServerDTO> resourceServerDTOList,String subject){

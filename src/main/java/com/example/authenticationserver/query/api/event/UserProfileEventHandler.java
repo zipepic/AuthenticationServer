@@ -35,7 +35,7 @@ public class UserProfileEventHandler {
       throw new RuntimeException("User not found");
     }
     UserProfileEntity userProfileEntity = userProfileEntityOptional.get();
-    userProfileEntity.setRefreshToken(event.getRefreshToken());
+    userProfileEntity.setTokenId(event.getTokenId());
     userProfileRepository.save(userProfileEntity);
   }
 }

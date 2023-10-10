@@ -12,7 +12,7 @@ public class TokenSummary implements TokenDTO {
   private Integer refreshExpiresIn;
   private String refreshToken;
   private String tokenType;
-  private String id_token;
+  private String tokenId;
   private String not_before_policy;
   private String session_state;
   private String scope;

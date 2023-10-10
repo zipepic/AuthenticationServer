@@ -1,7 +1,6 @@
 package com.example.authenticationserver.command.api.aggregate;
 
 import com.example.authenticationserver.command.api.restmodel.TokenSummary;
-import com.example.authenticationserver.query.api.dto.TokenAuthorizationCodeDTO;
 import com.example.authenticationserver.query.api.dto.TokenDTO;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.user.CreateUserProfileCommand;
@@ -19,6 +18,7 @@ import org.axonframework.spring.stereotype.Aggregate;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Aggregate
@@ -31,7 +31,7 @@ public class UserProfileAggregate {
   private String passwordHash;
   private String userStatus;
   private String role;
-  private String refreshToken;
+  private String tokenId;
   private Date createdAt;
   private Date lastUpdatedAt;
   private Date deleteAt;
@@ -64,10 +64,12 @@ public class UserProfileAggregate {
 
   @CommandHandler
   public TokenDTO handle(GenerateRefreshTokenForUserProfileCommand command) {
+    UUID tokenId = UUID.randomUUID();
     var refreshToken = Jwts.builder()
       .setSubject(command.getUserId())
       .setExpiration(new Date(System.currentTimeMillis() + REFRESH_EXPIRATION_TIME))
-      .addClaims(Map.of("token_type","refresh_token"));
+      .addClaims(Map.of("token_type","refresh_token"))
+      .setId(tokenId.toString());
     String signRefreshToken = JwtTokenUtils.signAndCompactWithDefaults(refreshToken);
 
     var accessToken = Jwts.builder()
@@ -77,6 +79,7 @@ public class UserProfileAggregate {
     var event = RefreshTokenForUserProfileGeneratedEvent.builder()
       .userId(command.getUserId())
       .refreshToken(signRefreshToken)
+      .tokenId(tokenId.toString())
       .build();
 
     AggregateLifecycle.apply(event);
@@ -87,20 +90,22 @@ public class UserProfileAggregate {
       .refreshExpiresIn(REFRESH_EXPIRATION_TIME)
       .refreshToken(signRefreshToken)
       .tokenType("Bearer")
+      .tokenId(tokenId.toString())
       .build();
   }
 
   @EventSourcingHandler
   public void on(RefreshTokenForUserProfileGeneratedEvent event) {
-    this.refreshToken = event.getRefreshToken();
+    this.tokenId = event.getTokenId();
   }
   @CommandHandler
   public TokenDTO handle(RefreshAccessTokenForUserProfileCommand command){
-    TokenDTO tokenDTO = JwtTokenUtils.refresh(command.getRefreshToken());
+    TokenDTO tokenDTO = JwtTokenUtils.refresh(command.getClaims());
 
     var event = RefreshTokenForUserProfileGeneratedEvent.builder()
       .userId(command.getUserId())
       .refreshToken(tokenDTO.getRefreshToken())
+      .tokenId(tokenDTO.getTokenId())
       .build();
 
     AggregateLifecycle.apply(event);

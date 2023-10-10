@@ -52,6 +52,6 @@ public class OAuthRestController {
   public TokenAuthorizationCodeDTO refreshToken(@RequestParam String client_id,
                                                 @RequestParam String client_secret,
                                                 @RequestParam String refresh_token){
-    return JwtTokenUtils.refresh(refresh_token);
+    return JwtTokenUtils.refresh(JwtTokenUtils.extractClaims(refresh_token));
   }
 }

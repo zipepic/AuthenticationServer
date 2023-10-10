@@ -15,7 +15,7 @@ public class UserProfileEntity {
   private String passwordHash;
   private String userStatus;
   private String role;
-  private String refreshToken;
+  private String tokenId;
   private Date createdAt;
   private Date lastUpdatedAt;
   private Date deleteAt;

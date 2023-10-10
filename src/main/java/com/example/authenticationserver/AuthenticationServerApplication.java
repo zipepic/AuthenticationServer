@@ -30,6 +30,7 @@ import com.project.core.queries.app.CheckLoginDataQuery;
 import com.project.core.queries.user.FetchUserProfileByUserIdQuery;
 import com.project.core.queries.user.FetchUserProfileByUserNameQuery;
 import com.project.core.queries.user.FindUserIdByUserNameQuery;
+import com.project.core.queries.user.ValidateRefreshTokenForUserProfileQuery;
 import com.thoughtworks.xstream.XStream;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.NonNull;
@@ -82,7 +83,8 @@ public class AuthenticationServerApplication {
       TokenAuthorizationCodeDTO.class,
       GenerateRefreshTokenForUserProfileCommand.class,
       RefreshTokenForUserProfileGeneratedEvent.class,
-      RefreshAccessTokenForUserProfileCommand.class);
+      RefreshAccessTokenForUserProfileCommand.class,
+      ValidateRefreshTokenForUserProfileQuery.class);
     return xStream;
   }
 

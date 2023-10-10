@@ -5,6 +5,7 @@ import com.example.authenticationserver.query.api.data.user.UserProfileRepositor
 import com.project.core.queries.user.FetchUserProfileByUserIdQuery;
 import com.project.core.queries.user.FetchUserProfileByUserNameQuery;
 import com.project.core.queries.user.FindUserIdByUserNameQuery;
+import com.project.core.queries.user.ValidateRefreshTokenForUserProfileQuery;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -54,5 +55,16 @@ public class UserProfileQueryHandler {
     else {
       throw new IllegalArgumentException("User not found");
     }
+  }
+  @QueryHandler
+  public boolean validateRefreshToken(ValidateRefreshTokenForUserProfileQuery query) {
+    Optional<UserProfileEntity> optionalUserProfileEntity =
+      userProfileRepository.findById(query.getUserId());
+
+    if (optionalUserProfileEntity.isEmpty())
+      throw new IllegalArgumentException("User not found");
+
+    UserProfileEntity userProfileEntity = optionalUserProfileEntity.get();
+    return userProfileEntity.getTokenId().equals(query.getTokenId());
   }
 }

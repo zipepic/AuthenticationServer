@@ -6,4 +6,5 @@ public interface TokenDTO {
   Integer getRefreshExpiresIn();
   String getRefreshToken();
   String getTokenType();
+  String getTokenId();
 }

@@ -1,0 +1,35 @@
+package com.example.authenticationserver.config.filter.token;
+
+import com.example.authenticationserver.security.UserProfileDetails;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+
+public class JwtRefreshFilter extends OncePerRequestFilter {
+  private final TokenGenerationFilter tokenGenerationFilter;
+
+  public JwtRefreshFilter(TokenGenerationFilter tokenGenerationFilter) {
+    this.tokenGenerationFilter = tokenGenerationFilter;
+  }
+
+  @Override
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      var userProfileDetails = (UserProfileDetails) authentication.getPrincipal();
+
+      var claims = (Claims) authentication.getCredentials();
+
+      if (!userProfileDetails.getUserProfileEntity().getTokenId().equals(claims.getId()))
+        throw new IllegalArgumentException("Invalid refresh token");
+
+      filterChain.doFilter(request, response);
+  }
+}

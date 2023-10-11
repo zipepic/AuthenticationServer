@@ -1,4 +1,4 @@
-package com.example.authenticationserver.config;
+package com.example.authenticationserver.config.filter.auth;
 
 import com.example.authenticationserver.util.JwtTokenUtils;
 import jakarta.servlet.FilterChain;
@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -19,7 +20,6 @@ import java.io.IOException;
 public class TokenSignatureVerificationFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    try {
       String authToken = request.getHeader("Authorization");
 
       if (authToken == null || authToken.isBlank() || !authToken.startsWith("Bearer "))
@@ -34,10 +34,6 @@ public class TokenSignatureVerificationFilter extends OncePerRequestFilter {
       Authentication authentication = new UsernamePasswordAuthenticationToken(null,claims,null);
       SecurityContextHolder.getContext().setAuthentication(authentication);
 
-    }catch (IllegalArgumentException e){
-      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
-      return;
-    }
     filterChain.doFilter(request, response);
   }
 }

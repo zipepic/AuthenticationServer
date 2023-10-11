@@ -1,4 +1,4 @@
-package com.example.authenticationserver.config;
+package com.example.authenticationserver.config.filter.auth;
 
 import com.example.authenticationserver.service.UserProfileDetailsService;
 import io.jsonwebtoken.Claims;
@@ -22,18 +22,16 @@ public class LoadUserFromDatabaseFilterByJwt extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    try {
-      var claims = (Claims) SecurityContextHolder.getContext().getAuthentication().getCredentials();
+    var claims = (Claims) SecurityContextHolder.getContext().getAuthentication().getCredentials();
 
-      String userId = claims.getSubject();
-      UserDetails userDetails = userProfileDetailsService.loadUserByUserId(userId);
-      UsernamePasswordAuthenticationToken authenticationToken =
-        new UsernamePasswordAuthenticationToken(userDetails, claims, userDetails.getAuthorities());
+    String userId = claims.getSubject();
 
-      SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-    }catch (Exception e){
-      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
-    }
+    UserDetails userDetails = userProfileDetailsService.loadUserByUserId(userId);
+
+    UsernamePasswordAuthenticationToken authenticationToken =
+      new UsernamePasswordAuthenticationToken(userDetails, claims, userDetails.getAuthorities());
+
+    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
     filterChain.doFilter(request, response);
   }

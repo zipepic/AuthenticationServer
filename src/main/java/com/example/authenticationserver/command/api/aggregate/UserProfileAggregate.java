@@ -74,7 +74,8 @@ public class UserProfileAggregate {
 
     var accessToken = Jwts.builder()
       .setSubject(command.getUserId())
-      .setExpiration(new Date(System.currentTimeMillis() + ACCESS_EXPIRATION_TIME));
+      .setExpiration(new Date(System.currentTimeMillis() + ACCESS_EXPIRATION_TIME))
+      .addClaims(Map.of("token_type","access_token"));
 
     var event = RefreshTokenForUserProfileGeneratedEvent.builder()
       .userId(command.getUserId())

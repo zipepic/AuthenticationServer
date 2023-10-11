@@ -70,9 +70,8 @@ public class JwtTokenUtils {
     accessTokenClaims.putAll(claims);
 
     accessTokenClaims
-      .setExpiration(new Date(System.currentTimeMillis() + exprirationAccessToken));
-
-    accessTokenClaims.remove("token_type");
+      .setExpiration(new Date(System.currentTimeMillis() + exprirationAccessToken))
+      .remove("token_type");
 
     return TokenAuthorizationCodeDTO.builder()
       .accessToken(generateTokenWithClaims(accessTokenClaims))

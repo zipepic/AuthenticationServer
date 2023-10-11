@@ -16,10 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -44,19 +41,9 @@ public class LoginRestController {
 
     return ResponseEntity.ok(commandGateway.sendAndWait(command));
   }
-  @PostMapping("/refresh")
-  public TokenDTO refresh(){
-    var authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-    var claims = (Claims) authentication.getCredentials();
-    var userEntity = (UserProfileDetails) authentication.getPrincipal();
-    String tokenId = userEntity.getUserProfileEntity().getTokenId();
-    if(true)
-    if(!tokenId.equals(claims.getId()))
-      throw new IllegalArgumentException("Invalid token");
-    var command = RefreshAccessTokenForUserProfileCommand.builder()
-      .userId(userEntity.getUserProfileEntity().getUserId())
-      .claims(claims)
-      .build();
-    return commandGateway.sendAndWait(command);
+  @GetMapping("/profile")
+  public String profile(){
+    var userDetails = (UserProfileDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    return userDetails.getUserProfileEntity().getUserName();
   }
 }

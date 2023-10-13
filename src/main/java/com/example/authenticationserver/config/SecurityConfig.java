@@ -57,13 +57,14 @@ public class SecurityConfig {
 
   @Bean
   protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http.securityMatcher(new AntPathRequestMatcher("/security/**"));
+    http.securityMatcher(new AntPathRequestMatcher("/login"));
+    http.securityMatcher(new AntPathRequestMatcher("/registration"));
 
     configureDefault(http);
 
-    configureAuthFilters(http);
+//    configureAuthFilters(http);
 
-    http.authenticationProvider(authUserProfileProvider);
+//    http.authenticationProvider(authUserProfileProvider);
     return http.build();
   }
 

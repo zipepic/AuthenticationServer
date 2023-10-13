@@ -31,7 +31,7 @@ public class JwtRefreshFilter extends OncePerRequestFilter {
         throw new IllegalArgumentException("This is not a refresh token. Token_type -> " + claims.get("token_type"));
 
       if (!userProfileDetails.getUserProfileEntity().getTokenId().equals(claims.getId()))
-        throw new IllegalArgumentException("Invalid refresh token");
+        throw new IllegalArgumentException("This token is epsent in the database");
 
       tokenGenerationFilter.doFilterInternal(request, response,filterChain);
   }

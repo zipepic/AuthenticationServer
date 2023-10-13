@@ -61,10 +61,6 @@ public class SecurityConfig {
     http.securityMatcher(new AntPathRequestMatcher("/registration"));
 
     configureDefault(http);
-
-//    configureAuthFilters(http);
-
-//    http.authenticationProvider(authUserProfileProvider);
     return http.build();
   }
 

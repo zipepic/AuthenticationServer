@@ -20,16 +20,19 @@ public class JwtRefreshFilter extends OncePerRequestFilter {
   }
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+  public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       var userProfileDetails = (UserProfileDetails) authentication.getPrincipal();
 
       var claims = (Claims) authentication.getCredentials();
 
+      if(!claims.get("token_type").equals("refresh_token"))
+        throw new IllegalArgumentException("This is not a refresh token. Token_type -> " + claims.get("token_type"));
+
       if (!userProfileDetails.getUserProfileEntity().getTokenId().equals(claims.getId()))
         throw new IllegalArgumentException("Invalid refresh token");
 
-      filterChain.doFilter(request, response);
+      tokenGenerationFilter.doFilterInternal(request, response,filterChain);
   }
 }

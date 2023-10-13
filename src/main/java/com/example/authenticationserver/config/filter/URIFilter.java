@@ -1,26 +1,26 @@
-package com.example.authenticationserver.config.filter.token;
+package com.example.authenticationserver.config.filter;
 
-import io.jsonwebtoken.Claims;
+import com.example.authenticationserver.config.filter.token.JwtRefreshFilter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.core.context.SecurityContextHolder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-
-public class TokenTypeFilter extends OncePerRequestFilter {
+@Slf4j
+public class URIFilter extends OncePerRequestFilter {
   private final JwtRefreshFilter jwtRefreshFilter;
 
-  public TokenTypeFilter(JwtRefreshFilter jwtRefreshFilter) {
+  public URIFilter(JwtRefreshFilter jwtRefreshFilter) {
     this.jwtRefreshFilter = jwtRefreshFilter;
   }
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-      var claims = (Claims) SecurityContextHolder.getContext().getAuthentication().getCredentials();
-      if(claims.get("token_type").equals("refresh_token")){
+      log.info("request url-> {}", request.getRequestURI());
+      if(request.getRequestURI().equals("/auth/refresh")){
         jwtRefreshFilter.doFilterInternal(request,response,filterChain);
       }else {
         filterChain.doFilter(request, response);

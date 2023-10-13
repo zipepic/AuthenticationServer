@@ -38,7 +38,7 @@ public class TokenGenerationFilter extends OncePerRequestFilter {
 
       response.setStatus(HttpStatus.OK.value());
       response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-      response.getWriter().write(objectMapper.writeValueAsString(tokenDTO)); // Преобразуйте в JSON и записьте в тело
+      response.getWriter().write(objectMapper.writeValueAsString(tokenDTO));
       response.getWriter().flush();
   }
 }

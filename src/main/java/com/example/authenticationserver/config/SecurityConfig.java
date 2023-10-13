@@ -5,7 +5,7 @@ import com.example.authenticationserver.config.filter.auth.LoadUserFromDatabaseF
 import com.example.authenticationserver.config.filter.auth.TokenSignatureVerificationFilter;
 import com.example.authenticationserver.config.filter.token.JwtRefreshFilter;
 import com.example.authenticationserver.config.filter.token.TokenGenerationFilter;
-import com.example.authenticationserver.config.filter.token.TokenTypeFilter;
+import com.example.authenticationserver.config.filter.URIFilter;
 import com.example.authenticationserver.security.AuthUserProfileProviderImpl;
 import com.example.authenticationserver.service.UserProfileDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +14,6 @@ import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -49,6 +48,8 @@ public class SecurityConfig {
     configureDefault(http);
 
     configureAuthFilters(http);
+
+    http.addFilterAfter(tokenTypeFilter(), LoadUserFromDatabaseFilterByJwt.class);
 
     http.authenticationProvider(authUserProfileProvider);
     return http.build();
@@ -88,15 +89,13 @@ public class SecurityConfig {
       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     }
 
-  TokenTypeFilter tokenTypeFilter(){
-    return new TokenTypeFilter(jwtRefreshFilter());
+  URIFilter tokenTypeFilter(){
+    return new URIFilter(jwtRefreshFilter());
   }
   JwtRefreshFilter jwtRefreshFilter(){
     return new JwtRefreshFilter(tokenGenerationFilter());
   }
-  TokenGenerationFilter tokenGenerationFilter(){
-    return new TokenGenerationFilter(commandGateway, new ObjectMapper());
-  }
+  TokenGenerationFilter tokenGenerationFilter() { return new TokenGenerationFilter(commandGateway, new ObjectMapper());}
   ErrorHandlingFilter errorHandlingFilter(){
     return new ErrorHandlingFilter(new ObjectMapper());
   }

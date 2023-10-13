@@ -43,20 +43,30 @@ public class SecurityConfig {
     this.commandGateway = commandGateway;
   }
   @Bean
-  @Order(1)
   protected SecurityFilterChain filterChainAuth(HttpSecurity http) throws Exception {
     http.securityMatcher(new AntPathRequestMatcher("/auth/**"));
-    http.csrf(AbstractHttpConfigurer::disable);
-    http.formLogin(formLogin -> formLogin.disable());
-    http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
-    http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-    http.addFilterBefore(errorHandlingFilter(), UsernamePasswordAuthenticationFilter.class);
-    http.addFilterAfter(new TokenSignatureVerificationFilter(), ErrorHandlingFilter.class);
-    http.addFilterAfter(new LoadUserFromDatabaseFilterByJwt(userProfileDetailsService), TokenSignatureVerificationFilter.class);
+
+    configureDefault(http);
+
+    configureAuthFilters(http);
 
     http.authenticationProvider(authUserProfileProvider);
     return http.build();
   }
+
+  @Bean
+  protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http.securityMatcher(new AntPathRequestMatcher("/security/**"));
+
+    configureDefault(http);
+
+    configureAuthFilters(http);
+
+    http.authenticationProvider(authUserProfileProvider);
+    return http.build();
+  }
+
+
 
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
@@ -64,6 +74,19 @@ public class SecurityConfig {
       .requestMatchers(new AntPathRequestMatcher("/h2-console/**"))
       .requestMatchers(new AntPathRequestMatcher("/auth/login"));
   }
+
+  private void configureAuthFilters(HttpSecurity http) throws Exception {
+    http
+      .addFilterBefore(errorHandlingFilter(), UsernamePasswordAuthenticationFilter.class)
+      .addFilterAfter(new TokenSignatureVerificationFilter(), ErrorHandlingFilter.class)
+      .addFilterAfter(new LoadUserFromDatabaseFilterByJwt(userProfileDetailsService), TokenSignatureVerificationFilter.class);
+  }
+  private void configureDefault(HttpSecurity http) throws Exception {
+    http.csrf(AbstractHttpConfigurer::disable)
+      .formLogin(formLogin -> formLogin.disable())
+      .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
+      .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    }
 
   TokenTypeFilter tokenTypeFilter(){
     return new TokenTypeFilter(jwtRefreshFilter());

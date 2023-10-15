@@ -1,6 +1,8 @@
 package com.example.authenticationserver.config;
 
+import com.example.authenticationserver.command.api.test.JwtTokenGenerator;
 import com.example.authenticationserver.config.filter.ErrorHandlingFilter;
+import com.example.authenticationserver.config.filter.auth.JWKsSignatureVerificationFilter;
 import com.example.authenticationserver.config.filter.auth.LoadUserFromDatabaseFilterByJwt;
 import com.example.authenticationserver.config.filter.auth.TokenSignatureVerificationFilter;
 import com.example.authenticationserver.config.filter.token.JwtRefreshFilter;
@@ -34,12 +36,14 @@ public class SecurityConfig {
   private final UserProfileDetailsService userProfileDetailsService;
   private final QueryGateway queryGateway;
   private final CommandGateway commandGateway;
+  private final JwtTokenGenerator jwtTokenGenerator;
   @Autowired
-  public SecurityConfig(AuthUserProfileProviderImpl authUserProfileProvider, UserProfileDetailsService userProfileDetailsService, QueryGateway queryGateway, CommandGateway commandGateway) {
+  public SecurityConfig(AuthUserProfileProviderImpl authUserProfileProvider, UserProfileDetailsService userProfileDetailsService, QueryGateway queryGateway, CommandGateway commandGateway, JwtTokenGenerator jwtTokenGenerator) {
     this.authUserProfileProvider = authUserProfileProvider;
     this.userProfileDetailsService = userProfileDetailsService;
     this.queryGateway = queryGateway;
     this.commandGateway = commandGateway;
+    this.jwtTokenGenerator = jwtTokenGenerator;
   }
   @Bean
   protected SecurityFilterChain filterChainAuth(HttpSecurity http) throws Exception {
@@ -95,6 +99,9 @@ public class SecurityConfig {
   TokenGenerationFilter tokenGenerationFilter() { return new TokenGenerationFilter(commandGateway, new ObjectMapper());}
   ErrorHandlingFilter errorHandlingFilter(){
     return new ErrorHandlingFilter(new ObjectMapper());
+  }
+  JWKsSignatureVerificationFilter jwkSignatureVerificationFilter(){
+    return new JWKsSignatureVerificationFilter(jwtTokenGenerator);
   }
 }
 

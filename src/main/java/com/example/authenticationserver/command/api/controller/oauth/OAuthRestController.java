@@ -1,10 +1,9 @@
 package com.example.authenticationserver.command.api.controller.oauth;
 
-import com.example.authenticationserver.query.api.dto.TokenAuthorizationCodeDTO;
+import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.queries.app.CheckLoginDataQuery;
-import io.jsonwebtoken.Claims;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.example.authenticationserver.command.api.test;
+package com.example.authenticationserver.test;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

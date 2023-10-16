@@ -1,4 +1,4 @@
-package com.example.authenticationserver.command.api.test;
+package com.example.authenticationserver.test;
 
 import io.jsonwebtoken.Claims;
 import org.springframework.web.bind.annotation.*;

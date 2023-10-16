@@ -1,4 +1,4 @@
-package com.example.authenticationserver.query.api.dto;
+package com.example.authenticationserver.dto;
 
 import lombok.Data;
 

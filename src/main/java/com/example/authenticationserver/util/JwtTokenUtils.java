@@ -1,6 +1,5 @@
 package com.example.authenticationserver.util;
-import com.example.authenticationserver.query.api.dto.TokenAuthorizationCodeDTO;
-import com.project.core.commands.ResourceServerDTO;
+import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -8,10 +7,8 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.time.Duration;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
+
 @Slf4j
 public class JwtTokenUtils {
   //TODO refracting this
@@ -22,15 +19,6 @@ public class JwtTokenUtils {
     this.secretKey = secretKey;
   }
 
-  public static String generateToken(String issuer, long expiration, HashMap<String, Object> claims, String subject) {
-    var jwt = Jwts.builder()
-      .setIssuedAt(new Date())
-      .setIssuer(issuer)
-      .addClaims(claims)
-      .setSubject(subject) // user id
-      .setExpiration(new Date(System.currentTimeMillis() + expiration));
-      return signAndCompactWithDefaults(jwt);
-  }
   public static String signAndCompactWithDefaults(JwtBuilder jwt) {
     return jwt
       .setIssuer(ISSUER)
@@ -91,22 +79,6 @@ public class JwtTokenUtils {
     } catch (Exception e) {
       return false;
     }
-  }
-  public static void checkTokenSignature(String token) throws IllegalArgumentException{
-    try {
-      Jwts.parser()
-        .setSigningKey(secretKey)
-        .parse(token);
-    } catch (Exception e) {
-      throw new IllegalArgumentException("Invalid token");
-    }
-  }
-  public static List<String> generateTokenForResourceServices(List<ResourceServerDTO> resourceServerDTOList,String subject){
-    List<String> tokens = resourceServerDTOList.stream()
-      .map(dto -> generateToken(dto.getResourceServerName(), 60000,new HashMap<>(),subject))
-      .collect(Collectors.toList());
-
-    return tokens;
   }
   public static boolean isRefreshToken(Claims claims) {
     String tokenType = (String) claims.get("token_type");

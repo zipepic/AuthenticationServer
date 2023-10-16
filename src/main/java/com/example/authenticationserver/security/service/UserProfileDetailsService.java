@@ -1,4 +1,4 @@
-package com.example.authenticationserver.service;
+package com.example.authenticationserver.security.service;
 
 import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
 import com.example.authenticationserver.query.api.data.user.UserProfileRepository;

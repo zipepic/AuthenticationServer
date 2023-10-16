@@ -1,6 +1,6 @@
-package com.example.authenticationserver.config.filter;
+package com.example.authenticationserver.security.filter;
 
-import com.example.authenticationserver.config.filter.token.JwtRefreshFilter;
+import com.example.authenticationserver.security.filter.token.JwtRefreshFilter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

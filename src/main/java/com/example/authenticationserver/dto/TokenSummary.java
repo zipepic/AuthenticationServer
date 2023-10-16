@@ -1,6 +1,5 @@
-package com.example.authenticationserver.command.api.restmodel;
+package com.example.authenticationserver.dto;
 
-import com.example.authenticationserver.query.api.dto.TokenDTO;
 import lombok.Builder;
 import lombok.Data;
 

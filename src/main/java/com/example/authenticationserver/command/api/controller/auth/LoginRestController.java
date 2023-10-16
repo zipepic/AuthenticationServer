@@ -1,21 +1,15 @@
 package com.example.authenticationserver.command.api.controller.auth;
 
 import com.example.authenticationserver.command.api.service.UserProfileCommandService;
-import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
-import com.example.authenticationserver.query.api.dto.TokenDTO;
+import com.example.authenticationserver.dto.TokenDTO;
 import com.example.authenticationserver.security.UserProfileDetails;
-import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
-import com.project.core.events.user.RefreshAccessTokenForUserProfileCommand;
-import com.project.core.queries.user.ValidateRefreshTokenForUserProfileQuery;
-import io.jsonwebtoken.Claims;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

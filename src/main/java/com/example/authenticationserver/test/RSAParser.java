@@ -1,10 +1,9 @@
-package com.example.authenticationserver.command.api.test;
+package com.example.authenticationserver.test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.util.Base64URL;
-import org.springframework.stereotype.Component;
 
 public class RSAParser {
   public static RSAKey parseRSAKeyFromJson(String json) throws JsonProcessingException {

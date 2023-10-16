@@ -1,7 +1,7 @@
 package com.example.authenticationserver.command.api.aggregate;
 
-import com.example.authenticationserver.command.api.restmodel.TokenSummary;
-import com.example.authenticationserver.query.api.dto.TokenDTO;
+import com.example.authenticationserver.dto.TokenSummary;
+import com.example.authenticationserver.dto.TokenDTO;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.user.CreateUserProfileCommand;
 import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;

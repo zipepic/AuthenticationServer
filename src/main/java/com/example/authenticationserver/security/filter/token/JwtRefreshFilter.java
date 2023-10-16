@@ -1,4 +1,4 @@
-package com.example.authenticationserver.config.filter.token;
+package com.example.authenticationserver.security.filter.token;
 
 import com.example.authenticationserver.security.UserProfileDetails;
 import io.jsonwebtoken.Claims;

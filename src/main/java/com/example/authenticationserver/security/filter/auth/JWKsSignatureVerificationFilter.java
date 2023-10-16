@@ -1,6 +1,6 @@
-package com.example.authenticationserver.config.filter.auth;
+package com.example.authenticationserver.security.filter.auth;
 
-import com.example.authenticationserver.command.api.test.JwtTokenGenerator;
+import com.example.authenticationserver.test.JwtTokenGenerator;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

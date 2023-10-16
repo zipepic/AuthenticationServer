@@ -1,4 +1,4 @@
-package com.example.authenticationserver.command.api.restmodel;
+package com.example.authenticationserver.dto;
 
 import lombok.Builder;
 import lombok.Data;

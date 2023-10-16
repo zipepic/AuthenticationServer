@@ -1,4 +1,4 @@
-package com.example.authenticationserver.config.filter;
+package com.example.authenticationserver.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;

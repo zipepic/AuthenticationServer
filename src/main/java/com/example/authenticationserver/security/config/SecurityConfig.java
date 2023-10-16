@@ -1,15 +1,15 @@
-package com.example.authenticationserver.config;
+package com.example.authenticationserver.security.config;
 
-import com.example.authenticationserver.command.api.test.JwtTokenGenerator;
-import com.example.authenticationserver.config.filter.ErrorHandlingFilter;
-import com.example.authenticationserver.config.filter.auth.JWKsSignatureVerificationFilter;
-import com.example.authenticationserver.config.filter.auth.LoadUserFromDatabaseFilterByJwt;
-import com.example.authenticationserver.config.filter.auth.TokenSignatureVerificationFilter;
-import com.example.authenticationserver.config.filter.token.JwtRefreshFilter;
-import com.example.authenticationserver.config.filter.token.TokenGenerationFilter;
-import com.example.authenticationserver.config.filter.URIFilter;
+import com.example.authenticationserver.test.JwtTokenGenerator;
+import com.example.authenticationserver.security.filter.ErrorHandlingFilter;
+import com.example.authenticationserver.security.filter.auth.JWKsSignatureVerificationFilter;
+import com.example.authenticationserver.security.filter.auth.LoadUserFromDatabaseFilterByJwt;
+import com.example.authenticationserver.security.filter.auth.TokenSignatureVerificationFilter;
+import com.example.authenticationserver.security.filter.token.JwtRefreshFilter;
+import com.example.authenticationserver.security.filter.token.TokenGenerationFilter;
+import com.example.authenticationserver.security.filter.URIFilter;
 import com.example.authenticationserver.security.AuthUserProfileProviderImpl;
-import com.example.authenticationserver.service.UserProfileDetailsService;
+import com.example.authenticationserver.security.service.UserProfileDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;

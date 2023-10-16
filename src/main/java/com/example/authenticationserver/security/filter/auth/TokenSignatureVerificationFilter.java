@@ -1,4 +1,4 @@
-package com.example.authenticationserver.config.filter.auth;
+package com.example.authenticationserver.security.filter.auth;
 
 import com.example.authenticationserver.util.JwtTokenUtils;
 import jakarta.servlet.FilterChain;

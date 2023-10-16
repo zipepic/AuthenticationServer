@@ -1,6 +1,6 @@
-package com.example.authenticationserver.config.filter.auth;
+package com.example.authenticationserver.security.filter.auth;
 
-import com.example.authenticationserver.service.UserProfileDetailsService;
+import com.example.authenticationserver.security.service.UserProfileDetailsService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -1,5 +1,6 @@
 package com.example.authenticationserver.test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -7,6 +8,8 @@ import com.nimbusds.jose.jwk.RSAKey;
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
 import java.security.*;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
@@ -50,7 +53,17 @@ public class JwtTokenGenerator {
     System.out.println(jwkSet);
 
     jwksRepository.save(new JwksEntity(kid, jwkSet.getKeyByKeyId(kid).toJSONString()));
+    saveInJsonFile(jwkSet);
     return jwtToken;
+  }
+  private void saveInJsonFile(JWKSet jwkSet) throws IOException {
+    String jsonFilePath = "jwk.json";
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    String jwksJson = String.valueOf(jwkSet.toJSONObject());
+
+    // Записываем JSON JWKS в файл
+    objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(jsonFilePath), jwksJson);
   }
   public Claims verifyAndParseJWT(String jwtToken) throws Exception {
 

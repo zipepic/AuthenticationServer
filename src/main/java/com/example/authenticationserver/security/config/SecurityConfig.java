@@ -1,6 +1,6 @@
 package com.example.authenticationserver.security.config;
 
-import com.example.authenticationserver.test.JwtTokenGenerator;
+import com.example.authenticationserver.test.JwkManager;
 import com.example.authenticationserver.security.filter.ErrorHandlingFilter;
 import com.example.authenticationserver.security.filter.auth.JWKsSignatureVerificationFilter;
 import com.example.authenticationserver.security.filter.auth.LoadUserFromDatabaseFilterByJwt;
@@ -36,9 +36,9 @@ public class SecurityConfig {
   private final UserProfileDetailsService userProfileDetailsService;
   private final QueryGateway queryGateway;
   private final CommandGateway commandGateway;
-  private final JwtTokenGenerator jwtTokenGenerator;
+  private final JwkManager jwtTokenGenerator;
   @Autowired
-  public SecurityConfig(AuthUserProfileProviderImpl authUserProfileProvider, UserProfileDetailsService userProfileDetailsService, QueryGateway queryGateway, CommandGateway commandGateway, JwtTokenGenerator jwtTokenGenerator) {
+  public SecurityConfig(AuthUserProfileProviderImpl authUserProfileProvider, UserProfileDetailsService userProfileDetailsService, QueryGateway queryGateway, CommandGateway commandGateway, JwkManager jwtTokenGenerator) {
     this.authUserProfileProvider = authUserProfileProvider;
     this.userProfileDetailsService = userProfileDetailsService;
     this.queryGateway = queryGateway;

@@ -1,6 +1,6 @@
 package com.example.authenticationserver.security.filter.auth;
 
-import com.example.authenticationserver.test.JwtTokenGenerator;
+import com.example.authenticationserver.test.JwkManager;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,9 +11,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 public class JWKsSignatureVerificationFilter extends OncePerRequestFilter {
-  private final JwtTokenGenerator jwtTokenGenerator;
+  private final JwkManager jwtTokenGenerator;
 
-  public JWKsSignatureVerificationFilter(JwtTokenGenerator jwtTokenGenerator) {
+  public JWKsSignatureVerificationFilter(JwkManager jwtTokenGenerator) {
     this.jwtTokenGenerator = jwtTokenGenerator;
   }
 

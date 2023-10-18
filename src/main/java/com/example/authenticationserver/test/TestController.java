@@ -1,14 +1,15 @@
 package com.example.authenticationserver.test;
 
+import com.nimbusds.jose.jwk.JWKSet;
 import io.jsonwebtoken.Claims;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/test/api")
+@RequestMapping("/oauth2/authorization/jwk")
 public class TestController {
-  private final JwtTokenGenerator jwtTokenGenerator;
+  private final JwkManager jwtTokenGenerator;
 
-  public TestController(JwtTokenGenerator jwtTokenGenerator) {
+  public TestController(JwkManager jwtTokenGenerator) {
     this.jwtTokenGenerator = jwtTokenGenerator;
   }
 
@@ -21,4 +22,8 @@ public class TestController {
     return jwtTokenGenerator.verifyAndParseJWT(jwt);
   }
 
+  @GetMapping("/jwk.json")
+  public JWKSet getJWKSet() throws Exception {
+    return jwtTokenGenerator.getJWKSet();
+  }
 }

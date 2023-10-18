@@ -56,15 +56,8 @@ public class JwkManager {
   public Claims verifyAndParseJWT(String jwtToken) throws Exception {
 
     String kid = getJwtHeader(jwtToken).getKeyID();
-
-//    Optional<JwksEntity> optionalJwksEntity = jwksRepository.findById(kid);
-//    if (optionalJwksEntity.isEmpty()) {
-//      throw new IllegalArgumentException("Token not found");
-//    }
-//    var jwksEntity = optionalJwksEntity.get();
     var jwk = getJWKSet().getKeyByKeyId(kid).toPublicJWK();
     RSAKey rsaKey = RSAParser.parseRSAKeyFromJson(jwk.toJSONString());
-
 
 
     return Jwts.parser()

@@ -2,6 +2,7 @@ package com.example.authenticationserver.test;
 
 import com.nimbusds.jose.jwk.JWKSet;
 import io.jsonwebtoken.Claims;
+import net.minidev.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,7 +24,7 @@ public class TestController {
   }
 
   @GetMapping("/jwk.json")
-  public JWKSet getJWKSet() throws Exception {
-    return jwtTokenGenerator.getJWKSet();
+  public JSONObject getJWKSet() throws Exception {
+    return jwtTokenGenerator.getJWKSet().toJSONObject();
   }
 }

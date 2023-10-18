@@ -3,6 +3,7 @@ package com.example.authenticationserver.test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import io.jsonwebtoken.*;
@@ -13,15 +14,14 @@ import java.io.IOException;
 import java.security.*;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
-public class JwtTokenGenerator {
+public class JwkManager {
   private final JwksRepository jwksRepository;
+  private static final String JWK_FILE_PATH= "/Users/xzz1p/Documents/MySpring/TEST_PROJECT/AuthenticationServer/jwk.json";
 
-  public JwtTokenGenerator(JwksRepository jwksRepository) {
+  public JwkManager(JwksRepository jwksRepository) {
     this.jwksRepository = jwksRepository;
   }
 
@@ -49,41 +49,47 @@ public class JwtTokenGenerator {
       .keyID(kid)
       .build();
 
-    JWKSet jwkSet = new JWKSet(rsaKey);
-    System.out.println(jwkSet);
-
-    jwksRepository.save(new JwksEntity(kid, jwkSet.getKeyByKeyId(kid).toJSONString()));
-    saveInJsonFile(jwkSet);
+    saveInJsonFile(rsaKey);
     return jwtToken;
-  }
-  private void saveInJsonFile(JWKSet jwkSet) throws IOException {
-    String jsonFilePath = "jwk.json";
-
-    ObjectMapper objectMapper = new ObjectMapper();
-    String jwksJson = String.valueOf(jwkSet.toJSONObject());
-
-    // Записываем JSON JWKS в файл
-    objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(jsonFilePath), jwksJson);
+    //    jwksRepository.save(new JwksEntity(kid, jwkSet.getKeyByKeyId(kid).toJSONString()));
   }
   public Claims verifyAndParseJWT(String jwtToken) throws Exception {
 
     String kid = getJwtHeader(jwtToken).getKeyID();
 
-    Optional<JwksEntity> optionalJwksEntity = jwksRepository.findById(kid);
-    if (optionalJwksEntity.isEmpty()) {
-      throw new IllegalArgumentException("Token not found");
-    }
-    var jwksEntity = optionalJwksEntity.get();
-    RSAKey rsaKey = RSAParser.parseRSAKeyFromJson(jwksEntity.getJwksData());
+//    Optional<JwksEntity> optionalJwksEntity = jwksRepository.findById(kid);
+//    if (optionalJwksEntity.isEmpty()) {
+//      throw new IllegalArgumentException("Token not found");
+//    }
+//    var jwksEntity = optionalJwksEntity.get();
+    var jwk = getJWKSet().getKeyByKeyId(kid).toPublicJWK();
+    RSAKey rsaKey = RSAParser.parseRSAKeyFromJson(jwk.toJSONString());
+
 
 
     return Jwts.parser()
-      .setSigningKey(rsaKey.toPublicKey())
+      .setSigningKey(rsaKey.toRSAPublicKey())
       .parseClaimsJws(jwtToken)
       .getBody();
   }
   public JWSHeader getJwtHeader(String jwtToken) throws ParseException {
     JWSObject jwsObject = JWSObject.parse(jwtToken);
     return jwsObject.getHeader();
+  }
+  private void saveInJsonFile(RSAKey rsaKey) throws IOException, ParseException {
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    JWKSet jwkSet = JWKSet.load(new File(JWK_FILE_PATH));
+
+    List<JWK> keys = new ArrayList<>(jwkSet.getKeys());
+
+    keys.add(rsaKey);
+
+    JWKSet updatedJWKSet = new JWKSet(keys);
+
+    objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(JWK_FILE_PATH), updatedJWKSet.toJSONObject());
+  }
+  public JWKSet getJWKSet() throws IOException, ParseException {
+    return JWKSet.load(new File(JWK_FILE_PATH));
   }
 }

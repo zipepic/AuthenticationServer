@@ -25,8 +25,7 @@ public class JwkManager {
     this.jwksRepository = jwksRepository;
   }
 
-  public String generateJwtToken() throws Exception {
-    String kid = UUID.randomUUID().toString();
+  public static Map<String, String> generateJwtTokens(String userId, String kid) throws Exception {
 
     KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
     keyPairGenerator.initialize(2048);
@@ -34,14 +33,23 @@ public class JwkManager {
     KeyPair keyPair = keyPairGenerator.genKeyPair();
     PrivateKey privateKey = keyPair.getPrivate();
 
-    String jwtToken = Jwts.builder()
+    String refresh = Jwts.builder()
       .setHeaderParam("kid", kid)
-      .setSubject("exampleUser")
-      .setIssuer("exampleIssuer")
-      .setAudience("exampleAudience")
+      .setSubject(userId)
+      .setIssuer("AUTH_SERVER")
       .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // Срок действия 1 час
       .setIssuedAt(new Date())
-      .claim("customClaim", "customClaimValue")
+      .addClaims(Map.of("token_type","refresh_token"))
+      .signWith(privateKey, SignatureAlgorithm.RS256)
+      .compact();
+
+    String access = Jwts.builder()
+      .setHeaderParam("kid", kid)
+      .setSubject(userId)
+      .setIssuer("AUTH_SERVER")
+      .setExpiration(new Date(System.currentTimeMillis() + 600000)) // Срок действия 10 min
+      .setIssuedAt(new Date())
+      .addClaims(Map.of("token_type","access_token"))
       .signWith(privateKey, SignatureAlgorithm.RS256)
       .compact();
 
@@ -50,9 +58,14 @@ public class JwkManager {
       .build();
 
     saveInJsonFile(rsaKey);
-    return jwtToken;
-    //    jwksRepository.save(new JwksEntity(kid, jwkSet.getKeyByKeyId(kid).toJSONString()));
+
+    Map<String, String> tokenMap = new HashMap<>();
+    tokenMap.put("refresh", refresh);
+    tokenMap.put("access", access);
+
+    return tokenMap;
   }
+
   public Claims verifyAndParseJWT(String jwtToken) throws Exception {
 
     String kid = getJwtHeader(jwtToken).getKeyID();
@@ -69,7 +82,7 @@ public class JwkManager {
     JWSObject jwsObject = JWSObject.parse(jwtToken);
     return jwsObject.getHeader();
   }
-  private void saveInJsonFile(RSAKey rsaKey) throws IOException, ParseException {
+  private static void saveInJsonFile(RSAKey rsaKey) throws IOException, ParseException {
 
     ObjectMapper objectMapper = new ObjectMapper();
     JWKSet jwkSet = JWKSet.load(new File(JWK_FILE_PATH));

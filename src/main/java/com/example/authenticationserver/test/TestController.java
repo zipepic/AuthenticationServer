@@ -5,6 +5,8 @@ import io.jsonwebtoken.Claims;
 import net.minidev.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/oauth2/authorization/jwk")
 public class TestController {
@@ -14,9 +16,10 @@ public class TestController {
     this.jwtTokenGenerator = jwtTokenGenerator;
   }
 
-  @GetMapping("/token")
-  public String getToken() throws Exception {
-    return jwtTokenGenerator.generateJwtToken();
+  @PostMapping("/token")
+  public String getToken(@RequestParam String userId) throws Exception {
+    String kid = UUID.randomUUID().toString();
+    return JwkManager.generateJwtTokens(userId, kid).get("refresh");
   }
   @PostMapping("/validate")
   public Claims validateToken(@RequestParam String jwt) throws Exception {

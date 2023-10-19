@@ -16,6 +16,7 @@ import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -79,9 +80,9 @@ public class SecurityConfig {
 
   private void configureAuthFilters(HttpSecurity http) throws Exception {
     http
-      .addFilterBefore(errorHandlingFilter(), UsernamePasswordAuthenticationFilter.class)
-      .addFilterAfter(new TokenSignatureVerificationFilter(), ErrorHandlingFilter.class)
-      .addFilterAfter(new LoadUserFromDatabaseFilterByJwt(userProfileDetailsService), TokenSignatureVerificationFilter.class);
+      .addFilterBefore(new ErrorHandlingFilter(new ObjectMapper()), UsernamePasswordAuthenticationFilter.class)
+      .addFilterAfter(new JWKsSignatureVerificationFilter(jwtTokenGenerator), ErrorHandlingFilter.class)
+      .addFilterAfter(new LoadUserFromDatabaseFilterByJwt(userProfileDetailsService), JWKsSignatureVerificationFilter.class);
   }
   private void configureDefault(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
@@ -97,11 +98,5 @@ public class SecurityConfig {
     return new JwtRefreshFilter(tokenGenerationFilter());
   }
   TokenGenerationFilter tokenGenerationFilter() { return new TokenGenerationFilter(commandGateway, new ObjectMapper());}
-  ErrorHandlingFilter errorHandlingFilter(){
-    return new ErrorHandlingFilter(new ObjectMapper());
-  }
-  JWKsSignatureVerificationFilter jwkSignatureVerificationFilter(){
-    return new JWKsSignatureVerificationFilter(jwtTokenGenerator);
-  }
 }
 

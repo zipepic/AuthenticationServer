@@ -40,7 +40,7 @@ public class JWKsSignatureVerificationFilter extends OncePerRequestFilter {
       Authentication authentication = new UsernamePasswordAuthenticationToken(null,claims,null);
       SecurityContextHolder.getContext().setAuthentication(authentication);
     } catch (Exception e) {
-      throw new IllegalArgumentException("Invalid token");
+      throw new IllegalArgumentException(e.getMessage());
     }
     filterChain.doFilter(request, response);
   }

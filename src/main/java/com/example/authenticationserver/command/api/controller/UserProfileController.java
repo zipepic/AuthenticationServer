@@ -1,38 +1,28 @@
 package com.example.authenticationserver.command.api.controller;
 
-import com.example.authenticationserver.command.api.restmodel.UserProfileRestModel;
-import com.project.core.commands.CreateUserProfileCommand;
+import com.example.authenticationserver.security.UserProfileDetails;
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Date;
-import java.util.UUID;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
 public class UserProfileController {
   private final CommandGateway commandGateway;
+  private final QueryGateway queryGateway;
+  private final PasswordEncoder passwordEncoder;
+
   @Autowired
-  public UserProfileController(CommandGateway commandGateway) {
+  public UserProfileController(CommandGateway commandGateway, QueryGateway queryGateway, PasswordEncoder passwordEncoder) {
     this.commandGateway = commandGateway;
+    this.queryGateway = queryGateway;
+    this.passwordEncoder = passwordEncoder;
   }
-
-  @PostMapping
-  public String create(@RequestBody UserProfileRestModel restModel){
-    UUID uuid = UUID.randomUUID();
-    CreateUserProfileCommand command =
-      CreateUserProfileCommand.builder()
-        .userId(uuid.toString())
-        .userName(restModel.getUserName())
-        .passwordHash(restModel.getPassword())
-        .userStatus("CREATE")
-        .createdAt(new Date())
-        .build();
-
-    return commandGateway.sendAndWait(command);
+  @GetMapping("/profile")
+  public String userprofile(@AuthenticationPrincipal UserProfileDetails userProfileDetails){
+    return userProfileDetails.getUserProfileEntity().toString();
   }
 }

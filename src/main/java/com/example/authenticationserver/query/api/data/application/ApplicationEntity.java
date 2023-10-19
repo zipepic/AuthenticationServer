@@ -1,4 +1,4 @@
-package com.example.authenticationserver.query.api.data;
+package com.example.authenticationserver.query.api.data.application;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -11,6 +11,4 @@ public class ApplicationEntity {
   private String clientId;
   private String secret;
 
-  private String code;
-  private String refreshToken;
 }

@@ -1,38 +1,88 @@
 package com.example.authenticationserver.util;
-
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Value;
+import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
+import io.jsonwebtoken.*;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
-import java.util.*;
-//TODO (1) create the ability to generate different jwt tokens (content and validity period) (2) put the secret in properties
+import java.time.Duration;
+import java.util.Date;
+import java.util.UUID;
 
+@Slf4j
 public class JwtTokenUtils {
-  @Value("${app.secret}")
-  private static String secret;
-  private static final Key secretKey;
-  private static final long expiration = 86400000 * 7; // 7 days
+  //TODO refracting this
+  private static Key secretKey;
 
-  static {
-    secretKey = generateSecretKey();
+  public JwtTokenUtils(SecretKeySpec secretKey) {
+    this.secretKey = secretKey;
   }
 
-  public static String generateToken(String clientId) {
-    Map<String, Object> claims = new HashMap<>();
-    String code = Jwts.builder()
-      .setSubject(clientId)
+  public static String signAndCompactWithDefaults(JwtBuilder jwt) {
+    return jwt
+      .setIssuer(AppConstants.ISSUER.toString())
       .setIssuedAt(new Date())
-      .setExpiration(new Date(System.currentTimeMillis() + 86400000 * 7))//week
-      .signWith(secretKey)
-      .compact();
-    return code;
+      .signWith(secretKey).compact();
   }
+  public static Claims extractClaims(String token) throws IllegalArgumentException {
+      return Jwts.parser()
+        .setSigningKey(secretKey)
+        .parseClaimsJws(token)
+        .getBody();
+  }
+  public static String generateTokenWithClaims(Claims claims){
+    var jwt = Jwts.builder()
+      .setClaims(claims);
+      return signAndCompactWithDefaults(jwt);
+  }
+  public static TokenAuthorizationCodeDTO refresh(Claims claims) {
 
-  private static Key generateSecretKey() {
-    byte[] secretKeyBytes = Base64.getDecoder().decode(secret);
-    return new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS256.getJcaName());
+    UUID tokenId = UUID.randomUUID();
+
+    if(!isRefreshToken(claims))
+      throw new IllegalArgumentException("Invalid token");
+
+    long expirationRefreshToken = Duration.between(claims.getIssuedAt().toInstant(),
+        claims.getExpiration().toInstant())
+      .toMillis();
+    long exprirationAccessToken = expirationRefreshToken/10;
+
+    Claims refreshTokenClaims = Jwts.claims();
+    refreshTokenClaims.putAll(claims);
+
+    refreshTokenClaims
+      .setExpiration(new Date(System.currentTimeMillis() + expirationRefreshToken)).setId(tokenId.toString());
+
+    Claims accessTokenClaims = Jwts.claims();
+    accessTokenClaims.putAll(claims);
+
+    accessTokenClaims
+      .setExpiration(new Date(System.currentTimeMillis() + exprirationAccessToken))
+      .put("token_type", "access_token");
+
+    return TokenAuthorizationCodeDTO.builder()
+      .accessToken(generateTokenWithClaims(accessTokenClaims))
+      .expiresIn((int) exprirationAccessToken)
+      .refreshExpiresIn((int) expirationRefreshToken)
+      .refreshToken(generateTokenWithClaims(refreshTokenClaims))
+      .tokenType(claims.get("type",String.class))
+      .tokenId(tokenId.toString())
+      .build();
+  }
+  public static boolean validateToken(String token) {
+    try {
+      Jwts.parser()
+        .setSigningKey(secretKey)
+        .parse(token);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+  public static boolean isRefreshToken(Claims claims) {
+    String tokenType = (String) claims.get("token_type");
+    return "refresh_token".equals(tokenType);
   }
 }
+
 

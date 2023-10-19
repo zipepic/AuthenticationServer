@@ -1,4 +1,4 @@
-package com.example.authenticationserver.query.api.data;
+package com.example.authenticationserver.query.api.data.user;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -14,6 +14,8 @@ public class UserProfileEntity {
   private String userName;
   private String passwordHash;
   private String userStatus;
+  private String role;
+  private String tokenId;
   private Date createdAt;
   private Date lastUpdatedAt;
   private Date deleteAt;

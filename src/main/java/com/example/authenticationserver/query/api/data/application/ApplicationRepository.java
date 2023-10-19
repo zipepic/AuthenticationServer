@@ -1,4 +1,4 @@
-package com.example.authenticationserver.query.api.data;
+package com.example.authenticationserver.query.api.data.application;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

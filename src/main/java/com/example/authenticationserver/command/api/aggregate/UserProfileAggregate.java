@@ -3,6 +3,7 @@ package com.example.authenticationserver.command.api.aggregate;
 import com.example.authenticationserver.dto.TokenSummary;
 import com.example.authenticationserver.dto.TokenDTO;
 import com.example.authenticationserver.test.JwkManager;
+import com.example.authenticationserver.util.AppConstants;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.user.CreateUserProfileCommand;
 import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
@@ -25,8 +26,6 @@ import java.util.UUID;
 @Slf4j
 @Aggregate
 public class UserProfileAggregate {
-  private final static Integer ACCESS_EXPIRATION_TIME = 60_000;
-  private final static Integer REFRESH_EXPIRATION_TIME = 6_000_000;
   @AggregateIdentifier
   private String userId;
   private String userName;
@@ -89,8 +88,8 @@ public class UserProfileAggregate {
 
     return TokenSummary.builder()
       .accessToken(tokenMap.get("access"))
-      .expiresIn(ACCESS_EXPIRATION_TIME)
-      .refreshExpiresIn(REFRESH_EXPIRATION_TIME)
+      .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())
+      .refreshExpiresIn(AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())
       .refreshToken(tokenMap.get("refresh"))
       .tokenType("Bearer")
       .tokenId(tokenId.toString())
@@ -99,14 +98,14 @@ public class UserProfileAggregate {
 private Map<String, String> generateTokens(String kid){
   var refreshToken = Jwts.builder()
     .setSubject(userId)
-    .setExpiration(new Date(System.currentTimeMillis() + REFRESH_EXPIRATION_TIME))
+    .setExpiration(new Date(System.currentTimeMillis() + AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal()))
     .addClaims(Map.of("token_type","refresh_token"))
     .setId(kid);
   String signRefreshToken = JwtTokenUtils.signAndCompactWithDefaults(refreshToken);
 
   var accessToken = Jwts.builder()
     .setSubject(userId)
-    .setExpiration(new Date(System.currentTimeMillis() + ACCESS_EXPIRATION_TIME))
+    .setExpiration(new Date(System.currentTimeMillis() + AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal()))
     .addClaims(Map.of("token_type","access_token"));
 
   String signAccessToken = JwtTokenUtils.signAndCompactWithDefaults(accessToken);

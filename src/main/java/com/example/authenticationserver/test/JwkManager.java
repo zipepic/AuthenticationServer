@@ -1,5 +1,6 @@
 package com.example.authenticationserver.test;
 
+import com.example.authenticationserver.util.AppConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
@@ -18,12 +19,7 @@ import java.util.*;
 
 @Service
 public class JwkManager {
-  private final JwksRepository jwksRepository;
   private static final String JWK_FILE_PATH= "/Users/xzz1p/Documents/MySpring/TEST_PROJECT/AuthenticationServer/jwk.json";
-
-  public JwkManager(JwksRepository jwksRepository) {
-    this.jwksRepository = jwksRepository;
-  }
 
   public static Map<String, String> generateJwtTokens(String userId, String kid) throws Exception {
 
@@ -36,8 +32,8 @@ public class JwkManager {
     String refresh = Jwts.builder()
       .setHeaderParam("kid", kid)
       .setSubject(userId)
-      .setIssuer("AUTH_SERVER")
-      .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // Срок действия 1 час
+      .setIssuer(AppConstants.ISSUER.toString())
+      .setExpiration(new Date(System.currentTimeMillis() + AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())) // Срок действия 1 час
       .setIssuedAt(new Date())
       .addClaims(Map.of("token_type","refresh_token"))
       .signWith(privateKey, SignatureAlgorithm.RS256)
@@ -46,8 +42,8 @@ public class JwkManager {
     String access = Jwts.builder()
       .setHeaderParam("kid", kid)
       .setSubject(userId)
-      .setIssuer("AUTH_SERVER")
-      .setExpiration(new Date(System.currentTimeMillis() + 600000)) // Срок действия 10 min
+      .setIssuer(AppConstants.ISSUER.toString())
+      .setExpiration(new Date(System.currentTimeMillis() + AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())) // Срок действия 10 min
       .setIssuedAt(new Date())
       .addClaims(Map.of("token_type","access_token"))
       .signWith(privateKey, SignatureAlgorithm.RS256)

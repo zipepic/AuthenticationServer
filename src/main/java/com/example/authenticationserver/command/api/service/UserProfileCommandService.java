@@ -45,5 +45,4 @@ public class UserProfileCommandService {
   public void on(){
 
   }
-
-  }
+}

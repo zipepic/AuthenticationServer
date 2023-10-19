@@ -1,6 +1,7 @@
 package com.example.authenticationserver.command.api.aggregate;
 
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
+import com.example.authenticationserver.util.AppConstants;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
@@ -21,8 +22,6 @@ import java.util.UUID;
 
 @Aggregate
 public class AuthorizationCodeFlowAggregate {
-  private final static Integer ACCESS_EXPIRATION_TIME = 60_000;
-  private final static Integer REFRESH_EXPIRATION_TIME = 6_000_000;
 
   @AggregateIdentifier
   private String code;
@@ -75,12 +74,12 @@ public class AuthorizationCodeFlowAggregate {
 
 
     return TokenAuthorizationCodeDTO.builder()
-      .accessToken(JwtTokenUtils.signAndCompactWithDefaults(generateToken(ACCESS_EXPIRATION_TIME)))
-      .expiresIn(ACCESS_EXPIRATION_TIME)
+      .accessToken(JwtTokenUtils.signAndCompactWithDefaults(generateToken(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())))
+      .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())
       .refreshToken(JwtTokenUtils
-        .signAndCompactWithDefaults(generateToken(ACCESS_EXPIRATION_TIME)
+        .signAndCompactWithDefaults(generateToken(AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())
           .addClaims(Map.of("token_type","refresh_token"))))
-      .refreshExpiresIn(REFRESH_EXPIRATION_TIME)
+      .refreshExpiresIn(AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())
       .tokenType("Bearer")
       .build();
   }

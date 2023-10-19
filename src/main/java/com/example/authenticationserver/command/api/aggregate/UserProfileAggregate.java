@@ -2,6 +2,8 @@ package com.example.authenticationserver.command.api.aggregate;
 
 import com.example.authenticationserver.dto.TokenSummary;
 import com.example.authenticationserver.dto.TokenDTO;
+import com.example.authenticationserver.test.JwkManager;
+import com.example.authenticationserver.util.AppConstants;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.user.CreateUserProfileCommand;
 import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
@@ -17,14 +19,13 @@ import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
 @Aggregate
 public class UserProfileAggregate {
-  private final static Integer ACCESS_EXPIRATION_TIME = 60_000;
-  private final static Integer REFRESH_EXPIRATION_TIME = 6_000_000;
   @AggregateIdentifier
   private String userId;
   private String userName;
@@ -65,35 +66,55 @@ public class UserProfileAggregate {
   @CommandHandler
   public TokenDTO handle(GenerateRefreshTokenForUserProfileCommand command) {
     UUID tokenId = UUID.randomUUID();
-    var refreshToken = Jwts.builder()
-      .setSubject(command.getUserId())
-      .setExpiration(new Date(System.currentTimeMillis() + REFRESH_EXPIRATION_TIME))
-      .addClaims(Map.of("token_type","refresh_token"))
-      .setId(tokenId.toString());
-    String signRefreshToken = JwtTokenUtils.signAndCompactWithDefaults(refreshToken);
 
-    var accessToken = Jwts.builder()
-      .setSubject(command.getUserId())
-      .setExpiration(new Date(System.currentTimeMillis() + ACCESS_EXPIRATION_TIME))
-      .addClaims(Map.of("token_type","access_token"));
+    Map<String,String> tokenMap;
+    if(command.getTokenType().equals("JWT")){
+      tokenMap = generateTokens(tokenId.toString());
+    }else {
+      try {
+        tokenMap = JwkManager.generateJwtTokens(command.getUserId(), tokenId.toString());
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+
 
     var event = RefreshTokenForUserProfileGeneratedEvent.builder()
       .userId(command.getUserId())
-      .refreshToken(signRefreshToken)
       .tokenId(tokenId.toString())
       .build();
 
     AggregateLifecycle.apply(event);
 
     return TokenSummary.builder()
-      .accessToken(JwtTokenUtils.signAndCompactWithDefaults(accessToken))
-      .expiresIn(ACCESS_EXPIRATION_TIME)
-      .refreshExpiresIn(REFRESH_EXPIRATION_TIME)
-      .refreshToken(signRefreshToken)
+      .accessToken(tokenMap.get("access"))
+      .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())
+      .refreshExpiresIn(AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())
+      .refreshToken(tokenMap.get("refresh"))
       .tokenType("Bearer")
       .tokenId(tokenId.toString())
       .build();
   }
+private Map<String, String> generateTokens(String kid){
+  var refreshToken = Jwts.builder()
+    .setSubject(userId)
+    .setExpiration(new Date(System.currentTimeMillis() + AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal()))
+    .addClaims(Map.of("token_type","refresh_token"))
+    .setId(kid);
+  String signRefreshToken = JwtTokenUtils.signAndCompactWithDefaults(refreshToken);
+
+  var accessToken = Jwts.builder()
+    .setSubject(userId)
+    .setExpiration(new Date(System.currentTimeMillis() + AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal()))
+    .addClaims(Map.of("token_type","access_token"));
+
+  String signAccessToken = JwtTokenUtils.signAndCompactWithDefaults(accessToken);
+
+  Map<String, String> tokenMap = new HashMap<>();
+  tokenMap.put("refresh", signRefreshToken);
+  tokenMap.put("access", signAccessToken);
+  return tokenMap;
+}
 
   @EventSourcingHandler
   public void on(RefreshTokenForUserProfileGeneratedEvent event) {
@@ -105,7 +126,6 @@ public class UserProfileAggregate {
 
     var event = RefreshTokenForUserProfileGeneratedEvent.builder()
       .userId(command.getUserId())
-      .refreshToken(tokenDTO.getRefreshToken())
       .tokenId(tokenDTO.getTokenId())
       .build();
 

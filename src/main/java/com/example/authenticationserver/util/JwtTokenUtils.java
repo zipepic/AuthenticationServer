@@ -13,7 +13,6 @@ import java.util.UUID;
 public class JwtTokenUtils {
   //TODO refracting this
   private static Key secretKey;
-  private final static String ISSUER = "http://localhost:8080";
 
   public JwtTokenUtils(SecretKeySpec secretKey) {
     this.secretKey = secretKey;
@@ -21,7 +20,7 @@ public class JwtTokenUtils {
 
   public static String signAndCompactWithDefaults(JwtBuilder jwt) {
     return jwt
-      .setIssuer(ISSUER)
+      .setIssuer(AppConstants.ISSUER.toString())
       .setIssuedAt(new Date())
       .signWith(secretKey).compact();
   }

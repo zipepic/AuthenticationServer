@@ -9,6 +9,7 @@ import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,18 +27,19 @@ public class LoginRestController {
   }
   @PostMapping("/login")
   public ResponseEntity<TokenDTO> login(@RequestParam String username,
-                                        @RequestParam String password){
+                                        @RequestParam String password,
+                                        @RequestParam String tokenType){
     var userDetails = userProfileCommandService.authenticationUser(new UsernamePasswordAuthenticationToken(username,password));
 
     var command = GenerateRefreshTokenForUserProfileCommand.builder()
         .userId(userDetails.getUserProfileEntity().getUserId())
+        .tokenType(tokenType)
         .build();
 
     return ResponseEntity.ok(commandGateway.sendAndWait(command));
   }
   @GetMapping("/profile")
-  public String profile(){
-    var userDetails = (UserProfileDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    return userDetails.getUserProfileEntity().getUserName();
+  public String profile(@AuthenticationPrincipal UserProfileDetails userProfileDetails){
+    return userProfileDetails.getUserProfileEntity().toString();
   }
 }

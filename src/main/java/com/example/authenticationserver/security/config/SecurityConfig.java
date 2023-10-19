@@ -1,6 +1,6 @@
 package com.example.authenticationserver.security.config;
 
-import com.example.authenticationserver.test.JwtTokenGenerator;
+import com.example.authenticationserver.test.JwkManager;
 import com.example.authenticationserver.security.filter.ErrorHandlingFilter;
 import com.example.authenticationserver.security.filter.auth.JWKsSignatureVerificationFilter;
 import com.example.authenticationserver.security.filter.auth.LoadUserFromDatabaseFilterByJwt;
@@ -16,6 +16,7 @@ import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -36,9 +37,9 @@ public class SecurityConfig {
   private final UserProfileDetailsService userProfileDetailsService;
   private final QueryGateway queryGateway;
   private final CommandGateway commandGateway;
-  private final JwtTokenGenerator jwtTokenGenerator;
+  private final JwkManager jwtTokenGenerator;
   @Autowired
-  public SecurityConfig(AuthUserProfileProviderImpl authUserProfileProvider, UserProfileDetailsService userProfileDetailsService, QueryGateway queryGateway, CommandGateway commandGateway, JwtTokenGenerator jwtTokenGenerator) {
+  public SecurityConfig(AuthUserProfileProviderImpl authUserProfileProvider, UserProfileDetailsService userProfileDetailsService, QueryGateway queryGateway, CommandGateway commandGateway, JwkManager jwtTokenGenerator) {
     this.authUserProfileProvider = authUserProfileProvider;
     this.userProfileDetailsService = userProfileDetailsService;
     this.queryGateway = queryGateway;
@@ -79,9 +80,9 @@ public class SecurityConfig {
 
   private void configureAuthFilters(HttpSecurity http) throws Exception {
     http
-      .addFilterBefore(errorHandlingFilter(), UsernamePasswordAuthenticationFilter.class)
-      .addFilterAfter(new TokenSignatureVerificationFilter(), ErrorHandlingFilter.class)
-      .addFilterAfter(new LoadUserFromDatabaseFilterByJwt(userProfileDetailsService), TokenSignatureVerificationFilter.class);
+      .addFilterBefore(new ErrorHandlingFilter(new ObjectMapper()), UsernamePasswordAuthenticationFilter.class)
+      .addFilterAfter(new JWKsSignatureVerificationFilter(jwtTokenGenerator), ErrorHandlingFilter.class)
+      .addFilterAfter(new LoadUserFromDatabaseFilterByJwt(userProfileDetailsService), JWKsSignatureVerificationFilter.class);
   }
   private void configureDefault(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
@@ -97,11 +98,5 @@ public class SecurityConfig {
     return new JwtRefreshFilter(tokenGenerationFilter());
   }
   TokenGenerationFilter tokenGenerationFilter() { return new TokenGenerationFilter(commandGateway, new ObjectMapper());}
-  ErrorHandlingFilter errorHandlingFilter(){
-    return new ErrorHandlingFilter(new ObjectMapper());
-  }
-  JWKsSignatureVerificationFilter jwkSignatureVerificationFilter(){
-    return new JWKsSignatureVerificationFilter(jwtTokenGenerator);
-  }
 }
 

@@ -1,24 +1,33 @@
 package com.example.authenticationserver.test;
 
+import com.nimbusds.jose.jwk.JWKSet;
 import io.jsonwebtoken.Claims;
+import net.minidev.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/test/api")
-public class TestController {
-  private final JwtTokenGenerator jwtTokenGenerator;
+import java.util.UUID;
 
-  public TestController(JwtTokenGenerator jwtTokenGenerator) {
+@RestController
+@RequestMapping("/oauth2/authorization/jwk")
+public class TestController {
+  private final JwkManager jwtTokenGenerator;
+
+  public TestController(JwkManager jwtTokenGenerator) {
     this.jwtTokenGenerator = jwtTokenGenerator;
   }
 
-  @GetMapping("/token")
-  public String getToken() throws Exception {
-    return jwtTokenGenerator.generateJwtToken();
+  @PostMapping("/token")
+  public String getToken(@RequestParam String userId) throws Exception {
+    String kid = UUID.randomUUID().toString();
+    return JwkManager.generateJwtTokens(userId, kid).get("refresh");
   }
   @PostMapping("/validate")
   public Claims validateToken(@RequestParam String jwt) throws Exception {
     return jwtTokenGenerator.verifyAndParseJWT(jwt);
   }
 
+  @GetMapping("/jwk.json")
+  public JSONObject getJWKSet() throws Exception {
+    return jwtTokenGenerator.getJWKSet().toJSONObject();
+  }
 }

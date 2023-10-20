@@ -6,7 +6,10 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,28 +20,6 @@ public class JwtManager extends TokenProcessor{
 
   public JwtManager(SecretKeySpec secretKey) {
     this.secretKey = secretKey;
-  }
-  @Override
-  public Map<String, String> generateJwtTokens(String userId) throws Exception {
-    String tokeId = UUID.randomUUID().toString();
-    var refresh = Jwts.builder()
-      .setSubject(userId)
-      .setIssuer(AppConstants.ISSUER.toString())
-      .setExpiration(new Date(System.currentTimeMillis() + AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal()))
-      .setId(tokeId)
-      .setIssuedAt(new Date())
-      .addClaims(Map.of("token_type","refresh_token"));
-
-    var access = Jwts.builder()
-      .setSubject(userId)
-      .setExpiration(new Date(System.currentTimeMillis() + AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal()))
-      .addClaims(Map.of("token_type","access_token"));
-
-    Map<String, String> tokenMap = new HashMap<>();
-    tokenMap.put("refresh", signAndCompactWithDefaults(refresh));
-    tokenMap.put("access", signAndCompactWithDefaults(access));
-
-    return tokenMap;
   }
 
   @Override
@@ -58,14 +39,7 @@ public class JwtManager extends TokenProcessor{
   }
 
   @Override
-  public String generateTokenWithClaims(Claims claims) {
-    var jwt = Jwts.builder()
-      .setClaims(claims);
-    return signAndCompactWithDefaults(jwt);
-  }
-
-  @Override
-  public Map<String, String> refresh(Claims claims) {
+  public Map<String, String> refresh(Claims claims) throws NoSuchAlgorithmException, IOException, ParseException {
     String tokenId = UUID.randomUUID().toString();
 
     if(!isRefreshToken(claims))
@@ -89,5 +63,9 @@ public class JwtManager extends TokenProcessor{
     tokenMap.put("access", generateTokenWithClaims(accessTokenClaims));
 
     return tokenMap;
+  }
+  @Override
+  public JwtBuilder tokenId(JwtBuilder iwt) {
+    return iwt.setId(UUID.randomUUID().toString());
   }
 }

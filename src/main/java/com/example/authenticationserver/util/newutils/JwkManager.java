@@ -26,27 +26,6 @@ import java.util.*;
 @Service
 public class JwkManager extends TokenProcessor{
   private static final String JWK_FILE_PATH= "/Users/xzz1p/Documents/MySpring/TEST_PROJECT/AuthenticationServer/jwk.json";
-  @Override
-  public Map<String, String> generateJwtTokens(String userId) throws Exception {
-
-    var refresh = Jwts.builder()
-      .setSubject(userId)
-      .setIssuer(AppConstants.ISSUER.toString())
-      .setExpiration(new Date(System.currentTimeMillis() + AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())) // Срок действия 1 час
-      .setIssuedAt(new Date())
-      .addClaims(Map.of("token_type","refresh_token"));
-
-    var access = Jwts.builder()
-      .setSubject(userId)
-      .setExpiration(new Date(System.currentTimeMillis() + AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())) // Срок действия 10 min
-      .addClaims(Map.of("token_type","access_token"));
-
-    Map<String, String> tokenMap = new HashMap<>();
-    tokenMap.put("refresh", signAndCompactWithDefaults(refresh));
-    tokenMap.put("access", signAndCompactWithDefaults(access));
-
-    return tokenMap;
-  }
 
   @Override
   public Claims extractClaims(String jwtToken) throws Exception {
@@ -78,14 +57,6 @@ public class JwkManager extends TokenProcessor{
     saveInJsonFile(rsaKey);
     return generatedJwt;
   }
-
-  @Override
-  public String generateTokenWithClaims(Claims claims) throws NoSuchAlgorithmException, IOException, ParseException {
-    var jwt = Jwts.builder()
-      .setClaims(claims);
-    return signAndCompactWithDefaults(jwt);
-  }
-
   @Override
   public Map<String, String> refresh(Claims claims) throws NoSuchAlgorithmException, IOException, ParseException {
 
@@ -111,6 +82,12 @@ public class JwkManager extends TokenProcessor{
 
     return tokenMap;
   }
+
+  @Override
+  public JwtBuilder tokenId(JwtBuilder iwt) {
+    return iwt;
+  }
+
   private void saveInJsonFile(RSAKey rsaKey) throws IOException, ParseException {
 
     ObjectMapper objectMapper = new ObjectMapper();

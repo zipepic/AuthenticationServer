@@ -2,7 +2,7 @@ package com.example.authenticationserver.command.api.aggregate;
 
 import com.example.authenticationserver.dto.TokenSummary;
 import com.example.authenticationserver.dto.TokenDTO;
-import com.example.authenticationserver.test.JwkManager;
+import com.example.authenticationserver.util.JwkManager;
 import com.example.authenticationserver.util.AppConstants;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.user.CreateUserProfileCommand;
@@ -36,12 +36,13 @@ public class UserProfileAggregate {
   private Date createdAt;
   private Date lastUpdatedAt;
   private Date deleteAt;
-
+  private UserProfileService userProfileService;
   public UserProfileAggregate() {
   }
 
   @CommandHandler
-  public UserProfileAggregate(CreateUserProfileCommand command) {
+  public UserProfileAggregate(CreateUserProfileCommand command, UserProfileService userProfileService) {
+    this.userProfileService = userProfileService;
     var event = UserProfileCreatedEvent.builder()
       .userId(command.getUserId())
       .userName(command.getUserName())
@@ -133,5 +134,4 @@ private Map<String, String> generateTokens(String kid){
 
     return tokenDTO;
   }
-
 }

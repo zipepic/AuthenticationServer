@@ -1,20 +1,16 @@
 package com.example.authenticationserver.security.filter.auth;
 
-import com.example.authenticationserver.test.JwkManager;
-import com.nimbusds.jose.jwk.JWKSet;
+import com.example.authenticationserver.util.JwkManager;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.SneakyThrows;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 public class JWKsSignatureVerificationFilter extends OncePerRequestFilter {
   private final JwkManager jwtTokenGenerator;

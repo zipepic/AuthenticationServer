@@ -1,10 +1,9 @@
 package com.example.authenticationserver.security.config;
 
-import com.example.authenticationserver.test.JwkManager;
+import com.example.authenticationserver.util.JwkManager;
 import com.example.authenticationserver.security.filter.ErrorHandlingFilter;
 import com.example.authenticationserver.security.filter.auth.JWKsSignatureVerificationFilter;
 import com.example.authenticationserver.security.filter.auth.LoadUserFromDatabaseFilterByJwt;
-import com.example.authenticationserver.security.filter.auth.TokenSignatureVerificationFilter;
 import com.example.authenticationserver.security.filter.token.JwtRefreshFilter;
 import com.example.authenticationserver.security.filter.token.TokenGenerationFilter;
 import com.example.authenticationserver.security.filter.URIFilter;
@@ -16,7 +15,6 @@ import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;

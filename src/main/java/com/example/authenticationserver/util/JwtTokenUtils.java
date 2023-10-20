@@ -7,6 +7,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.time.Duration;
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -34,6 +35,10 @@ public class JwtTokenUtils {
     var jwt = Jwts.builder()
       .setClaims(claims);
       return signAndCompactWithDefaults(jwt);
+  }
+  public static boolean isRefreshToken(Claims claims) {
+    String tokenType = (String) claims.get("token_type");
+    return "refresh_token".equals(tokenType);
   }
   public static TokenAuthorizationCodeDTO refresh(Claims claims) {
 
@@ -68,20 +73,6 @@ public class JwtTokenUtils {
       .tokenType(claims.get("type",String.class))
       .tokenId(tokenId.toString())
       .build();
-  }
-  public static boolean validateToken(String token) {
-    try {
-      Jwts.parser()
-        .setSigningKey(secretKey)
-        .parse(token);
-      return true;
-    } catch (Exception e) {
-      return false;
-    }
-  }
-  public static boolean isRefreshToken(Claims claims) {
-    String tokenType = (String) claims.get("token_type");
-    return "refresh_token".equals(tokenType);
   }
 }
 

@@ -1,6 +1,6 @@
 package com.example.authenticationserver.test;
 
-import com.nimbusds.jose.jwk.JWKSet;
+import com.example.authenticationserver.util.JwkManager;
 import io.jsonwebtoken.Claims;
 import net.minidev.json.JSONObject;
 import org.springframework.web.bind.annotation.*;

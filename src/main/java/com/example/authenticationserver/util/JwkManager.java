@@ -1,5 +1,6 @@
-package com.example.authenticationserver.test;
+package com.example.authenticationserver.util;
 
+import com.example.authenticationserver.test.RSAParser;
 import com.example.authenticationserver.util.AppConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JWSHeader;

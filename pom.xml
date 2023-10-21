@@ -91,6 +91,12 @@
       <artifactId>nimbus-jose-jwt</artifactId>
       <version>7.9</version> <!-- Укажите актуальную версию -->
     </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>

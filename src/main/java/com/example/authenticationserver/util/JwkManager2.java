@@ -1,7 +1,6 @@
 package com.example.authenticationserver.util;
 
 import com.example.authenticationserver.test.RSAParser;
-import com.example.authenticationserver.util.AppConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
@@ -19,7 +18,8 @@ import java.text.ParseException;
 import java.util.*;
 
 @Service
-public class JwkManager {
+@Deprecated
+public class JwkManager2 {
   private static final String JWK_FILE_PATH= "/Users/xzz1p/Documents/MySpring/TEST_PROJECT/AuthenticationServer/jwk.json";
 
   public static Map<String, String> generateJwtTokens(String userId, String kid) throws Exception {

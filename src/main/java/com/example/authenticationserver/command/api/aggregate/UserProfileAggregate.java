@@ -2,7 +2,6 @@ package com.example.authenticationserver.command.api.aggregate;
 
 import com.example.authenticationserver.dto.TokenSummary;
 import com.example.authenticationserver.dto.TokenDTO;
-import com.example.authenticationserver.util.JwkManager;
 import com.example.authenticationserver.util.AppConstants;
 import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.user.CreateUserProfileCommand;
@@ -10,7 +9,7 @@ import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
 import com.project.core.events.user.RefreshAccessTokenForUserProfileCommand;
 import com.project.core.events.user.RefreshTokenForUserProfileGeneratedEvent;
 import com.project.core.events.user.UserProfileCreatedEvent;
-import io.jsonwebtoken.Jwts;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
@@ -19,8 +18,6 @@ import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -36,13 +33,11 @@ public class UserProfileAggregate {
   private Date createdAt;
   private Date lastUpdatedAt;
   private Date deleteAt;
-  private UserProfileService userProfileService;
   public UserProfileAggregate() {
   }
 
   @CommandHandler
-  public UserProfileAggregate(CreateUserProfileCommand command, UserProfileService userProfileService) {
-    this.userProfileService = userProfileService;
+  public UserProfileAggregate(CreateUserProfileCommand command) {
     var event = UserProfileCreatedEvent.builder()
       .userId(command.getUserId())
       .userName(command.getUserName())
@@ -65,7 +60,7 @@ public class UserProfileAggregate {
   }
 
   @CommandHandler
-  public TokenDTO handle(GenerateRefreshTokenForUserProfileCommand command) {
+  public TokenDTO handle(GenerateRefreshTokenForUserProfileCommand command,@NonNull UserProfileService userProfileService) {
     UUID tokenId = UUID.randomUUID();
 
     var event = RefreshTokenForUserProfileGeneratedEvent.builder()

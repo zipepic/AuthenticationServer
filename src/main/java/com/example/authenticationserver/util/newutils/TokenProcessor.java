@@ -15,6 +15,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public abstract class TokenProcessor implements TokenUtils {
   public boolean isRefreshToken(Claims claims) {
@@ -25,14 +26,14 @@ public abstract class TokenProcessor implements TokenUtils {
     JWSObject jwsObject = JWSObject.parse(jwtToken);
     return jwsObject.getHeader();
   }
-  public Map<String, String> generateJwtTokens(String userId) throws Exception{
+  public Map<String, String> generateJwtTokens(String userId, String tokenId) throws Exception{
     var refresh = Jwts.builder()
       .setSubject(userId)
       .setIssuer(AppConstants.ISSUER.toString())
       .setExpiration(new Date(System.currentTimeMillis() + AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())) // Срок действия 1 час
       .setIssuedAt(new Date())
       .addClaims(Map.of("token_type","refresh_token"));
-      tokenId(refresh);
+      tokenId(refresh,tokenId);
 
     var access = Jwts.builder()
       .setSubject(userId)
@@ -49,9 +50,35 @@ public abstract class TokenProcessor implements TokenUtils {
       .setClaims(claims);
     return signAndCompactWithDefaults(jwt);
   }
+  public Map<String, String> refresh(Claims claims,String tokenId) throws NoSuchAlgorithmException, IOException, ParseException{
+
+    if(!isRefreshToken(claims))
+      throw new IllegalArgumentException("Invalid token");
+
+    Claims refreshTokenClaims = Jwts.claims();
+    refreshTokenClaims.putAll(claims);
+
+    refreshTokenClaims
+      .setExpiration(new Date(System.currentTimeMillis() + AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal()));
+    tokenId(refreshTokenClaims,tokenId);
+
+    Claims accessTokenClaims = Jwts.claims();
+    accessTokenClaims.putAll(claims);
+
+    accessTokenClaims
+      .setExpiration(new Date(System.currentTimeMillis() + AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal()))
+      .put("token_type", "access_token");
+
+    Map<String, String> tokenMap = new HashMap<>();
+    tokenMap.put("refresh", generateTokenWithClaims(refreshTokenClaims));
+    tokenMap.put("access", generateTokenWithClaims(accessTokenClaims));
+
+    return tokenMap;
+  }
   public abstract Claims extractClaims(String jwtToken) throws Exception;
   public abstract String signAndCompactWithDefaults(JwtBuilder jwt) throws NoSuchAlgorithmException, IOException, ParseException;
-  public abstract Map<String, String> refresh(Claims claims) throws NoSuchAlgorithmException, IOException, ParseException;
-  public abstract JwtBuilder tokenId(JwtBuilder iwt);
+  public abstract JwtBuilder tokenId(JwtBuilder iwt,String tokenId);
+  public abstract Claims tokenId(Claims claims, String tokenId);
+
 }
 

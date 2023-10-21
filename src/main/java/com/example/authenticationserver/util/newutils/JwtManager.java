@@ -4,6 +4,7 @@ import com.example.authenticationserver.util.AppConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
+import org.springframework.stereotype.Service;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
@@ -29,7 +30,6 @@ public class JwtManager extends TokenProcessor{
       .parseClaimsJws(jwtToken)
       .getBody();
   }
-
   @Override
   public String signAndCompactWithDefaults(JwtBuilder jwt) {
     return jwt
@@ -37,35 +37,13 @@ public class JwtManager extends TokenProcessor{
       .setIssuedAt(new Date())
       .signWith(secretKey).compact();
   }
-
   @Override
-  public Map<String, String> refresh(Claims claims) throws NoSuchAlgorithmException, IOException, ParseException {
-    String tokenId = UUID.randomUUID().toString();
-
-    if(!isRefreshToken(claims))
-      throw new IllegalArgumentException("Invalid token");
-
-    Claims refreshTokenClaims = Jwts.claims();
-    refreshTokenClaims.putAll(claims);
-
-    refreshTokenClaims
-      .setExpiration(new Date(System.currentTimeMillis() + AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())).setId(tokenId);
-
-    Claims accessTokenClaims = Jwts.claims();
-    accessTokenClaims.putAll(claims);
-
-    accessTokenClaims
-      .setExpiration(new Date(System.currentTimeMillis() + AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal()))
-      .put("token_type", "access_token");
-
-    Map<String, String> tokenMap = new HashMap<>();
-    tokenMap.put("refresh", generateTokenWithClaims(refreshTokenClaims));
-    tokenMap.put("access", generateTokenWithClaims(accessTokenClaims));
-
-    return tokenMap;
+  public JwtBuilder tokenId(JwtBuilder iwt, String tokeId) {
+    return iwt.setId(tokeId);
   }
+
   @Override
-  public JwtBuilder tokenId(JwtBuilder iwt) {
-    return iwt.setId(UUID.randomUUID().toString());
+  public Claims tokenId(Claims claims, String tokenId) {
+    return claims.setId(tokenId);
   }
 }

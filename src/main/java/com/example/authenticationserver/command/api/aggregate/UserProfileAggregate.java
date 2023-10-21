@@ -68,54 +68,26 @@ public class UserProfileAggregate {
   public TokenDTO handle(GenerateRefreshTokenForUserProfileCommand command) {
     UUID tokenId = UUID.randomUUID();
 
-    Map<String,String> tokenMap;
-    if(command.getTokenType().equals("JWT")){
-      tokenMap = generateTokens(tokenId.toString());
-    }else {
-      try {
-        tokenMap = JwkManager.generateJwtTokens(command.getUserId(), tokenId.toString());
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-    }
-
-
     var event = RefreshTokenForUserProfileGeneratedEvent.builder()
       .userId(command.getUserId())
       .tokenId(tokenId.toString())
       .build();
 
     AggregateLifecycle.apply(event);
-
-    return TokenSummary.builder()
-      .accessToken(tokenMap.get("access"))
-      .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())
-      .refreshExpiresIn(AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())
-      .refreshToken(tokenMap.get("refresh"))
-      .tokenType("Bearer")
-      .tokenId(tokenId.toString())
-      .build();
+    try {
+      var tokenMap = userProfileService.generateJwtTokens(command.getUserId(), tokenId.toString());
+      return TokenSummary.builder()
+        .accessToken(tokenMap.get("access"))
+        .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())
+        .refreshExpiresIn(AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())
+        .refreshToken(tokenMap.get("refresh"))
+        .tokenType("Bearer")
+        .tokenId(tokenId.toString())
+        .build();
+    }catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
-private Map<String, String> generateTokens(String kid){
-  var refreshToken = Jwts.builder()
-    .setSubject(userId)
-    .setExpiration(new Date(System.currentTimeMillis() + AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal()))
-    .addClaims(Map.of("token_type","refresh_token"))
-    .setId(kid);
-  String signRefreshToken = JwtTokenUtils.signAndCompactWithDefaults(refreshToken);
-
-  var accessToken = Jwts.builder()
-    .setSubject(userId)
-    .setExpiration(new Date(System.currentTimeMillis() + AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal()))
-    .addClaims(Map.of("token_type","access_token"));
-
-  String signAccessToken = JwtTokenUtils.signAndCompactWithDefaults(accessToken);
-
-  Map<String, String> tokenMap = new HashMap<>();
-  tokenMap.put("refresh", signRefreshToken);
-  tokenMap.put("access", signAccessToken);
-  return tokenMap;
-}
 
   @EventSourcingHandler
   public void on(RefreshTokenForUserProfileGeneratedEvent event) {

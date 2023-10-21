@@ -39,6 +39,7 @@ public abstract class TokenProcessor implements TokenUtils {
       .setSubject(userId)
       .setExpiration(new Date(System.currentTimeMillis() + AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())) // Срок действия 10 min
       .addClaims(Map.of("token_type","access_token"));
+    tokenId(access,tokenId);
 
     Map<String, String> tokenMap = new HashMap<>();
     tokenMap.put("refresh", signAndCompactWithDefaults(refresh));

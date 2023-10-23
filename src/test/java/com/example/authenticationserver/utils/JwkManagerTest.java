@@ -42,6 +42,11 @@ public class JwkManagerTest {
     var claims = jwkManager.extractClaims(tokens.get("access"));
     Assert.assertEquals("userId",claims.getSubject());
   }
+  @Test
+  public void findJwkById() throws Exception {
+    var jwks = jwkManager.getJWKSet();
+    Assert.assertNotNull(jwks.getKeyByKeyId("tokenId").toPublicJWK().toJSONString());
+  }
   @After
   public void tearDown() throws Exception {
     ObjectMapper objectMapper = new ObjectMapper();

@@ -22,7 +22,7 @@ import java.util.*;
 @Service
 public class JwkManager extends TokenProcessor{
   private static final String JWK_FILE_PATH= "/Users/xzz1p/Documents/MySpring/TEST_PROJECT/AuthenticationServer/jwk.json";
-
+  private RSAKey rsaKey;
   @Override
   public Claims extractClaims(String jwtToken) throws Exception {
     String kid = getJwtHeader(jwtToken).getKeyID();
@@ -45,11 +45,9 @@ public class JwkManager extends TokenProcessor{
       .setIssuedAt(new Date())
       .signWith(keyPair.getPrivate()).compact();
 
-      RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) keyPair.getPublic())
+       this.rsaKey = new RSAKey.Builder((RSAPublicKey) keyPair.getPublic())
         .keyID(getJwtHeader(generatedJwt).getKeyID())
         .build();
-
-      saveInJsonFile(rsaKey);
     return generatedJwt;
   }
   @Override
@@ -60,6 +58,20 @@ public class JwkManager extends TokenProcessor{
   @Override
   public Claims tokenId(Claims claims, String tokenId) {
     return claims;
+  }
+
+  @Override
+  public void save() throws IOException, ParseException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JWKSet jwkSet = JWKSet.load(new File(JWK_FILE_PATH));
+
+    List<JWK> keys = new ArrayList<>(jwkSet.getKeys());
+
+    keys.add(this.rsaKey);
+
+    JWKSet updatedJWKSet = new JWKSet(keys);
+
+    objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(JWK_FILE_PATH), updatedJWKSet.toJSONObject());
   }
 
   private void saveInJsonFile(RSAKey rsaKey) throws IOException, ParseException {

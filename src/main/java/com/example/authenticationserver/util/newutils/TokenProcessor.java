@@ -5,6 +5,7 @@ import com.example.authenticationserver.util.AppConstants;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.RSAKey;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
@@ -44,6 +45,7 @@ public abstract class TokenProcessor implements TokenUtils {
     Map<String, String> tokenMap = new HashMap<>();
     tokenMap.put("refresh", signAndCompactWithDefaults(refresh));
     tokenMap.put("access", signAndCompactWithDefaults(access));
+    save();
     return tokenMap;
   }
   public String generateTokenWithClaims(Claims claims) throws Exception {
@@ -73,13 +75,13 @@ public abstract class TokenProcessor implements TokenUtils {
     Map<String, String> tokenMap = new HashMap<>();
     tokenMap.put("refresh", generateTokenWithClaims(refreshTokenClaims));
     tokenMap.put("access", generateTokenWithClaims(accessTokenClaims));
-
+    save();
     return tokenMap;
   }
   public abstract Claims extractClaims(String jwtToken) throws Exception;
   public abstract String signAndCompactWithDefaults(JwtBuilder jwt) throws Exception;
   public abstract JwtBuilder tokenId(JwtBuilder iwt,String tokenId);
   public abstract Claims tokenId(Claims claims, String tokenId);
-
+  public abstract void save() throws IOException, ParseException;
 }
 

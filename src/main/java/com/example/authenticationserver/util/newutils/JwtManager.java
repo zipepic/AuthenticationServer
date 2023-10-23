@@ -46,4 +46,9 @@ public class JwtManager extends TokenProcessor{
   public Claims tokenId(Claims claims, String tokenId) {
     return claims.setId(tokenId);
   }
+
+  @Override
+  public void save() throws IOException, ParseException {
+
+  }
 }

@@ -37,7 +37,7 @@ public class JwkManager extends TokenProcessor{
   }
 
   @Override
-  public String signAndCompactWithDefaults(JwtBuilder jwt) throws NoSuchAlgorithmException, IOException, ParseException {
+  public String signAndCompactWithDefaults(JwtBuilder jwt) throws Exception {
     var keyPair = generateKeyPair();
 
     var generatedJwt = jwt
@@ -45,11 +45,11 @@ public class JwkManager extends TokenProcessor{
       .setIssuedAt(new Date())
       .signWith(keyPair.getPrivate()).compact();
 
-    RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) keyPair.getPublic())
-      .keyID(getJwtHeader(generatedJwt).getKeyID())
-      .build();
+      RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) keyPair.getPublic())
+        .keyID(getJwtHeader(generatedJwt).getKeyID())
+        .build();
 
-    saveInJsonFile(rsaKey);
+      saveInJsonFile(rsaKey);
     return generatedJwt;
   }
   @Override

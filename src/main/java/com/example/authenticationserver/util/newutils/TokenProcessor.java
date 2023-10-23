@@ -46,12 +46,12 @@ public abstract class TokenProcessor implements TokenUtils {
     tokenMap.put("access", signAndCompactWithDefaults(access));
     return tokenMap;
   }
-  public String generateTokenWithClaims(Claims claims) throws NoSuchAlgorithmException, IOException, ParseException{
+  public String generateTokenWithClaims(Claims claims) throws Exception {
     var jwt = Jwts.builder()
       .setClaims(claims);
     return signAndCompactWithDefaults(jwt);
   }
-  public Map<String, String> refresh(Claims claims,String tokenId) throws NoSuchAlgorithmException, IOException, ParseException{
+  public Map<String, String> refresh(Claims claims,String tokenId) throws Exception {
 
     if(!isRefreshToken(claims))
       throw new IllegalArgumentException("Invalid token");
@@ -77,7 +77,7 @@ public abstract class TokenProcessor implements TokenUtils {
     return tokenMap;
   }
   public abstract Claims extractClaims(String jwtToken) throws Exception;
-  public abstract String signAndCompactWithDefaults(JwtBuilder jwt) throws NoSuchAlgorithmException, IOException, ParseException;
+  public abstract String signAndCompactWithDefaults(JwtBuilder jwt) throws Exception;
   public abstract JwtBuilder tokenId(JwtBuilder iwt,String tokenId);
   public abstract Claims tokenId(Claims claims, String tokenId);
 

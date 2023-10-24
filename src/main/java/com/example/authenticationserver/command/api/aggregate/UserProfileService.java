@@ -15,8 +15,12 @@ public class UserProfileService {
     this.jwkManager = jwkManager;
   }
 
-  public Map<String, String> generateJwtTokens(String userId, String tokenId) throws Exception{
-    return jwkManager.generateJwtTokens(userId, tokenId);
+  public Map<String, String> generateJwtTokens(String userId, String tokenId, String tokenType) throws Exception{
+    if(tokenType.equals("JWK")) {
+      return jwkManager.generateJwtTokens(userId, tokenId);
+    }else{
+      throw new IllegalArgumentException("Invalid token type");
+    }
   }
 
 }

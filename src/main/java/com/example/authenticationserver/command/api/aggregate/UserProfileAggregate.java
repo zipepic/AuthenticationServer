@@ -70,7 +70,7 @@ public class UserProfileAggregate {
 
     AggregateLifecycle.apply(event);
     try {
-      var tokenMap = userProfileService.generateJwtTokens(command.getUserId(), tokenId.toString());
+      var tokenMap = userProfileService.generateJwtTokens(command.getUserId(), tokenId.toString(), command.getTokenType());
       return TokenSummary.builder()
         .accessToken(tokenMap.get("access"))
         .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())

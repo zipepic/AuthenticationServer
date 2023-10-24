@@ -1,6 +1,5 @@
 package com.example.authenticationserver.security.config;
 
-import com.example.authenticationserver.util.JwkManager2;
 import com.example.authenticationserver.security.filter.ErrorHandlingFilter;
 import com.example.authenticationserver.security.filter.auth.JWKsSignatureVerificationFilter;
 import com.example.authenticationserver.security.filter.auth.LoadUserFromDatabaseFilterByJwt;
@@ -9,6 +8,7 @@ import com.example.authenticationserver.security.filter.token.TokenGenerationFil
 import com.example.authenticationserver.security.filter.URIFilter;
 import com.example.authenticationserver.security.AuthUserProfileProviderImpl;
 import com.example.authenticationserver.security.service.UserProfileDetailsService;
+import com.example.authenticationserver.util.newutils.JwkManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
@@ -35,14 +35,14 @@ public class SecurityConfig {
   private final UserProfileDetailsService userProfileDetailsService;
   private final QueryGateway queryGateway;
   private final CommandGateway commandGateway;
-  private final JwkManager2 jwtTokenGenerator;
+  private final JwkManager jwkManager;
   @Autowired
-  public SecurityConfig(AuthUserProfileProviderImpl authUserProfileProvider, UserProfileDetailsService userProfileDetailsService, QueryGateway queryGateway, CommandGateway commandGateway, JwkManager2 jwtTokenGenerator) {
+  public SecurityConfig(AuthUserProfileProviderImpl authUserProfileProvider, UserProfileDetailsService userProfileDetailsService, QueryGateway queryGateway, CommandGateway commandGateway, JwkManager jwkManager) {
     this.authUserProfileProvider = authUserProfileProvider;
     this.userProfileDetailsService = userProfileDetailsService;
     this.queryGateway = queryGateway;
     this.commandGateway = commandGateway;
-    this.jwtTokenGenerator = jwtTokenGenerator;
+    this.jwkManager = jwkManager;
   }
   @Bean
   protected SecurityFilterChain filterChainAuth(HttpSecurity http) throws Exception {
@@ -79,7 +79,7 @@ public class SecurityConfig {
   private void configureAuthFilters(HttpSecurity http) throws Exception {
     http
       .addFilterBefore(new ErrorHandlingFilter(new ObjectMapper()), UsernamePasswordAuthenticationFilter.class)
-      .addFilterAfter(new JWKsSignatureVerificationFilter(jwtTokenGenerator), ErrorHandlingFilter.class)
+      .addFilterAfter(new JWKsSignatureVerificationFilter(jwkManager), ErrorHandlingFilter.class)
       .addFilterAfter(new LoadUserFromDatabaseFilterByJwt(userProfileDetailsService), JWKsSignatureVerificationFilter.class);
   }
   private void configureDefault(HttpSecurity http) throws Exception {

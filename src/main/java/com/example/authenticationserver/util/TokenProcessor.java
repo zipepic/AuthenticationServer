@@ -1,22 +1,16 @@
-package com.example.authenticationserver.util.newutils;
+package com.example.authenticationserver.util;
 
-import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
-import com.example.authenticationserver.util.AppConstants;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public abstract class TokenProcessor implements TokenUtils {
   public boolean isRefreshToken(Claims claims) {
@@ -31,14 +25,14 @@ public abstract class TokenProcessor implements TokenUtils {
     var refresh = Jwts.builder()
       .setSubject(userId)
       .setIssuer(AppConstants.ISSUER.toString())
-      .setExpiration(new Date(System.currentTimeMillis() + AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())) // Срок действия 1 час
+      .setExpiration(new Date(System.currentTimeMillis() + 1000000)) // Срок действия 1 час
       .setIssuedAt(new Date())
       .addClaims(Map.of("token_type","refresh_token"));
       tokenId(refresh,tokenId);
 
     var access = Jwts.builder()
       .setSubject(userId)
-      .setExpiration(new Date(System.currentTimeMillis() + AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())) // Срок действия 10 min
+      .setExpiration(new Date(System.currentTimeMillis() + 1000000)) // Срок действия 10 min
       .addClaims(Map.of("token_type","access_token"));
     tokenId(access,tokenId);
 

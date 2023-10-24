@@ -1,7 +1,6 @@
-package com.example.authenticationserver.util.newutils;
+package com.example.authenticationserver.util;
 
 import com.example.authenticationserver.test.RSAParser;
-import com.example.authenticationserver.util.AppConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -20,7 +19,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.util.*;
 @Service
-public class JwkManager extends TokenProcessor{
+public class JwkManager extends TokenProcessor {
   private static final String JWK_FILE_PATH= "/Users/xzz1p/Documents/MySpring/TEST_PROJECT/AuthenticationServer/jwk.json";
   private RSAKey rsaKey;
   @Override

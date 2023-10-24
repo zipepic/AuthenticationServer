@@ -1,4 +1,4 @@
-package com.example.authenticationserver.util.newutils;
+package com.example.authenticationserver.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;

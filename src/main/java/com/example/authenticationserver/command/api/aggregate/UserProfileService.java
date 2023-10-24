@@ -1,7 +1,6 @@
 package com.example.authenticationserver.command.api.aggregate;
 
-import com.example.authenticationserver.util.newutils.JwkManager;
-import com.example.authenticationserver.util.newutils.JwtManager;
+import com.example.authenticationserver.util.JwkManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

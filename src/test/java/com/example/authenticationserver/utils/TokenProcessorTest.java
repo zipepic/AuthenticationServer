@@ -2,7 +2,7 @@
 //
 //import static org.junit.Assert.*;
 //
-//import com.example.authenticationserver.util.newutils.TokenProcessor;
+//import com.example.authenticationserver.util.TokenProcessor;
 //import io.jsonwebtoken.Claims;
 //import io.jsonwebtoken.JwtBuilder;
 //import org.junit.Before;

@@ -1,6 +1,5 @@
-package com.example.authenticationserver.util.newutils;
+package com.example.authenticationserver.util;
 
-import com.example.authenticationserver.util.AppConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
@@ -9,15 +8,11 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+
 @Service
-public class JwtManager extends TokenProcessor{
+public class JwtManager extends TokenProcessor {
   private static SecretKeySpec secretKey;
   @Autowired
   public JwtManager(SecretKeySpec secretKey) {

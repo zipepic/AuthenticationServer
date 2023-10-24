@@ -4,7 +4,7 @@ import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
 import com.example.authenticationserver.dto.TokenSummary;
 import com.example.authenticationserver.dto.TokenDTO;
 import com.example.authenticationserver.util.AppConstants;
-import com.example.authenticationserver.util.newutils.JwkManager;
+import com.example.authenticationserver.util.JwkManager;
 import com.project.core.commands.user.CreateUserProfileCommand;
 import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
 import com.project.core.events.user.RefreshAccessTokenForUserProfileCommand;

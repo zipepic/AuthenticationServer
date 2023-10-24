@@ -8,7 +8,7 @@ import com.example.authenticationserver.security.filter.token.TokenGenerationFil
 import com.example.authenticationserver.security.filter.URIFilter;
 import com.example.authenticationserver.security.AuthUserProfileProviderImpl;
 import com.example.authenticationserver.security.service.UserProfileDetailsService;
-import com.example.authenticationserver.util.newutils.JwkManager;
+import com.example.authenticationserver.util.JwkManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;

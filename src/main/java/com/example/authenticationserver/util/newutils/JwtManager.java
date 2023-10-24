@@ -4,6 +4,7 @@ import com.example.authenticationserver.util.AppConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -15,10 +16,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
+@Service
 public class JwtManager extends TokenProcessor{
-  private static Key secretKey;
-
+  private static SecretKeySpec secretKey;
+  @Autowired
   public JwtManager(SecretKeySpec secretKey) {
     this.secretKey = secretKey;
   }

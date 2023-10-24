@@ -1,6 +1,7 @@
 package com.example.authenticationserver.security.filter.auth;
 
-import com.example.authenticationserver.util.JwtTokenUtils;
+import com.example.authenticationserver.util.newutils.JwtManager;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +19,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 public class TokenSignatureVerificationFilter extends OncePerRequestFilter {
+  private final JwtManager jwtManager;
+
+  public TokenSignatureVerificationFilter(JwtManager jwtManager) {
+    this.jwtManager = jwtManager;
+  }
+
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
       String authToken = request.getHeader("Authorization");
@@ -26,9 +33,14 @@ public class TokenSignatureVerificationFilter extends OncePerRequestFilter {
         throw new IllegalArgumentException("Invalid token");
 
       authToken = authToken.replace("Bearer ", "");
-      var claims = JwtTokenUtils.extractClaims(authToken);
+    Claims claims = null;
+    try {
+      claims = jwtManager.extractClaims(authToken);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
 
-      if(!(SecurityContextHolder.getContext().getAuthentication() == null))
+    if(!(SecurityContextHolder.getContext().getAuthentication() == null))
         throw new IllegalArgumentException("Security context already contains an authentication object");
 
       Authentication authentication = new UsernamePasswordAuthenticationToken(null,claims,null);

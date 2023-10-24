@@ -2,7 +2,7 @@ package com.example.authenticationserver.command.api.aggregate;
 
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
 import com.example.authenticationserver.util.AppConstants;
-import com.example.authenticationserver.util.JwtTokenUtils;
+import com.example.authenticationserver.util.newutils.JwtManager;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.events.code.AuthorizationCodeGeneratedEvent;
@@ -60,7 +60,8 @@ public class AuthorizationCodeFlowAggregate {
     this.sessionId = event.getSessionId();
   }
   @CommandHandler
-  public TokenAuthorizationCodeDTO handle(UseAuthorizationCodeCommand command){
+  public TokenAuthorizationCodeDTO handle(UseAuthorizationCodeCommand command, JwtManager jwtManager){
+    String tokeId = UUID.randomUUID().toString();
     if(this.status.equals("USED")){
       throw new IllegalStateException("Authorization code already used");
     }
@@ -71,31 +72,23 @@ public class AuthorizationCodeFlowAggregate {
 
     AggregateLifecycle.apply(event);
 
+    try {
+      var tokenMap = jwtManager.generateJwtTokens(this.userId, tokeId);
+      return TokenAuthorizationCodeDTO.builder()
+        .accessToken(tokenMap.get("access"))
+        .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())
+        .refreshToken(tokenMap.get("refresh"))
+        .refreshExpiresIn(AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())
+        .tokenType("Bearer")
+        .build();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
 
 
-    return TokenAuthorizationCodeDTO.builder()
-      .accessToken(JwtTokenUtils.signAndCompactWithDefaults(generateToken(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())))
-      .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())
-      .refreshToken(JwtTokenUtils
-        .signAndCompactWithDefaults(generateToken(AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())
-          .addClaims(Map.of("token_type","refresh_token"))))
-      .refreshExpiresIn(AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())
-      .tokenType("Bearer")
-      .build();
   }
   @EventSourcingHandler
   public void on(AuthorizationCodeUsedEvent event){
     this.status = event.getStatus();
-  }
-
-  private JwtBuilder generateToken(long expiration) {
-    var claims = new HashMap<String,Object>();
-    claims.put("scope",this.scope);
-    claims.put("type", "Bearer");
-    return Jwts.builder()
-      .setIssuedAt(new Date())
-      .setExpiration(new Date(System.currentTimeMillis() + expiration))
-      .setSubject(this.userId)
-      .addClaims(claims);
   }
 }

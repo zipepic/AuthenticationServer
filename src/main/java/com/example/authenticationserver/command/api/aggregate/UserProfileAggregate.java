@@ -1,9 +1,10 @@
 package com.example.authenticationserver.command.api.aggregate;
 
+import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
 import com.example.authenticationserver.dto.TokenSummary;
 import com.example.authenticationserver.dto.TokenDTO;
 import com.example.authenticationserver.util.AppConstants;
-import com.example.authenticationserver.util.JwtTokenUtils;
+import com.example.authenticationserver.util.newutils.JwkManager;
 import com.project.core.commands.user.CreateUserProfileCommand;
 import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
 import com.project.core.events.user.RefreshAccessTokenForUserProfileCommand;
@@ -89,16 +90,28 @@ public class UserProfileAggregate {
     this.tokenId = event.getTokenId();
   }
   @CommandHandler
-  public TokenDTO handle(RefreshAccessTokenForUserProfileCommand command){
-    TokenDTO tokenDTO = JwtTokenUtils.refresh(command.getClaims());
+  public TokenDTO handle(RefreshAccessTokenForUserProfileCommand command, JwkManager jwkManager) {
+    try {
+      var kid = jwkManager.getJwtHeader(command.getRefreshToken()).getKeyID();
+      var tokenMap = jwkManager.refresh(jwkManager.extractClaims(command.getRefreshToken()),kid);
 
-    var event = RefreshTokenForUserProfileGeneratedEvent.builder()
-      .userId(command.getUserId())
-      .tokenId(tokenDTO.getTokenId())
-      .build();
+      var event = RefreshTokenForUserProfileGeneratedEvent.builder()
+        .userId(command.getUserId())
+        .tokenId(kid)
+        .build();
 
-    AggregateLifecycle.apply(event);
+      AggregateLifecycle.apply(event);
 
-    return tokenDTO;
+      return TokenAuthorizationCodeDTO.builder()
+        .accessToken(tokenMap.get("access"))
+        .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())
+        .refreshExpiresIn(AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())
+        .refreshToken(tokenMap.get("refresh"))
+        .tokenType("Barer")
+        .tokenId(kid)
+        .build();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 }

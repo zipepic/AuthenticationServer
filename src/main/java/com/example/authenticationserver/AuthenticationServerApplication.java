@@ -4,7 +4,6 @@ import com.example.authenticationserver.dto.TokenInfo;
 import com.example.authenticationserver.dto.TokenSummary;
 import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
-import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.commands.app.CreateApplicationCommand;
@@ -79,9 +78,8 @@ public class AuthenticationServerApplication {
   }
 
   @Bean
-  public static JwtTokenUtils jwtTokenUtils(@NonNull @Value("${app.secret:#{null}}") String secret) {
+  public SecretKeySpec secretKeySpec(@NonNull @Value("${app.secret:#{null}}") String secret) {
     byte[] secretKeyBytes = Base64.getDecoder().decode(secret);
-    var secretKey = new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS256.getJcaName());
-    return new JwtTokenUtils(secretKey);
+    return new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS256.getJcaName());
   }
 }

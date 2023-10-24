@@ -38,6 +38,7 @@ public class JwkManager extends TokenProcessor{
 
   @Override
   public String signAndCompactWithDefaults(JwtBuilder jwt) throws Exception {
+    //TODO fix regenerating key for access/refresh token
     var keyPair = generateKeyPair();
 
     var generatedJwt = jwt
@@ -68,20 +69,6 @@ public class JwkManager extends TokenProcessor{
     List<JWK> keys = new ArrayList<>(jwkSet.getKeys());
 
     keys.add(this.rsaKey);
-
-    JWKSet updatedJWKSet = new JWKSet(keys);
-
-    objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(JWK_FILE_PATH), updatedJWKSet.toJSONObject());
-  }
-
-  private void saveInJsonFile(RSAKey rsaKey) throws IOException, ParseException {
-
-    ObjectMapper objectMapper = new ObjectMapper();
-    JWKSet jwkSet = JWKSet.load(new File(JWK_FILE_PATH));
-
-    List<JWK> keys = new ArrayList<>(jwkSet.getKeys());
-
-    keys.add(rsaKey);
 
     JWKSet updatedJWKSet = new JWKSet(keys);
 

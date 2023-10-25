@@ -1,6 +1,6 @@
 package com.example.authenticationserver.util;
 
-import com.example.authenticationserver.test.RSAParser;
+import com.example.authenticationserver.util.jwk.RSAParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;

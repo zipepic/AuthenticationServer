@@ -1,4 +1,4 @@
-package com.example.authenticationserver.test;
+package com.example.authenticationserver.util.jwk;
 
 import lombok.Data;
 

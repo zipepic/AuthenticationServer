@@ -3,6 +3,7 @@ package com.example.authenticationserver.security.config;
 import com.example.authenticationserver.security.filter.ErrorHandlingFilter;
 import com.example.authenticationserver.security.filter.auth.JWKsSignatureVerificationFilter;
 import com.example.authenticationserver.security.filter.auth.LoadUserFromDatabaseFilterByJwt;
+import com.example.authenticationserver.security.filter.auth.TokenRemoverFilter;
 import com.example.authenticationserver.security.filter.token.JwtRefreshFilter;
 import com.example.authenticationserver.security.filter.token.TokenGenerationFilter;
 import com.example.authenticationserver.security.filter.URIFilter;
@@ -79,7 +80,8 @@ public class SecurityConfig {
   private void configureAuthFilters(HttpSecurity http) throws Exception {
     http
       .addFilterBefore(new ErrorHandlingFilter(new ObjectMapper()), UsernamePasswordAuthenticationFilter.class)
-      .addFilterAfter(new JWKsSignatureVerificationFilter(jwkManager), ErrorHandlingFilter.class)
+      .addFilterAfter(new TokenRemoverFilter(), ErrorHandlingFilter.class)
+      .addFilterAfter(new JWKsSignatureVerificationFilter(jwkManager), TokenRemoverFilter.class)
       .addFilterAfter(new LoadUserFromDatabaseFilterByJwt(userProfileDetailsService), JWKsSignatureVerificationFilter.class);
   }
   private void configureDefault(HttpSecurity http) throws Exception {

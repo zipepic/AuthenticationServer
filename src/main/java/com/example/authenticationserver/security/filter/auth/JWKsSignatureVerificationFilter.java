@@ -1,6 +1,7 @@
 package com.example.authenticationserver.security.filter.auth;
 
 import com.example.authenticationserver.util.JwkManager;
+import com.example.authenticationserver.util.TokenUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,10 +14,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 public class JWKsSignatureVerificationFilter extends OncePerRequestFilter {
-  private final JwkManager jwtTokenGenerator;
+  private final TokenUtils tokenUtils;
 
-  public JWKsSignatureVerificationFilter(JwkManager jwtTokenGenerator) {
-    this.jwtTokenGenerator = jwtTokenGenerator;
+  public JWKsSignatureVerificationFilter(TokenUtils tokenUtils) {
+    this.tokenUtils = tokenUtils;
   }
 
   @Override
@@ -28,7 +29,7 @@ public class JWKsSignatureVerificationFilter extends OncePerRequestFilter {
 
     authToken = authToken.replace("Bearer ", "");
     try {
-      var claims = jwtTokenGenerator.extractClaims(authToken);
+      var claims = tokenUtils.extractClaims(authToken);
 
       if(!(SecurityContextHolder.getContext().getAuthentication() == null))
         throw new IllegalArgumentException("Security context already contains an authentication object");

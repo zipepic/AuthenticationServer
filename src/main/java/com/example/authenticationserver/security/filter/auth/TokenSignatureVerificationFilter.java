@@ -1,6 +1,7 @@
 package com.example.authenticationserver.security.filter.auth;
 
 import com.example.authenticationserver.util.JwtManager;
+import com.example.authenticationserver.util.TokenUtils;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -14,10 +15,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 public class TokenSignatureVerificationFilter extends OncePerRequestFilter {
-  private final JwtManager jwtManager;
+  private final TokenUtils tokenUtils;
 
-  public TokenSignatureVerificationFilter(JwtManager jwtManager) {
-    this.jwtManager = jwtManager;
+  public TokenSignatureVerificationFilter(TokenUtils tokenUtils) {
+    this.tokenUtils = tokenUtils;
   }
 
   @Override
@@ -30,7 +31,7 @@ public class TokenSignatureVerificationFilter extends OncePerRequestFilter {
       authToken = authToken.replace("Bearer ", "");
     Claims claims = null;
     try {
-      claims = jwtManager.extractClaims(authToken);
+      claims = tokenUtils.extractClaims(authToken);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

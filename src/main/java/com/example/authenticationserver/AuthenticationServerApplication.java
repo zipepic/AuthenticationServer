@@ -73,11 +73,6 @@ public class AuthenticationServerApplication {
     }
   }
   @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
-
-  @Bean
   public SecretKeySpec secretKeySpec(@NonNull @Value("${app.secret:#{null}}") String secret) {
     byte[] secretKeyBytes = Base64.getDecoder().decode(secret);
     return new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS256.getJcaName());

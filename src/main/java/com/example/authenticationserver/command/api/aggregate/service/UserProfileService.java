@@ -1,4 +1,4 @@
-package com.example.authenticationserver.command.api.aggregate;
+package com.example.authenticationserver.command.api.aggregate.service;
 
 import com.example.authenticationserver.util.JwkManager;
 import org.springframework.beans.factory.annotation.Autowired;

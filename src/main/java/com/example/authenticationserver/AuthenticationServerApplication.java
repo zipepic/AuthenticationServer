@@ -1,6 +1,5 @@
 package com.example.authenticationserver;
 
-import com.example.authenticationserver.dto.TokenInfo;
 import com.example.authenticationserver.dto.TokenSummary;
 import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
@@ -27,8 +26,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
@@ -55,7 +52,6 @@ public class AuthenticationServerApplication {
       UseAuthorizationCodeCommand.class,
       AuthorizationCodeGeneratedEvent.class,
       AuthorizationCodeUsedEvent.class,
-      TokenInfo.class,
       UserProfileEntity.class,
       FetchUserProfileByUserIdQuery.class,
       FetchUserProfileByUserNameQuery.class,

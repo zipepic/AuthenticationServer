@@ -1,5 +1,6 @@
 package com.example.authenticationserver.command.api.aggregate;
 
+import com.example.authenticationserver.command.api.aggregate.service.UserProfileService;
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
 import com.example.authenticationserver.dto.TokenSummary;
 import com.example.authenticationserver.dto.TokenDTO;

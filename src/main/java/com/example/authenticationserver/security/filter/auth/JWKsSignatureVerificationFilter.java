@@ -22,12 +22,8 @@ public class JWKsSignatureVerificationFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    String authToken = request.getHeader("Authorization");
+    String authToken = request.getHeader("token");
 
-    if (authToken == null || authToken.isBlank() || !authToken.startsWith("Bearer "))
-      throw new IllegalArgumentException("Invalid token");
-
-    authToken = authToken.replace("Bearer ", "");
     try {
       var claims = tokenUtils.extractClaims(authToken);
 

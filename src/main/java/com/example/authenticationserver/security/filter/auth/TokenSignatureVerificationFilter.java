@@ -23,12 +23,7 @@ public class TokenSignatureVerificationFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-      String authToken = request.getHeader("Authorization");
-
-      if (authToken == null || authToken.isBlank() || !authToken.startsWith("Bearer "))
-        throw new IllegalArgumentException("Invalid token");
-
-      authToken = authToken.replace("Bearer ", "");
+    String authToken = request.getHeader("token");
     Claims claims = null;
     try {
       claims = tokenUtils.extractClaims(authToken);

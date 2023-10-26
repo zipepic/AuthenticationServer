@@ -26,6 +26,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
@@ -72,5 +74,9 @@ public class AuthenticationServerApplication {
   public SecretKeySpec secretKeySpec(@NonNull @Value("${app.secret:#{null}}") String secret) {
     byte[] secretKeyBytes = Base64.getDecoder().decode(secret);
     return new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS256.getJcaName());
+  }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
   }
 }

@@ -106,10 +106,6 @@ public class SecurityConfig {
     return new JwtRefreshFilter(tokenGenerationFilter());
   }
   TokenGenerationFilter tokenGenerationFilter() { return new TokenGenerationFilter(commandGateway, new ObjectMapper());}
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
 
 }
 

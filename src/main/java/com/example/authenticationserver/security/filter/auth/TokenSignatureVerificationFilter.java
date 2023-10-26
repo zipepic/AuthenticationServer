@@ -23,7 +23,7 @@ public class TokenSignatureVerificationFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    String authToken = request.getHeader("token");
+    String authToken = (String) request.getAttribute("token");
     Claims claims = null;
     try {
       claims = tokenUtils.extractClaims(authToken);

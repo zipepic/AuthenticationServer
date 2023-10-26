@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.Date;
 
@@ -22,7 +24,7 @@ public class JwtManager extends TokenProcessor {
   @Override
   public Claims extractClaims(String jwtToken) throws Exception {
     return Jwts.parser()
-      .setSigningKey(secretKey)
+      .setSigningKey(this.keyContainer.getVerifyKey())
       .parseClaimsJws(jwtToken)
       .getBody();
   }
@@ -31,20 +33,26 @@ public class JwtManager extends TokenProcessor {
     return jwt
       .setIssuer(AppConstants.ISSUER.toString())
       .setIssuedAt(new Date())
-      .signWith(secretKey).compact();
+      .signWith(keyContainer.getSignKey()).compact();
   }
   @Override
-  public JwtBuilder tokenId(JwtBuilder iwt, String tokeId) {
-    return iwt.setId(tokeId);
+  public JwtBuilder tokenId(JwtBuilder iwt) {
+    return iwt.setId(this.tokenId);
   }
 
   @Override
-  public Claims tokenId(Claims claims, String tokenId) {
-    return claims.setId(tokenId);
+  public Claims tokenId(Claims claims) {
+    return claims.setId(this.tokenId);
   }
 
   @Override
-  public void save() throws IOException, ParseException {
+  public void save(String userId) throws IOException, ParseException {
 
   }
+
+  @Override
+  protected KeyContainer getKeyContainer() {
+    return new KeyContainer(secretKey);
+  }
+
 }

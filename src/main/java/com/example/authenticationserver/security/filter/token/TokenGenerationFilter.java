@@ -32,6 +32,7 @@ public class TokenGenerationFilter extends OncePerRequestFilter {
 
       var command = RefreshAccessTokenForUserProfileCommand.builder()
         .userId(userDetails.getUserProfileEntity().getUserId())
+        .refreshToken(request.getAttribute("token").toString())
         .claims(claims)
         .build();
       var tokenDTO = commandGateway.sendAndWait(command);

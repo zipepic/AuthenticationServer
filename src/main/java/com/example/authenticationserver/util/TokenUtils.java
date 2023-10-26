@@ -11,7 +11,5 @@ import java.util.Map;
 public interface TokenUtils {
   public Map<String, String> generateJwtTokens(String userId, String tokenId) throws Exception;
   public Claims extractClaims(String jwtToken) throws Exception;
-  public String signAndCompactWithDefaults(JwtBuilder jwt) throws Exception;
-  public String generateTokenWithClaims(Claims claims) throws Exception;
   public Map<String, String> refresh(Claims claims, String tokenId) throws Exception;
 }

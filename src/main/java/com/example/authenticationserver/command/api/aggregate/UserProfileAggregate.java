@@ -94,7 +94,7 @@ public class UserProfileAggregate {
   public TokenDTO handle(RefreshAccessTokenForUserProfileCommand command, JwkManager jwkManager) {
     try {
       var kid = jwkManager.getJwtHeader(command.getRefreshToken()).getKeyID();
-      var tokenMap = jwkManager.refresh(jwkManager.extractClaims(command.getRefreshToken()),kid);
+      var tokenMap = jwkManager.refresh(command.getClaims(),kid);
 
       var event = RefreshTokenForUserProfileGeneratedEvent.builder()
         .userId(command.getUserId())

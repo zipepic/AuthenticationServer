@@ -10,6 +10,7 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyPair;
@@ -21,13 +22,11 @@ import java.util.*;
 @Service
 public class JwkManager extends TokenProcessor {
   private static final String JWK_FILE_PATH= "/Users/xzz1p/Documents/MySpring/TEST_PROJECT/AuthenticationServer/jwk.json";
-  private RSAKey rsaKey;
   @Override
   public Claims extractClaims(String jwtToken) throws Exception {
     String kid = getJwtHeader(jwtToken).getKeyID();
     var jwk = getJWKSet().getKeyByKeyId(kid).toPublicJWK();
     RSAKey rsaKey = RSAParser.parseRSAKeyFromJson(jwk.toJSONString());
-
 
     return Jwts.parser()
       .setSigningKey(rsaKey.toRSAPublicKey())
@@ -37,47 +36,47 @@ public class JwkManager extends TokenProcessor {
 
   @Override
   public String signAndCompactWithDefaults(JwtBuilder jwt) throws Exception {
-    //TODO fix regenerating key for access/refresh token
-    var keyPair = generateKeyPair();
-
     var generatedJwt = jwt
       .setIssuer(AppConstants.ISSUER.toString())
       .setIssuedAt(new Date())
-      .signWith(keyPair.getPrivate()).compact();
-
-       this.rsaKey = new RSAKey.Builder((RSAPublicKey) keyPair.getPublic())
-        .keyID(getJwtHeader(generatedJwt).getKeyID())
-        .build();
+      .signWith(this.keyContainer.getSignKey()).compact();
     return generatedJwt;
   }
   @Override
-  public JwtBuilder tokenId(JwtBuilder iwt, String tokenId) {
-    return iwt.setHeader(Map.of("kid",tokenId));
+  public JwtBuilder tokenId(JwtBuilder iwt) {
+    return iwt.setHeader(Map.of("kid",this.tokenId));
   }
 
   @Override
-  public Claims tokenId(Claims claims, String tokenId) {
+  public Claims tokenId(Claims claims) {
     return claims;
   }
 
   @Override
-  public void save() throws IOException, ParseException {
+  public void save(String userId) throws IOException, ParseException {
+    //TODO add logic to delete duplicate keys
     ObjectMapper objectMapper = new ObjectMapper();
     JWKSet jwkSet = JWKSet.load(new File(JWK_FILE_PATH));
 
+    var rsaKey = new RSAKey.Builder((RSAPublicKey) this.keyContainer.getVerifyKey())
+      .keyID(this.tokenId)
+      .build();
+
     List<JWK> keys = new ArrayList<>(jwkSet.getKeys());
 
-    keys.add(this.rsaKey);
+    keys.add(rsaKey);
 
     JWKSet updatedJWKSet = new JWKSet(keys);
 
     objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(JWK_FILE_PATH), updatedJWKSet.toJSONObject());
   }
-  private KeyPair generateKeyPair() throws NoSuchAlgorithmException {
+
+  @Override
+  protected KeyContainer getKeyContainer() throws NoSuchAlgorithmException {
     KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
     keyPairGenerator.initialize(2048);
 
-    return keyPairGenerator.genKeyPair();
+    return new KeyContainer(keyPairGenerator.generateKeyPair());
   }
   public JWKSet getJWKSet() throws IOException, ParseException {
     return JWKSet.load(new File(JWK_FILE_PATH));

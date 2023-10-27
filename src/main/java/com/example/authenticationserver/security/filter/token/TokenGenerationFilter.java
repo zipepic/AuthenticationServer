@@ -2,8 +2,7 @@ package com.example.authenticationserver.security.filter.token;
 
 import com.example.authenticationserver.security.UserProfileDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.core.events.user.RefreshAccessTokenForUserProfileCommand;
-import io.jsonwebtoken.Claims;
+import com.project.core.commands.user.RefreshAccessTokenForUserProfileCommand;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,12 +27,10 @@ public class TokenGenerationFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
       var userDetails = (UserProfileDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-      var claims = (Claims) SecurityContextHolder.getContext().getAuthentication().getCredentials();
 
       var command = RefreshAccessTokenForUserProfileCommand.builder()
         .userId(userDetails.getUserProfileEntity().getUserId())
         .refreshToken(request.getAttribute("token").toString())
-        .claims(claims)
         .build();
       var tokenDTO = commandGateway.sendAndWait(command);
 

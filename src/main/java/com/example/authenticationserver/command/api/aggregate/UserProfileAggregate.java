@@ -5,10 +5,9 @@ import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
 import com.example.authenticationserver.dto.TokenSummary;
 import com.example.authenticationserver.dto.TokenDTO;
 import com.example.authenticationserver.util.AppConstants;
-import com.example.authenticationserver.util.JwkManager;
 import com.project.core.commands.user.CreateUserProfileCommand;
 import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
-import com.project.core.events.user.RefreshAccessTokenForUserProfileCommand;
+import com.project.core.commands.user.RefreshAccessTokenForUserProfileCommand;
 import com.project.core.events.user.RefreshTokenForUserProfileGeneratedEvent;
 import com.project.core.events.user.UserProfileCreatedEvent;
 import lombok.NonNull;
@@ -62,7 +61,7 @@ public class UserProfileAggregate {
   }
 
   @CommandHandler
-  public TokenDTO handle(GenerateRefreshTokenForUserProfileCommand command,@NonNull UserProfileService userProfileService) {
+  public TokenDTO handle(GenerateRefreshTokenForUserProfileCommand command, @NonNull UserProfileService userProfileService) {
     UUID tokenId = UUID.randomUUID();
 
     var event = RefreshTokenForUserProfileGeneratedEvent.builder()
@@ -71,19 +70,7 @@ public class UserProfileAggregate {
       .build();
 
     AggregateLifecycle.apply(event);
-    try {
-      var tokenMap = userProfileService.generateJwtTokens(command.getUserId(), tokenId.toString(), command.getTokenType());
-      return TokenSummary.builder()
-        .accessToken(tokenMap.get("access"))
-        .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())
-        .refreshExpiresIn(AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())
-        .refreshToken(tokenMap.get("refresh"))
-        .tokenType("Bearer")
-        .tokenId(tokenId.toString())
-        .build();
-    }catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+    return userProfileService.generateJwtTokens(command.getUserId(), tokenId.toString(), command.getTokenType());
   }
 
   @EventSourcingHandler
@@ -91,29 +78,16 @@ public class UserProfileAggregate {
     this.tokenId = event.getTokenId();
   }
   @CommandHandler
-  public TokenDTO handle(RefreshAccessTokenForUserProfileCommand command, UserProfileService service) {
-    try {
-      var kid = UUID.randomUUID().toString();
-
-      var tokenMap = service.refreshJwtToken(command.getRefreshToken(), kid);
+  public TokenDTO handle(RefreshAccessTokenForUserProfileCommand command, @NonNull UserProfileService service) {
+      UUID tokenId = UUID.randomUUID();
 
       var event = RefreshTokenForUserProfileGeneratedEvent.builder()
         .userId(command.getUserId())
-        .tokenId(kid)
+        .tokenId(tokenId.toString())
         .build();
 
       AggregateLifecycle.apply(event);
+      return service.refreshJwtToken(command.getRefreshToken(), tokenId.toString());
 
-      return TokenAuthorizationCodeDTO.builder()
-        .accessToken(tokenMap.get("access"))
-        .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())
-        .refreshExpiresIn(AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())
-        .refreshToken(tokenMap.get("refresh"))
-        .tokenType("Bearer")
-        .tokenId(kid)
-        .build();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
   }
 }

@@ -35,15 +35,6 @@ public class JwtManager extends TokenProcessor {
       .setIssuedAt(new Date())
       .signWith(keyContainer.getSignKey()).compact();
   }
-  @Override
-  public JwtBuilder tokenId(JwtBuilder iwt) {
-    return iwt.setId(this.tokenId);
-  }
-
-  @Override
-  public Claims tokenId(Claims claims) {
-    return claims.setId(this.tokenId);
-  }
 
   @Override
   public void save(String userId) throws IOException, ParseException {

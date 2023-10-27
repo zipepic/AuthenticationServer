@@ -44,16 +44,6 @@ public class JwkManager extends TokenProcessor {
     return generatedJwt;
   }
   @Override
-  public JwtBuilder tokenId(JwtBuilder iwt) {
-    return iwt.setHeader(Map.of("kid",this.tokenId));
-  }
-
-  @Override
-  public Claims tokenId(Claims claims) {
-    return claims;
-  }
-
-  @Override
   public void save(String userId) throws IOException, ParseException {
     ObjectMapper objectMapper = new ObjectMapper();
     JWKSet jwkSet = JWKSet.load(new File(JWK_FILE_PATH));

@@ -33,13 +33,11 @@ abstract class TokenProcessor implements TokenUtils {
       .setExpiration(new Date(System.currentTimeMillis() + 100000)) // Срок действия 1 час
       .setIssuedAt(new Date())
       .addClaims(Map.of("token_type","refresh_token"));
-      tokenId(refresh);
 
     var access = Jwts.builder()
       .setSubject(userId)
       .setExpiration(new Date(System.currentTimeMillis() + 100000)) // Срок действия 10 min
       .addClaims(Map.of("token_type","access_token"));
-    tokenId(access);
 
     Map<String, String> tokenMap = new HashMap<>();
     tokenMap.put("refresh", signAndCompactWithDefaults(refresh));
@@ -62,11 +60,9 @@ abstract class TokenProcessor implements TokenUtils {
 
     refreshTokenClaims
       .setExpiration(new Date(System.currentTimeMillis() + 100000));
-    tokenId(refreshTokenClaims);
 
     Claims accessTokenClaims = Jwts.claims();
     accessTokenClaims.putAll(claims);
-    tokenId(accessTokenClaims);
 
     accessTokenClaims
       .setExpiration(new Date(System.currentTimeMillis() + 100000))
@@ -80,8 +76,6 @@ abstract class TokenProcessor implements TokenUtils {
   }
   public abstract Claims extractClaims(String jwtToken) throws Exception;
   public abstract String signAndCompactWithDefaults(JwtBuilder jwt) throws Exception;
-  protected abstract JwtBuilder tokenId(JwtBuilder iwt);
-  protected abstract Claims tokenId(Claims claims);
   public abstract void save(String userId) throws IOException, ParseException;
   protected abstract KeyContainer getKeyContainer() throws NoSuchAlgorithmException;
 }

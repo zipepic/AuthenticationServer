@@ -41,8 +41,4 @@ public class UserProfileCommandService {
     var auth = authUserProfileProvider.authenticate(token);
     return (UserProfileDetails) auth.getPrincipal();
   }
-  @PreAuthorize("hasRole('ROLE_USER')")
-  public void on(){
-
-  }
 }

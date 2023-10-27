@@ -1,5 +1,9 @@
 package com.example.authenticationserver.command.api.aggregate.service;
 
+import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
+import com.example.authenticationserver.dto.TokenDTO;
+import com.example.authenticationserver.dto.TokenSummary;
+import com.example.authenticationserver.util.AppConstants;
 import com.example.authenticationserver.util.JwkManager;
 import com.example.authenticationserver.util.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,17 +20,34 @@ public class UserProfileService {
     this.tokenUtils = tokenUtils;
   }
 
-  public Map<String, String> generateJwtTokens(String userId, String tokenId, String tokenType) throws Exception{
-    if(tokenType.equals("JWK")) {
-      return tokenUtils.generateJwtTokens(userId, tokenId);
-    }else{
-      throw new IllegalArgumentException("Invalid token type");
+  public TokenDTO generateJwtTokens(String userId, String tokenId, String tokenType){
+    try {
+        var tokenMap = tokenUtils.generateJwtTokens(userId, tokenId);
+        return TokenSummary.builder()
+          .accessToken(tokenMap.get("access"))
+          .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())
+          .refreshExpiresIn(AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())
+          .refreshToken(tokenMap.get("refresh"))
+          .tokenType("Bearer")
+          .tokenId(tokenId.toString())
+          .build();
+    }
+    catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
-  public Map<String,String> refreshJwtToken(String refreshToken, String tokenId){
+  public TokenDTO refreshJwtToken(String refreshToken, String tokenId){
     try {
       var claims = tokenUtils.extractClaims(refreshToken);
-      return tokenUtils.refresh(claims,tokenId);
+      var tokenMap = tokenUtils.refresh(claims,tokenId);
+      return TokenAuthorizationCodeDTO.builder()
+        .accessToken(tokenMap.get("access"))
+        .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())
+        .refreshExpiresIn(AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())
+        .refreshToken(tokenMap.get("refresh"))
+        .tokenType("Bearer")
+        .tokenId(tokenId)
+        .build();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

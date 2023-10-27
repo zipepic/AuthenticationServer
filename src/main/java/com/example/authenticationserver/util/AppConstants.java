@@ -1,9 +1,6 @@
 package com.example.authenticationserver.util;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-@Component
 public enum AppConstants {
   REFRESH_TOKEN_EXP_TIME,
   ACCESS_TOKEN_EXP_TIME,

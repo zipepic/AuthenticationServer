@@ -1,18 +1,16 @@
 package com.example.authenticationserver;
 
-import com.example.authenticationserver.dto.TokenInfo;
 import com.example.authenticationserver.dto.TokenSummary;
 import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
-import com.example.authenticationserver.util.JwtTokenUtils;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.commands.app.CreateApplicationCommand;
 import com.project.core.commands.user.CreateUserProfileCommand;
 import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
+import com.project.core.commands.user.RefreshAccessTokenForUserProfileCommand;
 import com.project.core.events.code.AuthorizationCodeGeneratedEvent;
 import com.project.core.events.code.AuthorizationCodeUsedEvent;
-import com.project.core.events.user.RefreshAccessTokenForUserProfileCommand;
 import com.project.core.events.user.RefreshTokenForUserProfileGeneratedEvent;
 import com.project.core.events.user.UserProfileCreatedEvent;
 import com.project.core.events.app.ApplicationCreatedEvent;
@@ -56,7 +54,6 @@ public class AuthenticationServerApplication {
       UseAuthorizationCodeCommand.class,
       AuthorizationCodeGeneratedEvent.class,
       AuthorizationCodeUsedEvent.class,
-      TokenInfo.class,
       UserProfileEntity.class,
       FetchUserProfileByUserIdQuery.class,
       FetchUserProfileByUserNameQuery.class,
@@ -74,14 +71,12 @@ public class AuthenticationServerApplication {
     }
   }
   @Bean
+  public SecretKeySpec secretKeySpec(@NonNull @Value("${app.secret:#{null}}") String secret) {
+    byte[] secretKeyBytes = Base64.getDecoder().decode(secret);
+    return new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS256.getJcaName());
+  }
+  @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
-  }
-
-  @Bean
-  public static JwtTokenUtils jwtTokenUtils(@NonNull @Value("${app.secret:#{null}}") String secret) {
-    byte[] secretKeyBytes = Base64.getDecoder().decode(secret);
-    var secretKey = new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS256.getJcaName());
-    return new JwtTokenUtils(secretKey);
   }
 }

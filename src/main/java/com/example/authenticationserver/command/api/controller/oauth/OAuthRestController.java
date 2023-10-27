@@ -1,7 +1,10 @@
 package com.example.authenticationserver.command.api.controller.oauth;
 
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
-import com.example.authenticationserver.util.JwtTokenUtils;
+import com.example.authenticationserver.dto.TokenDTO;
+import com.example.authenticationserver.dto.TokenSummary;
+import com.example.authenticationserver.util.AppConstants;
+import com.example.authenticationserver.util.JwtManager;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.queries.app.CheckLoginDataQuery;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -17,10 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class OAuthRestController {
   private final QueryGateway queryGateway;
   private final CommandGateway commandGateway;
+  private final JwtManager jwtManager;
   @Autowired
-  public OAuthRestController(QueryGateway queryGateway, CommandGateway commandGateway) {
+  public OAuthRestController(QueryGateway queryGateway, CommandGateway commandGateway, JwtManager jwtManager) {
     this.queryGateway = queryGateway;
     this.commandGateway = commandGateway;
+    this.jwtManager = jwtManager;
   }
 
   @PostMapping("/token")
@@ -48,9 +53,23 @@ public class OAuthRestController {
     return commandGateway.sendAndWait(command);
   }
   @PostMapping("/refresh_token")
-  public TokenAuthorizationCodeDTO refreshToken(@RequestParam String client_id,
-                                                @RequestParam String client_secret,
-                                                @RequestParam String refresh_token){
-    return JwtTokenUtils.refresh(JwtTokenUtils.extractClaims(refresh_token));
+  public TokenDTO refreshToken(@RequestParam String client_id,
+                               @RequestParam String client_secret,
+                               @RequestParam String refresh_token){
+    try {
+
+      var claims = jwtManager.extractClaims(refresh_token);
+      var tokenMap = jwtManager.refresh(claims, claims.getId());
+      return TokenSummary.builder()
+        .accessToken(tokenMap.get("access"))
+        .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())
+        .refreshExpiresIn(AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())
+        .refreshToken(tokenMap.get("refresh"))
+        .tokenType("Bearer")
+        .tokenId(claims.getId())
+        .build();
+    }catch (Exception e){
+      throw new RuntimeException(e.getMessage());
+    }
   }
 }

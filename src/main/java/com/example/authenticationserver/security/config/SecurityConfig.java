@@ -1,22 +1,22 @@
 package com.example.authenticationserver.security.config;
 
-import com.example.authenticationserver.test.JwkManager;
 import com.example.authenticationserver.security.filter.ErrorHandlingFilter;
-import com.example.authenticationserver.security.filter.auth.JWKsSignatureVerificationFilter;
+import com.example.authenticationserver.security.filter.auth.SignatureVerificationFilter;
 import com.example.authenticationserver.security.filter.auth.LoadUserFromDatabaseFilterByJwt;
-import com.example.authenticationserver.security.filter.auth.TokenSignatureVerificationFilter;
+import com.example.authenticationserver.security.filter.auth.TokenRemoverFilter;
 import com.example.authenticationserver.security.filter.token.JwtRefreshFilter;
 import com.example.authenticationserver.security.filter.token.TokenGenerationFilter;
 import com.example.authenticationserver.security.filter.URIFilter;
 import com.example.authenticationserver.security.AuthUserProfileProviderImpl;
 import com.example.authenticationserver.security.service.UserProfileDetailsService;
+import com.example.authenticationserver.util.TokenUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -37,14 +37,18 @@ public class SecurityConfig {
   private final UserProfileDetailsService userProfileDetailsService;
   private final QueryGateway queryGateway;
   private final CommandGateway commandGateway;
-  private final JwkManager jwtTokenGenerator;
+  private final TokenUtils tokenUtils;
   @Autowired
-  public SecurityConfig(AuthUserProfileProviderImpl authUserProfileProvider, UserProfileDetailsService userProfileDetailsService, QueryGateway queryGateway, CommandGateway commandGateway, JwkManager jwtTokenGenerator) {
+  public SecurityConfig(AuthUserProfileProviderImpl authUserProfileProvider,
+                        UserProfileDetailsService userProfileDetailsService,
+                        QueryGateway queryGateway,
+                        CommandGateway commandGateway,
+                        @Qualifier("jwtManager")TokenUtils tokenUtils) {
     this.authUserProfileProvider = authUserProfileProvider;
     this.userProfileDetailsService = userProfileDetailsService;
     this.queryGateway = queryGateway;
     this.commandGateway = commandGateway;
-    this.jwtTokenGenerator = jwtTokenGenerator;
+    this.tokenUtils = tokenUtils;
   }
   @Bean
   protected SecurityFilterChain filterChainAuth(HttpSecurity http) throws Exception {
@@ -68,9 +72,6 @@ public class SecurityConfig {
     configureDefault(http);
     return http.build();
   }
-
-
-
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
     return (web) -> web.ignoring()
@@ -81,8 +82,9 @@ public class SecurityConfig {
   private void configureAuthFilters(HttpSecurity http) throws Exception {
     http
       .addFilterBefore(new ErrorHandlingFilter(new ObjectMapper()), UsernamePasswordAuthenticationFilter.class)
-      .addFilterAfter(new JWKsSignatureVerificationFilter(jwtTokenGenerator), ErrorHandlingFilter.class)
-      .addFilterAfter(new LoadUserFromDatabaseFilterByJwt(userProfileDetailsService), JWKsSignatureVerificationFilter.class);
+      .addFilterAfter(new TokenRemoverFilter(), ErrorHandlingFilter.class)
+      .addFilterAfter(new SignatureVerificationFilter(tokenUtils), TokenRemoverFilter.class)
+      .addFilterAfter(new LoadUserFromDatabaseFilterByJwt(userProfileDetailsService), SignatureVerificationFilter.class);
   }
   private void configureDefault(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
@@ -98,5 +100,6 @@ public class SecurityConfig {
     return new JwtRefreshFilter(tokenGenerationFilter());
   }
   TokenGenerationFilter tokenGenerationFilter() { return new TokenGenerationFilter(commandGateway, new ObjectMapper());}
+
 }
 

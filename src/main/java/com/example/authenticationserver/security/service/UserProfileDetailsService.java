@@ -34,7 +34,6 @@ public class UserProfileDetailsService implements UserDetailsService {
       throw new UsernameNotFoundException("User not found");
     }
   }
-
   public UserDetails loadUserByUserId(String userId) throws UsernameNotFoundException {
     try {
       var query = FetchUserProfileByUserIdQuery.builder()

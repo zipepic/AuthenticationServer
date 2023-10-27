@@ -1,5 +1,6 @@
-package com.example.authenticationserver.test;
+package com.example.authenticationserver.util.jwk;
 
+import com.example.authenticationserver.util.jwk.Jwk;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.RSAKey;

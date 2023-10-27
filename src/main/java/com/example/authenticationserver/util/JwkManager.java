@@ -19,6 +19,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Collectors;
+
 @Service
 public class JwkManager extends TokenProcessor {
   private static final String JWK_FILE_PATH= "/Users/xzz1p/Documents/MySpring/TEST_PROJECT/AuthenticationServer/jwk.json";
@@ -54,7 +56,6 @@ public class JwkManager extends TokenProcessor {
 
   @Override
   public void save(String userId) throws IOException, ParseException {
-    //TODO add logic to delete duplicate keys
     ObjectMapper objectMapper = new ObjectMapper();
     JWKSet jwkSet = JWKSet.load(new File(JWK_FILE_PATH));
 
@@ -63,6 +64,8 @@ public class JwkManager extends TokenProcessor {
       .build();
 
     List<JWK> keys = new ArrayList<>(jwkSet.getKeys());
+
+    keys.stream().filter(key -> !key.getKeyID().equals(this.tokenId)).collect(Collectors.toList());
 
     keys.add(rsaKey);
 

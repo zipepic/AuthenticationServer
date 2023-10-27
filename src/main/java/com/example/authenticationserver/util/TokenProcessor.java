@@ -84,6 +84,5 @@ abstract class TokenProcessor implements TokenUtils {
   protected abstract Claims tokenId(Claims claims);
   public abstract void save(String userId) throws IOException, ParseException;
   protected abstract KeyContainer getKeyContainer() throws NoSuchAlgorithmException;
-  public abstract String getTokenId(String jwtToken) throws Exception;
 }
 

@@ -31,12 +31,4 @@ public class UserProfileService {
       throw new RuntimeException(e);
     }
   }
-  public String getTokenId(String jwtToken){
-    try {
-      return tokenUtils.getTokenId(jwtToken);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
 }

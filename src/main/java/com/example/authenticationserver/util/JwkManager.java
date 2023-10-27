@@ -31,7 +31,7 @@ public class JwkManager extends TokenProcessor {
     return Jwts.parser()
       .setSigningKey(rsaKey.toRSAPublicKey())
       .parseClaimsJws(jwtToken)
-      .getBody();
+      .getBody().setId(kid);
   }
 
   @Override
@@ -80,12 +80,6 @@ public class JwkManager extends TokenProcessor {
 
     return new KeyContainer(keyPairGenerator.generateKeyPair());
   }
-
-  @Override
-  public String getTokenId(String jwtToken) throws ParseException {
-    return getJwtHeader(jwtToken).getKeyID();
-  }
-
   public JWKSet getJWKSet() throws IOException, ParseException {
     return JWKSet.load(new File(JWK_FILE_PATH));
   }

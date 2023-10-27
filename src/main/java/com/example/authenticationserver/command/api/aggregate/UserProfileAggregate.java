@@ -91,10 +91,11 @@ public class UserProfileAggregate {
     this.tokenId = event.getTokenId();
   }
   @CommandHandler
-  public TokenDTO handle(RefreshAccessTokenForUserProfileCommand command, JwkManager jwkManager) {
+  public TokenDTO handle(RefreshAccessTokenForUserProfileCommand command, UserProfileService service) {
     try {
-      var kid = jwkManager.getJwtHeader(command.getRefreshToken()).getKeyID();
-      var tokenMap = jwkManager.refresh(command.getClaims(),kid);
+      var kid = UUID.randomUUID().toString();
+
+      var tokenMap = service.refreshJwtToken(command.getRefreshToken(), kid);
 
       var event = RefreshTokenForUserProfileGeneratedEvent.builder()
         .userId(command.getUserId())
@@ -108,7 +109,7 @@ public class UserProfileAggregate {
         .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())
         .refreshExpiresIn(AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal())
         .refreshToken(tokenMap.get("refresh"))
-        .tokenType("Barer")
+        .tokenType("Bearer")
         .tokenId(kid)
         .build();
     } catch (Exception e) {

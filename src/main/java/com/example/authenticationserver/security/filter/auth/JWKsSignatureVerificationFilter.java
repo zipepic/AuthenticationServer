@@ -26,6 +26,7 @@ public class JWKsSignatureVerificationFilter extends OncePerRequestFilter {
 
     try {
       var claims = tokenUtils.extractClaims(authToken);
+      claims.setId(tokenUtils.getTokenId(authToken));
 
       if(!(SecurityContextHolder.getContext().getAuthentication() == null))
         throw new IllegalArgumentException("Security context already contains an authentication object");

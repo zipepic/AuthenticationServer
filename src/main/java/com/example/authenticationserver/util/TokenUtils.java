@@ -12,4 +12,5 @@ public interface TokenUtils {
   public Map<String, String> generateJwtTokens(String userId, String tokenId) throws Exception;
   public Claims extractClaims(String jwtToken) throws Exception;
   public Map<String, String> refresh(Claims claims, String tokenId) throws Exception;
+  public String getTokenId(String jwtToken) throws Exception;
 }

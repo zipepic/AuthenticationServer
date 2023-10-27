@@ -10,10 +10,8 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
 import java.io.File;
 import java.io.IOException;
-import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
@@ -41,6 +39,7 @@ public class JwkManager extends TokenProcessor {
     var generatedJwt = jwt
       .setIssuer(AppConstants.ISSUER.toString())
       .setIssuedAt(new Date())
+      .setHeader(Map.of("kid",this.tokenId))
       .signWith(this.keyContainer.getSignKey()).compact();
     return generatedJwt;
   }
@@ -65,7 +64,7 @@ public class JwkManager extends TokenProcessor {
 
     List<JWK> keys = new ArrayList<>(jwkSet.getKeys());
 
-    keys.stream().filter(key -> !key.getKeyID().equals(this.tokenId)).collect(Collectors.toList());
+    keys = keys.stream().filter(key -> !key.getKeyID().equals(this.tokenId)).collect(Collectors.toList());
 
     keys.add(rsaKey);
 
@@ -81,6 +80,12 @@ public class JwkManager extends TokenProcessor {
 
     return new KeyContainer(keyPairGenerator.generateKeyPair());
   }
+
+  @Override
+  public String getTokenId(String jwtToken) throws ParseException {
+    return getJwtHeader(jwtToken).getKeyID();
+  }
+
   public JWKSet getJWKSet() throws IOException, ParseException {
     return JWKSet.load(new File(JWK_FILE_PATH));
   }

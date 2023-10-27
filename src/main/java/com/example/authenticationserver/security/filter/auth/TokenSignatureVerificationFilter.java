@@ -1,7 +1,6 @@
 package com.example.authenticationserver.security.filter.auth;
 
-import com.example.authenticationserver.util.JwtManager;
-import com.example.authenticationserver.util.TokenUtils;
+import com.example.authenticationserver.util.JwkManager;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,10 +14,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 public class TokenSignatureVerificationFilter extends OncePerRequestFilter {
-  private final TokenUtils tokenUtils;
+  private final JwkManager jwkManager;
 
-  public TokenSignatureVerificationFilter(TokenUtils tokenUtils) {
-    this.tokenUtils = tokenUtils;
+  public TokenSignatureVerificationFilter(JwkManager jwkManager) {
+    this.jwkManager = jwkManager;
   }
 
   @Override
@@ -26,7 +25,7 @@ public class TokenSignatureVerificationFilter extends OncePerRequestFilter {
     String authToken = (String) request.getAttribute("token");
     Claims claims = null;
     try {
-      claims = tokenUtils.extractClaims(authToken);
+      claims = jwkManager.extractClaims(authToken);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

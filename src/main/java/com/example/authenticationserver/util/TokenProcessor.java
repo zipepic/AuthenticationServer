@@ -7,7 +7,6 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 
 import java.io.IOException;
-import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.Date;
@@ -31,14 +30,14 @@ abstract class TokenProcessor implements TokenUtils {
     var refresh = Jwts.builder()
       .setSubject(userId)
       .setIssuer(AppConstants.ISSUER.toString())
-      .setExpiration(new Date(System.currentTimeMillis() + 1000000)) // Срок действия 1 час
+      .setExpiration(new Date(System.currentTimeMillis() + 100000)) // Срок действия 1 час
       .setIssuedAt(new Date())
       .addClaims(Map.of("token_type","refresh_token"));
       tokenId(refresh);
 
     var access = Jwts.builder()
       .setSubject(userId)
-      .setExpiration(new Date(System.currentTimeMillis() + 1000000)) // Срок действия 10 min
+      .setExpiration(new Date(System.currentTimeMillis() + 100000)) // Срок действия 10 min
       .addClaims(Map.of("token_type","access_token"));
     tokenId(access);
 
@@ -62,14 +61,15 @@ abstract class TokenProcessor implements TokenUtils {
     refreshTokenClaims.putAll(claims);
 
     refreshTokenClaims
-      .setExpiration(new Date(System.currentTimeMillis() + AppConstants.REFRESH_TOKEN_EXP_TIME.ordinal()));
+      .setExpiration(new Date(System.currentTimeMillis() + 100000));
     tokenId(refreshTokenClaims);
 
     Claims accessTokenClaims = Jwts.claims();
     accessTokenClaims.putAll(claims);
+    tokenId(accessTokenClaims);
 
     accessTokenClaims
-      .setExpiration(new Date(System.currentTimeMillis() + AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal()))
+      .setExpiration(new Date(System.currentTimeMillis() + 100000))
       .put("token_type", "access_token");
 
     Map<String, String> tokenMap = new HashMap<>();
@@ -84,5 +84,6 @@ abstract class TokenProcessor implements TokenUtils {
   protected abstract Claims tokenId(Claims claims);
   public abstract void save(String userId) throws IOException, ParseException;
   protected abstract KeyContainer getKeyContainer() throws NoSuchAlgorithmException;
+  public abstract String getTokenId(String jwtToken) throws Exception;
 }
 

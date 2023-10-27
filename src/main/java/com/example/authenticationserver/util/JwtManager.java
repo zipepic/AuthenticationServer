@@ -55,4 +55,9 @@ public class JwtManager extends TokenProcessor {
     return new KeyContainer(secretKey);
   }
 
+  @Override
+  public String getTokenId(String jwtToken) throws Exception {
+    return extractClaims(jwtToken).getId();
+  }
+
 }

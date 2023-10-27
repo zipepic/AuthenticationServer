@@ -10,13 +10,12 @@ import com.example.authenticationserver.security.filter.URIFilter;
 import com.example.authenticationserver.security.AuthUserProfileProviderImpl;
 import com.example.authenticationserver.security.service.UserProfileDetailsService;
 import com.example.authenticationserver.util.JwkManager;
+import com.example.authenticationserver.util.TokenUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.NonNull;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -25,14 +24,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
-import javax.crypto.spec.SecretKeySpec;
-import java.util.Base64;
 
 
 @Configuration
@@ -44,14 +38,18 @@ public class SecurityConfig {
   private final UserProfileDetailsService userProfileDetailsService;
   private final QueryGateway queryGateway;
   private final CommandGateway commandGateway;
-  private final JwkManager jwkManager;
+  private final TokenUtils tokenUtils;
   @Autowired
-  public SecurityConfig(AuthUserProfileProviderImpl authUserProfileProvider, UserProfileDetailsService userProfileDetailsService, QueryGateway queryGateway, CommandGateway commandGateway, JwkManager jwkManager) {
+  public SecurityConfig(AuthUserProfileProviderImpl authUserProfileProvider,
+                        UserProfileDetailsService userProfileDetailsService,
+                        QueryGateway queryGateway,
+                        CommandGateway commandGateway,
+                        @Qualifier("jwtManager")TokenUtils tokenUtils) {
     this.authUserProfileProvider = authUserProfileProvider;
     this.userProfileDetailsService = userProfileDetailsService;
     this.queryGateway = queryGateway;
     this.commandGateway = commandGateway;
-    this.jwkManager = jwkManager;
+    this.tokenUtils = tokenUtils;
   }
   @Bean
   protected SecurityFilterChain filterChainAuth(HttpSecurity http) throws Exception {
@@ -75,9 +73,6 @@ public class SecurityConfig {
     configureDefault(http);
     return http.build();
   }
-
-
-
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
     return (web) -> web.ignoring()
@@ -89,7 +84,7 @@ public class SecurityConfig {
     http
       .addFilterBefore(new ErrorHandlingFilter(new ObjectMapper()), UsernamePasswordAuthenticationFilter.class)
       .addFilterAfter(new TokenRemoverFilter(), ErrorHandlingFilter.class)
-      .addFilterAfter(new JWKsSignatureVerificationFilter(jwkManager), TokenRemoverFilter.class)
+      .addFilterAfter(new JWKsSignatureVerificationFilter(tokenUtils), TokenRemoverFilter.class)
       .addFilterAfter(new LoadUserFromDatabaseFilterByJwt(userProfileDetailsService), JWKsSignatureVerificationFilter.class);
   }
   private void configureDefault(HttpSecurity http) throws Exception {

@@ -13,6 +13,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Абстрактный класс для работы с токенами
+ * @author xzz1p
+ * @see TokenUtils
+ * @see JwtManager
+ * @see KeyContainer
+ * @since version 1.0
+ */
+
 abstract class TokenProcessor implements TokenUtils {
   protected KeyContainer keyContainer;
   protected String tokenId;

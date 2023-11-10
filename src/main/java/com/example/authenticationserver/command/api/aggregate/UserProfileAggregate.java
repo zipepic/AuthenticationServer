@@ -1,10 +1,7 @@
 package com.example.authenticationserver.command.api.aggregate;
 
 import com.example.authenticationserver.command.api.aggregate.service.UserProfileService;
-import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
-import com.example.authenticationserver.dto.TokenSummary;
 import com.example.authenticationserver.dto.TokenDTO;
-import com.example.authenticationserver.util.AppConstants;
 import com.project.core.commands.user.CreateUserProfileCommand;
 import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
 import com.project.core.commands.user.RefreshAccessTokenForUserProfileCommand;
@@ -88,6 +85,5 @@ public class UserProfileAggregate {
 
       AggregateLifecycle.apply(event);
       return service.refreshJwtToken(command.getRefreshToken(), tokenId.toString());
-
   }
 }

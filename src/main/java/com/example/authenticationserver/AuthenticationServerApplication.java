@@ -3,6 +3,8 @@ package com.example.authenticationserver;
 import com.example.authenticationserver.dto.TokenSummary;
 import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
+import com.example.authenticationserver.util.newutil.TokenFacade;
+import com.example.authenticationserver.util.newutil.TokenProcessorFactory;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.commands.app.CreateApplicationCommand;

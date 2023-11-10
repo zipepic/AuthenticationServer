@@ -3,26 +3,23 @@ package com.example.authenticationserver.command.api.aggregate.service;
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
 import com.example.authenticationserver.dto.TokenDTO;
 import com.example.authenticationserver.dto.TokenSummary;
-import com.example.authenticationserver.util.AppConstants;
-import com.example.authenticationserver.util.JwkManager;
-import com.example.authenticationserver.util.TokenUtils;
+import com.example.authenticationserver.util.jwk.AppConstants;
+import com.example.authenticationserver.util.newutil.TokenFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-
 @Service
 public class UserProfileService {
-  private final TokenUtils tokenUtils;
+  private final TokenFacade tokenFacade;
   @Autowired
-  public UserProfileService(@Qualifier("jwtManager") TokenUtils tokenUtils) {
-    this.tokenUtils = tokenUtils;
+  public UserProfileService(TokenFacade tokenFacade) {
+    this.tokenFacade = tokenFacade;
   }
 
   public TokenDTO generateJwtTokens(String userId, String tokenId, String tokenType){
     try {
-        var tokenMap = tokenUtils.generateJwtTokens(userId, tokenId);
+        var tokenMap = tokenFacade.issueUserTokens(userId, tokenId);
         return TokenSummary.builder()
           .accessToken(tokenMap.get("access"))
           .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())
@@ -38,8 +35,8 @@ public class UserProfileService {
   }
   public TokenDTO refreshJwtToken(String refreshToken, String tokenId){
     try {
-      var claims = tokenUtils.extractClaims(refreshToken);
-      var tokenMap = tokenUtils.refresh(claims,tokenId);
+      var claims = tokenFacade.extractClaimsFromToken(refreshToken);
+      var tokenMap = tokenFacade.refreshTokens(claims,tokenId);
       return TokenAuthorizationCodeDTO.builder()
         .accessToken(tokenMap.get("access"))
         .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())

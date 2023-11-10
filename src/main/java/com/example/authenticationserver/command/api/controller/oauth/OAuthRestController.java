@@ -3,8 +3,8 @@ package com.example.authenticationserver.command.api.controller.oauth;
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
 import com.example.authenticationserver.dto.TokenDTO;
 import com.example.authenticationserver.dto.TokenSummary;
-import com.example.authenticationserver.util.AppConstants;
-import com.example.authenticationserver.util.JwtManager;
+import com.example.authenticationserver.util.jwk.AppConstants;
+import com.example.authenticationserver.util.newutil.TokenFacade;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.queries.app.CheckLoginDataQuery;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class OAuthRestController {
   private final QueryGateway queryGateway;
   private final CommandGateway commandGateway;
-  private final JwtManager jwtManager;
+  private final TokenFacade jwtManager;
   @Autowired
-  public OAuthRestController(QueryGateway queryGateway, CommandGateway commandGateway, JwtManager jwtManager) {
+  public OAuthRestController(QueryGateway queryGateway, CommandGateway commandGateway, TokenFacade jwtManager) {
     this.queryGateway = queryGateway;
     this.commandGateway = commandGateway;
     this.jwtManager = jwtManager;
@@ -58,8 +58,8 @@ public class OAuthRestController {
                                @RequestParam String refresh_token){
     try {
 
-      var claims = jwtManager.extractClaims(refresh_token);
-      var tokenMap = jwtManager.refresh(claims, claims.getId());
+      var claims = jwtManager.extractClaimsFromToken(refresh_token);
+      var tokenMap = jwtManager.refreshTokens(claims, claims.getId());
       return TokenSummary.builder()
         .accessToken(tokenMap.get("access"))
         .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())

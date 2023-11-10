@@ -1,8 +1,8 @@
 package com.example.authenticationserver.command.api.aggregate;
 
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
-import com.example.authenticationserver.util.AppConstants;
-import com.example.authenticationserver.util.JwtManager;
+import com.example.authenticationserver.util.jwk.AppConstants;
+import com.example.authenticationserver.util.newutil.TokenFacade;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.events.code.AuthorizationCodeGeneratedEvent;
@@ -56,7 +56,7 @@ public class AuthorizationCodeFlowAggregate {
     this.sessionId = event.getSessionId();
   }
   @CommandHandler
-  public TokenAuthorizationCodeDTO handle(UseAuthorizationCodeCommand command, JwtManager jwtManager){
+  public TokenAuthorizationCodeDTO handle(UseAuthorizationCodeCommand command, TokenFacade jwtManager){
     String tokeId = UUID.randomUUID().toString();
     if(this.status.equals("USED")){
       throw new IllegalStateException("Authorization code already used");
@@ -69,7 +69,7 @@ public class AuthorizationCodeFlowAggregate {
     AggregateLifecycle.apply(event);
 
     try {
-      var tokenMap = jwtManager.generateJwtTokens(this.userId, tokeId);
+      var tokenMap = jwtManager.issueUserTokens(this.userId, tokeId);
       return TokenAuthorizationCodeDTO.builder()
         .accessToken(tokenMap.get("access"))
         .expiresIn(AppConstants.ACCESS_TOKEN_EXP_TIME.ordinal())

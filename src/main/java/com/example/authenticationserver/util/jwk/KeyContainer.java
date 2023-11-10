@@ -1,4 +1,4 @@
-package com.example.authenticationserver.util;
+package com.example.authenticationserver.util.jwk;
 
 import javax.crypto.SecretKey;
 import java.security.Key;

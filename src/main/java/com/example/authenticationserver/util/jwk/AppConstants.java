@@ -1,4 +1,4 @@
-package com.example.authenticationserver.util;
+package com.example.authenticationserver.util.jwk;
 
 import org.springframework.beans.factory.annotation.Value;
 public enum AppConstants {

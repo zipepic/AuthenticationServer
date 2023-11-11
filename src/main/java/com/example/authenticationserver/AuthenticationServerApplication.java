@@ -3,8 +3,6 @@ package com.example.authenticationserver;
 import com.example.authenticationserver.dto.TokenSummary;
 import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
-import com.example.authenticationserver.util.newutil.TokenFacade;
-import com.example.authenticationserver.util.newutil.TokenProcessorFactory;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.commands.app.CreateApplicationCommand;
@@ -13,6 +11,7 @@ import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
 import com.project.core.commands.user.RefreshAccessTokenForUserProfileCommand;
 import com.project.core.events.code.AuthorizationCodeGeneratedEvent;
 import com.project.core.events.code.AuthorizationCodeUsedEvent;
+import com.project.core.events.user.JwkTokenInfoEvent;
 import com.project.core.events.user.RefreshTokenForUserProfileGeneratedEvent;
 import com.project.core.events.user.UserProfileCreatedEvent;
 import com.project.core.events.app.ApplicationCreatedEvent;
@@ -63,7 +62,8 @@ public class AuthenticationServerApplication {
       GenerateRefreshTokenForUserProfileCommand.class,
       RefreshTokenForUserProfileGeneratedEvent.class,
       RefreshAccessTokenForUserProfileCommand.class,
-      ValidateRefreshTokenForUserProfileQuery.class);
+      ValidateRefreshTokenForUserProfileQuery.class,
+      JwkTokenInfoEvent.class);
     return xStream;
   }
 

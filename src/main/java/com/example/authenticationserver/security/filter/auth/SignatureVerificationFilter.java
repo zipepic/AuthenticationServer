@@ -1,6 +1,6 @@
 package com.example.authenticationserver.security.filter.auth;
 
-import com.example.authenticationserver.util.TokenFacade;
+import tokenlib.util.TokenFacade;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

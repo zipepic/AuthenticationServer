@@ -1,6 +1,6 @@
 package com.example.authenticationserver;
-import com.example.authenticationserver.util.TokenFacade;
-import com.example.authenticationserver.util.TokenProcessorFactory;
+import tokenlib.util.TokenFacade;
+import tokenlib.util.TokenProcessorFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;

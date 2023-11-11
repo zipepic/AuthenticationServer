@@ -2,9 +2,8 @@ package com.example.authenticationserver.command.api.aggregate.service;
 
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
 import com.example.authenticationserver.dto.TokenDTO;
-import com.example.authenticationserver.dto.TokenSummary;
-import com.example.authenticationserver.util.TokenFacade;
-import com.example.authenticationserver.util.tokenenum.TokenExpiration;
+import tokenlib.util.TokenFacade;
+import tokenlib.util.tokenenum.TokenExpiration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

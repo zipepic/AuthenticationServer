@@ -3,23 +3,26 @@ package com.example.authenticationserver.util.newutil;
 import com.example.authenticationserver.util.jwk.AppConstants;
 import com.example.authenticationserver.util.jwk.KeyContainer;
 import com.example.authenticationserver.util.jwk.RSAParser;
+import com.example.authenticationserver.util.newutil.tokenenum.TokenFields;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
+import com.project.core.events.user.JwkTokenInfoEvent;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
-import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
-@Service
+
 public class JwkManager implements JwkProvider{
   private static final String JWK_FILE_PATH = "/Users/xzz1p/Documents/MySpring/TEST_PROJECT/AuthenticationServer/jwk.json";
 
@@ -44,12 +47,25 @@ public class JwkManager implements JwkProvider{
       generatedJwt = jwt
         .setIssuer(AppConstants.ISSUER.toString())
         .setIssuedAt(new Date())
-        .setHeader(Map.of("kid",kid))
+        .setHeader(Map.of(TokenFields.KID.getValue(), kid))
         .signWith(obtainKeyContainer().getSignKey()).compact();
     } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     }
     return generatedJwt;
+  }
+
+  @Override
+  public Map<String, String> generateTokenPair(JwtBuilder access, JwtBuilder refresh, String tokenId) throws NoSuchAlgorithmException {
+    var keyContainer = obtainKeyContainer();
+    var rsaKey = new RSAKey.Builder((RSAPublicKey) keyContainer.getVerifyKey())
+      .keyID(tokenId)
+      .build();
+    Map<String, String> tokenMap = new HashMap<>();
+    tokenMap.put("refresh", generateSignedCompactToken(refresh,tokenId,keyContainer));
+    tokenMap.put("access", generateSignedCompactToken(access,tokenId, keyContainer));
+    tokenMap.put(TokenFields.PUBLIC_KEY.getValue(), rsaKey.toJSONString());
+    return tokenMap;
   }
 
   @Override
@@ -72,7 +88,15 @@ public class JwkManager implements JwkProvider{
   }
 
   @Override
-  public void save(String userId) throws IOException, ParseException {
-
+  public String generateSignedCompactToken(JwtBuilder jwt, String kid, KeyContainer keyContainer) {
+    return  jwt
+        .setIssuer(AppConstants.ISSUER.toString())
+        .setIssuedAt(new Date())
+        .setHeader(Map.of(TokenFields.KID.getValue(),kid))
+        .signWith(keyContainer.getSignKey()).compact();
+  }
+  @Override
+  public Class<JwkTokenInfoEvent> getEventClass() {
+    return JwkTokenInfoEvent.class;
   }
 }

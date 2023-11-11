@@ -2,9 +2,11 @@ package com.example.authenticationserver.command.api.aggregate;
 
 import com.example.authenticationserver.command.api.aggregate.service.UserProfileService;
 import com.example.authenticationserver.dto.TokenDTO;
+import com.example.authenticationserver.util.newutil.tokenenum.TokenFields;
 import com.project.core.commands.user.CreateUserProfileCommand;
 import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
 import com.project.core.commands.user.RefreshAccessTokenForUserProfileCommand;
+import com.project.core.events.user.JwkTokenInfoEvent;
 import com.project.core.events.user.RefreshTokenForUserProfileGeneratedEvent;
 import com.project.core.events.user.UserProfileCreatedEvent;
 import lombok.NonNull;
@@ -58,16 +60,27 @@ public class UserProfileAggregate {
   }
 
   @CommandHandler
-  public TokenDTO handle(GenerateRefreshTokenForUserProfileCommand command, @NonNull UserProfileService userProfileService) {
+  public TokenDTO handle(GenerateRefreshTokenForUserProfileCommand command, @NonNull UserProfileService service) {
     UUID tokenId = UUID.randomUUID();
 
-    var event = RefreshTokenForUserProfileGeneratedEvent.builder()
-      .userId(command.getUserId())
-      .tokenId(tokenId.toString())
-      .build();
-
-    AggregateLifecycle.apply(event);
-    return userProfileService.generateJwtTokens(command.getUserId(), tokenId.toString(), command.getTokenType());
+    var map = service.generateJwtTokensMap(
+      command.getUserId(),
+      tokenId.toString());
+    if(service.getEventClass().equals(JwkTokenInfoEvent.class)){
+      var event = JwkTokenInfoEvent.builder()
+        .userId(command.getUserId())
+        .publicKey(map.get(TokenFields.PUBLIC_KEY.getValue()))
+        .kid(tokenId.toString())
+        .build();
+      AggregateLifecycle.apply(event);
+    } else {
+      var event = RefreshTokenForUserProfileGeneratedEvent.builder()
+        .userId(command.getUserId())
+        .tokenId(tokenId.toString())
+        .build();
+      AggregateLifecycle.apply(event);
+    }
+    return service.makeTokenDTO(map, tokenId.toString());
   }
 
   @EventSourcingHandler
@@ -76,14 +89,25 @@ public class UserProfileAggregate {
   }
   @CommandHandler
   public TokenDTO handle(RefreshAccessTokenForUserProfileCommand command, @NonNull UserProfileService service) {
-      UUID tokenId = UUID.randomUUID();
-
+    UUID tokenId = UUID.randomUUID();
+    var map = service.refreshToken(
+      command.getRefreshToken(),
+      tokenId.toString());
+    if(service.getEventClass().equals(JwkTokenInfoEvent.class)){
+      var event = JwkTokenInfoEvent.builder()
+        .userId(command.getUserId())
+        .publicKey(map.get(TokenFields.PUBLIC_KEY.getValue()))
+        .kid(tokenId.toString())
+        .build();
+      AggregateLifecycle.apply(event);
+    } else {
       var event = RefreshTokenForUserProfileGeneratedEvent.builder()
         .userId(command.getUserId())
         .tokenId(tokenId.toString())
         .build();
-
       AggregateLifecycle.apply(event);
-      return service.refreshJwtToken(command.getRefreshToken(), tokenId.toString());
+    }
+
+    return service.makeTokenDTO(map, tokenId.toString());
   }
 }

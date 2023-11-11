@@ -2,6 +2,8 @@ package com.example.authenticationserver.util.newutil;
 
 import com.example.authenticationserver.util.jwk.AppConstants;
 import com.nimbusds.jose.JOSEException;
+import com.project.core.events.user.JwkTokenInfoEvent;
+import com.project.core.events.user.RefreshTokenForUserProfileGeneratedEvent;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
@@ -9,9 +11,12 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.Date;
-@Service
+import java.util.HashMap;
+import java.util.Map;
+
 public class JwtManager implements JwtProvider{
   private final SecretKeySpec secretKey;
   public JwtManager(SecretKeySpec secretKey) {
@@ -34,7 +39,16 @@ public class JwtManager implements JwtProvider{
   }
 
   @Override
-  public void save(String userId) throws IOException, ParseException {
-
+  public Map<String, String> generateTokenPair(JwtBuilder access, JwtBuilder refresh, String tokenId) throws NoSuchAlgorithmException {
+    access.setId(tokenId);
+    refresh.setId(tokenId);
+    Map<String, String> tokenMap = new HashMap<>();
+    tokenMap.put("refresh", generateSignedCompactToken(refresh,tokenId));
+    tokenMap.put("access", generateSignedCompactToken(access,tokenId));
+    return tokenMap;
+  }
+  @Override
+  public Class<RefreshTokenForUserProfileGeneratedEvent> getEventClass() {
+    return RefreshTokenForUserProfileGeneratedEvent.class;
   }
 }

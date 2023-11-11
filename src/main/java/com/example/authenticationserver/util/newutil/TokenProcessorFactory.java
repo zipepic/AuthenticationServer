@@ -1,23 +1,41 @@
 package com.example.authenticationserver.util.newutil;
 
+import com.example.authenticationserver.util.newutil.tokenenum.TokenTypes;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
 public class TokenProcessorFactory {
-  private final String secret;
 
-  // Конструктор для инъекции значения secret
-  public TokenProcessorFactory(@Value("${jwt.secret}") String secret) {
-    this.secret = secret;
+  private final SecretKeySpec secret;
+
+  public TokenProcessorFactory(String secret) {
+    byte[] secretKeyBytes = Base64.getDecoder().decode(secret);
+    this.secret = new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS256.getJcaName());
   }
 
-  public TokenProcessorContext generate() {
-    byte[] secretKeyBytes = Base64.getDecoder().decode(secret);
-    var sec =  new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS256.getJcaName());
-    return new TokenProcessorContext(new JwtManager(sec));
+  public TokenProcessorContext generate(TokenTypes type) {
+    switch (type) {
+      case JWT:
+        return new TokenProcessorContext(new JwtManager(secret));
+      case JWK:
+        return new TokenProcessorContext(new JwkManager());
+      default:
+        throw new IllegalArgumentException("Unknown token type");
+    }
+  }
+  public TokenProcessorContext generate(int type){
+    switch (type) {
+      case 0:
+        return new TokenProcessorContext(new JwtManager(secret));
+      case 1:
+        return new TokenProcessorContext(new JwkManager());
+      default:
+        throw new IllegalArgumentException("Unknown token type");
+    }
   }
 }
+
+
 

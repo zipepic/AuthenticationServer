@@ -17,23 +17,6 @@ public class UserProfileService {
   public UserProfileService(TokenFacade tokenFacade) {
     this.tokenFacade = tokenFacade;
   }
-  @Deprecated
-  public TokenDTO generateJwtTokens(String userId, String tokenId){
-    try {
-        var tokenMap = tokenFacade.issueUserTokens(userId, tokenId);
-        return TokenSummary.builder()
-          .accessToken(tokenMap.get("access"))
-          .expiresIn((int) TokenExpiration.TEN_MINUTES.getMilliseconds())
-          .refreshExpiresIn((int) TokenExpiration.ONE_HOUR.getMilliseconds())
-          .refreshToken(tokenMap.get("refresh"))
-          .tokenType("Bearer")
-          .tokenId(tokenId.toString())
-          .build();
-    }
-    catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
   public TokenDTO makeTokenDTO(Map<String,String> tokenMap, String tokenId){
     return TokenAuthorizationCodeDTO.builder()
       .accessToken(tokenMap.get("access"))
@@ -43,23 +26,6 @@ public class UserProfileService {
       .tokenType("Bearer")
       .tokenId(tokenId)
       .build();
-  }
-  @Deprecated
-  public TokenDTO refreshJwtToken(String refreshToken, String tokenId){
-    try {
-      var claims = tokenFacade.extractClaimsFromToken(refreshToken);
-      var tokenMap = tokenFacade.refreshTokens(claims,tokenId);
-      return TokenAuthorizationCodeDTO.builder()
-        .accessToken(tokenMap.get("access"))
-        .expiresIn((int) TokenExpiration.TEN_MINUTES.getMilliseconds())
-        .refreshExpiresIn((int) TokenExpiration.ONE_HOUR.getMilliseconds())
-        .refreshToken(tokenMap.get("refresh"))
-        .tokenType("Bearer")
-        .tokenId(tokenId)
-        .build();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
   }
   public Map<String,String> generateJwtTokensMap(String userId, String tokenId){
     try {

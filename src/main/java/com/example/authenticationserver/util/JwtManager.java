@@ -27,7 +27,7 @@ public class JwtManager implements JwtProvider{
       .parseClaimsJws(jwtToken)
       .getBody();
   }
-
+  @Override
   public String generateSignedCompactToken(JwtBuilder jwt, String tokenId) {
     return jwt
       .setIssuer(AppConstants.ISSUER.toString())

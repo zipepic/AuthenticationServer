@@ -3,7 +3,7 @@ package com.example.authenticationserver.util.jwk;
 import javax.crypto.SecretKey;
 import java.security.Key;
 import java.security.KeyPair;
-
+@Deprecated
 public class KeyContainer {
   private final SecretKey secretKey;
   private final KeyPair keyPair;

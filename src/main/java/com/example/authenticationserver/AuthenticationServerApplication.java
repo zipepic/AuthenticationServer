@@ -12,7 +12,7 @@ import com.project.core.commands.user.RefreshAccessTokenForUserProfileCommand;
 import com.project.core.events.code.AuthorizationCodeGeneratedEvent;
 import com.project.core.events.code.AuthorizationCodeUsedEvent;
 import com.project.core.events.user.JwkTokenInfoEvent;
-import com.project.core.events.user.RefreshTokenForUserProfileGeneratedEvent;
+import com.project.core.events.user.JwtTokenInfoEvent;
 import com.project.core.events.user.UserProfileCreatedEvent;
 import com.project.core.events.app.ApplicationCreatedEvent;
 import com.project.core.queries.app.CheckLoginDataQuery;
@@ -60,7 +60,7 @@ public class AuthenticationServerApplication {
       FetchUserProfileByUserNameQuery.class,
       TokenAuthorizationCodeDTO.class,
       GenerateRefreshTokenForUserProfileCommand.class,
-      RefreshTokenForUserProfileGeneratedEvent.class,
+      JwtTokenInfoEvent.class,
       RefreshAccessTokenForUserProfileCommand.class,
       ValidateRefreshTokenForUserProfileQuery.class,
       JwkTokenInfoEvent.class);

@@ -7,7 +7,7 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.project.core.events.user.JwkTokenInfoEvent;
-import com.project.core.events.user.RefreshTokenForUserProfileGeneratedEvent;
+import com.project.core.events.user.JwtTokenInfoEvent;
 import com.project.core.events.user.UserProfileCreatedEvent;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.beans.BeanUtils;
@@ -40,7 +40,7 @@ public class UserProfileEventHandler {
     userProfileRepository.save(userProfileEntity);
   }
   @EventHandler
-  void on(RefreshTokenForUserProfileGeneratedEvent event){
+  void on(JwtTokenInfoEvent event){
     Optional<UserProfileEntity> userProfileEntityOptional =
       userProfileRepository.findById(event.getUserId());
     if(userProfileEntityOptional.isEmpty()){
@@ -57,7 +57,7 @@ public class UserProfileEventHandler {
 
     List<JWK> keys = new ArrayList<>(jwkSet.getKeys());
 
-    keys = keys.stream().filter(key -> !key.getKeyID().equals(event.getKid())).collect(Collectors.toList());
+    keys = keys.stream().filter(key -> !key.getKeyID().equals(event.getLastTokenId())).collect(Collectors.toList());
 
     keys.add(RSAKey.parse(event.getPublicKey()));
 

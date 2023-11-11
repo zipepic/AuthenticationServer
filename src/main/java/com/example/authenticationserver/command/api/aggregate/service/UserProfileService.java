@@ -36,7 +36,10 @@ public class UserProfileService {
   }
   public Map<String,String> refreshToken(String refreshToken, String tokenId){
     try {
-      return tokenFacade.refreshTokens(tokenFacade.extractClaimsFromToken(refreshToken),tokenId);
+      var claims = tokenFacade.extractClaimsFromToken(refreshToken);
+      var map = tokenFacade.refreshTokens(claims,tokenId);
+      map.put("last_token_id",claims.getId());
+      return map;
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

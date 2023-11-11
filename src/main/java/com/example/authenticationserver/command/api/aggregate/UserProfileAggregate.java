@@ -7,7 +7,7 @@ import com.project.core.commands.user.CreateUserProfileCommand;
 import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
 import com.project.core.commands.user.RefreshAccessTokenForUserProfileCommand;
 import com.project.core.events.user.JwkTokenInfoEvent;
-import com.project.core.events.user.RefreshTokenForUserProfileGeneratedEvent;
+import com.project.core.events.user.JwtTokenInfoEvent;
 import com.project.core.events.user.UserProfileCreatedEvent;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -74,7 +74,7 @@ public class UserProfileAggregate {
         .build();
       AggregateLifecycle.apply(event);
     } else {
-      var event = RefreshTokenForUserProfileGeneratedEvent.builder()
+      var event = JwtTokenInfoEvent.builder()
         .userId(command.getUserId())
         .tokenId(tokenId.toString())
         .build();
@@ -84,7 +84,7 @@ public class UserProfileAggregate {
   }
 
   @EventSourcingHandler
-  public void on(RefreshTokenForUserProfileGeneratedEvent event) {
+  public void on(JwtTokenInfoEvent event) {
     this.tokenId = event.getTokenId();
   }
   @CommandHandler
@@ -98,10 +98,11 @@ public class UserProfileAggregate {
         .userId(command.getUserId())
         .publicKey(map.get(TokenFields.PUBLIC_KEY.getValue()))
         .kid(tokenId.toString())
+        .lastTokenId(map.get("last_token_id"))
         .build();
       AggregateLifecycle.apply(event);
     } else {
-      var event = RefreshTokenForUserProfileGeneratedEvent.builder()
+      var event = JwtTokenInfoEvent.builder()
         .userId(command.getUserId())
         .tokenId(tokenId.toString())
         .build();

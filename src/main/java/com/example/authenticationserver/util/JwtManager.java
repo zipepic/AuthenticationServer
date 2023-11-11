@@ -2,7 +2,7 @@ package com.example.authenticationserver.util;
 
 import com.example.authenticationserver.util.jwk.AppConstants;
 import com.nimbusds.jose.JOSEException;
-import com.project.core.events.user.RefreshTokenForUserProfileGeneratedEvent;
+import com.project.core.events.user.JwtTokenInfoEvent;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
@@ -45,7 +45,7 @@ public class JwtManager implements JwtProvider{
     return tokenMap;
   }
   @Override
-  public Class<RefreshTokenForUserProfileGeneratedEvent> getEventClass() {
-    return RefreshTokenForUserProfileGeneratedEvent.class;
+  public Class<JwtTokenInfoEvent> getEventClass() {
+    return JwtTokenInfoEvent.class;
   }
 }

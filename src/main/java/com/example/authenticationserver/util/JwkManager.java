@@ -1,7 +1,6 @@
 package com.example.authenticationserver.util;
 
 import com.example.authenticationserver.util.jwk.AppConstants;
-import com.example.authenticationserver.util.jwk.KeyContainer;
 import com.example.authenticationserver.util.jwk.RSAParser;
 import com.example.authenticationserver.util.tokenenum.TokenFields;
 import com.nimbusds.jose.JOSEException;
@@ -15,6 +14,7 @@ import io.jsonwebtoken.Jwts;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
@@ -37,43 +37,25 @@ public class JwkManager implements JwkProvider{
       .parseClaimsJws(jwtToken)
       .getBody().setId(kid);
   }
-
-
-  @Override
-  public String generateSignedCompactToken(JwtBuilder jwt,String kid) {
-
-    String generatedJwt = null;
-    try {
-      generatedJwt = jwt
-        .setIssuer(AppConstants.ISSUER.toString())
-        .setIssuedAt(new Date())
-        .setHeader(Map.of(TokenFields.KID.getValue(), kid))
-        .signWith(obtainKeyContainer().getSignKey()).compact();
-    } catch (NoSuchAlgorithmException e) {
-      throw new RuntimeException(e);
-    }
-    return generatedJwt;
-  }
-
   @Override
   public Map<String, String> generateTokenPair(JwtBuilder access, JwtBuilder refresh, String tokenId) throws NoSuchAlgorithmException {
-    var keyContainer = obtainKeyContainer();
-    var rsaKey = new RSAKey.Builder((RSAPublicKey) keyContainer.getVerifyKey())
+    var keyPair = obtainKeyContainer();
+    var rsaKey = new RSAKey.Builder((RSAPublicKey) keyPair.getPublic())
       .keyID(tokenId)
       .build();
     Map<String, String> tokenMap = new HashMap<>();
-    tokenMap.put("refresh", generateSignedCompactToken(refresh,tokenId,keyContainer));
-    tokenMap.put("access", generateSignedCompactToken(access,tokenId, keyContainer));
+    tokenMap.put("refresh", generateSignedCompactToken(refresh,tokenId,keyPair));
+    tokenMap.put("access", generateSignedCompactToken(access,tokenId, keyPair));
     tokenMap.put(TokenFields.PUBLIC_KEY.getValue(), rsaKey.toJSONString());
     return tokenMap;
   }
 
   @Override
-  public KeyContainer obtainKeyContainer() throws NoSuchAlgorithmException {
+  public KeyPair obtainKeyContainer() throws NoSuchAlgorithmException {
     KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
     keyPairGenerator.initialize(2048);
 
-    return new KeyContainer(keyPairGenerator.generateKeyPair());
+    return keyPairGenerator.generateKeyPair();
   }
 
   @Override
@@ -88,12 +70,12 @@ public class JwkManager implements JwkProvider{
   }
 
   @Override
-  public String generateSignedCompactToken(JwtBuilder jwt, String kid, KeyContainer keyContainer) {
+  public String generateSignedCompactToken(JwtBuilder jwt, String kid, KeyPair KeyPair) {
     return  jwt
         .setIssuer(AppConstants.ISSUER.toString())
         .setIssuedAt(new Date())
         .setHeader(Map.of(TokenFields.KID.getValue(),kid))
-        .signWith(keyContainer.getSignKey()).compact();
+        .signWith(KeyPair.getPrivate()).compact();
   }
   @Override
   public Class<JwkTokenInfoEvent> getEventClass() {

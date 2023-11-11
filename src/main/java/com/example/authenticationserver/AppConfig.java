@@ -1,4 +1,6 @@
 package com.example.authenticationserver;
+import org.axonframework.queryhandling.QueryGateway;
+import org.springframework.beans.factory.annotation.Autowired;
 import tokenlib.util.TokenFacade;
 import tokenlib.util.TokenProcessorFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +19,11 @@ public class AppConfig {
   private String jwtSecret;
   @Value("${app.token-type}")
   private int tokenTypeInt;
+  private final QueryGateway queryGateway;
+  @Autowired
+  public AppConfig(QueryGateway queryGateway) {
+    this.queryGateway = queryGateway;
+  }
 
   @ManagedAttribute(description = "Set Token Type. 0 - JWT, 1 - JWK")
   public void setTokenTypeInt(int tokenTypeInt) {
@@ -33,7 +40,7 @@ public class AppConfig {
 
   @Bean
   public TokenProcessorFactory tokenProcessorFactory() {
-    return new TokenProcessorFactory(jwtSecret);
+    return new TokenProcessorFactory(jwtSecret,queryGateway);
   }
 
   @Bean

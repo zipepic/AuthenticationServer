@@ -2,15 +2,20 @@ package com.example.authenticationserver.query.api.query;
 
 import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
 import com.example.authenticationserver.query.api.data.user.UserProfileRepository;
-import com.project.core.queries.user.FetchUserProfileByUserIdQuery;
-import com.project.core.queries.user.FetchUserProfileByUserNameQuery;
-import com.project.core.queries.user.FindUserIdByUserNameQuery;
-import com.project.core.queries.user.ValidateRefreshTokenForUserProfileQuery;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.project.core.queries.user.*;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tokenlib.util.jwk.Jwk;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class UserProfileQueryHandler {
@@ -66,5 +71,13 @@ public class UserProfileQueryHandler {
 
     UserProfileEntity userProfileEntity = optionalUserProfileEntity.get();
     return userProfileEntity.getTokenId().equals(query.getTokenId());
+  }
+  @QueryHandler(queryName = "fetchJwkSet")
+  public List<String> fetchJwkSet(String path) throws IOException, ParseException {
+    //TODO optimize this
+    var jwkSet = JWKSet.load(new File("/Users/xzz1p/Documents/MySpring/TEST_PROJECT/AuthenticationServer/jwk.json"))
+      .getKeys().stream().map(x->
+        x.toJSONString()).collect(Collectors.toList());
+    return jwkSet;
   }
 }

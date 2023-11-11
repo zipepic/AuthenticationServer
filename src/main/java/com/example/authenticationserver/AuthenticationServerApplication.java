@@ -3,6 +3,8 @@ package com.example.authenticationserver;
 import com.example.authenticationserver.dto.TokenSummary;
 import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.JWKSet;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.commands.app.CreateApplicationCommand;
@@ -16,10 +18,7 @@ import com.project.core.events.user.JwtTokenInfoEvent;
 import com.project.core.events.user.UserProfileCreatedEvent;
 import com.project.core.events.app.ApplicationCreatedEvent;
 import com.project.core.queries.app.CheckLoginDataQuery;
-import com.project.core.queries.user.FetchUserProfileByUserIdQuery;
-import com.project.core.queries.user.FetchUserProfileByUserNameQuery;
-import com.project.core.queries.user.FindUserIdByUserNameQuery;
-import com.project.core.queries.user.ValidateRefreshTokenForUserProfileQuery;
+import com.project.core.queries.user.*;
 import com.thoughtworks.xstream.XStream;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.NonNull;
@@ -63,7 +62,9 @@ public class AuthenticationServerApplication {
       JwtTokenInfoEvent.class,
       RefreshAccessTokenForUserProfileCommand.class,
       ValidateRefreshTokenForUserProfileQuery.class,
-      JwkTokenInfoEvent.class);
+      JwkTokenInfoEvent.class,
+      FetchJwkSet.class,
+      JWK.class);
     return xStream;
   }
 

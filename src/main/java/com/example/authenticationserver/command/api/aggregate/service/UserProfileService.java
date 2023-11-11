@@ -3,12 +3,9 @@ package com.example.authenticationserver.command.api.aggregate.service;
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
 import com.example.authenticationserver.dto.TokenDTO;
 import com.example.authenticationserver.dto.TokenSummary;
-import com.example.authenticationserver.util.jwk.AppConstants;
-import com.example.authenticationserver.util.newutil.TokenFacade;
-import com.example.authenticationserver.util.newutil.tokenenum.TokenExpiration;
-import com.project.core.events.user.JwkTokenInfoEvent;
+import com.example.authenticationserver.util.TokenFacade;
+import com.example.authenticationserver.util.tokenenum.TokenExpiration;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;

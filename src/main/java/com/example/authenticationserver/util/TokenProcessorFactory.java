@@ -1,6 +1,6 @@
-package com.example.authenticationserver.util.newutil;
+package com.example.authenticationserver.util;
 
-import com.example.authenticationserver.util.newutil.tokenenum.TokenTypes;
+import com.example.authenticationserver.util.tokenenum.TokenTypes;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 import javax.crypto.spec.SecretKeySpec;

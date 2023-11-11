@@ -1,4 +1,4 @@
-package com.example.authenticationserver.util.newutil;
+package com.example.authenticationserver.util;
 
 import com.nimbusds.jose.JOSEException;
 import io.jsonwebtoken.Claims;

@@ -2,7 +2,7 @@ package com.example.authenticationserver.command.api.aggregate;
 
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
 import com.example.authenticationserver.util.jwk.AppConstants;
-import com.example.authenticationserver.util.newutil.TokenFacade;
+import com.example.authenticationserver.util.TokenFacade;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.events.code.AuthorizationCodeGeneratedEvent;

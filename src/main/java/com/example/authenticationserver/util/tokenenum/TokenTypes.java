@@ -1,4 +1,4 @@
-package com.example.authenticationserver.util.newutil.tokenenum;
+package com.example.authenticationserver.util.tokenenum;
 
 public enum TokenTypes {
   ACCESS_TOKEN("access_token"),

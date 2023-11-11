@@ -9,12 +9,11 @@ import com.example.authenticationserver.security.filter.token.TokenGenerationFil
 import com.example.authenticationserver.security.filter.URIFilter;
 import com.example.authenticationserver.security.AuthUserProfileProviderImpl;
 import com.example.authenticationserver.security.service.UserProfileDetailsService;
-import com.example.authenticationserver.util.newutil.TokenFacade;
+import com.example.authenticationserver.util.TokenFacade;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;

@@ -1,13 +1,11 @@
-package com.example.authenticationserver.util.newutil;
+package com.example.authenticationserver.util;
 
 import com.example.authenticationserver.util.jwk.AppConstants;
 import com.nimbusds.jose.JOSEException;
-import com.project.core.events.user.JwkTokenInfoEvent;
 import com.project.core.events.user.RefreshTokenForUserProfileGeneratedEvent;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
-import org.springframework.stereotype.Service;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;

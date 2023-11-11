@@ -1,6 +1,5 @@
-package com.example.authenticationserver.util.newutil;
+package com.example.authenticationserver.util;
 
-import com.example.authenticationserver.util.jwk.AppConstants;
 import com.example.authenticationserver.util.jwk.KeyContainer;
 import com.nimbusds.jose.jwk.JWKSet;
 import io.jsonwebtoken.JwtBuilder;
@@ -8,8 +7,6 @@ import io.jsonwebtoken.JwtBuilder;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.Map;
 
 interface JwkProvider extends TokenProcessingStrategy{
   KeyContainer obtainKeyContainer() throws NoSuchAlgorithmException;

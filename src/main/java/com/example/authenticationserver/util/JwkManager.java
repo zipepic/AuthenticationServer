@@ -1,9 +1,9 @@
-package com.example.authenticationserver.util.newutil;
+package com.example.authenticationserver.util;
 
 import com.example.authenticationserver.util.jwk.AppConstants;
 import com.example.authenticationserver.util.jwk.KeyContainer;
 import com.example.authenticationserver.util.jwk.RSAParser;
-import com.example.authenticationserver.util.newutil.tokenenum.TokenFields;
+import com.example.authenticationserver.util.tokenenum.TokenFields;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.jwk.JWKSet;

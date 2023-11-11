@@ -1,14 +1,13 @@
-package com.example.authenticationserver.util.newutil;
+package com.example.authenticationserver.util;
 
 import com.example.authenticationserver.util.jwk.AppConstants;
-import com.example.authenticationserver.util.newutil.tokenenum.TokenExpiration;
-import com.example.authenticationserver.util.newutil.tokenenum.TokenFields;
-import com.example.authenticationserver.util.newutil.tokenenum.TokenTypes;
+import com.example.authenticationserver.util.tokenenum.TokenExpiration;
+import com.example.authenticationserver.util.tokenenum.TokenFields;
+import com.example.authenticationserver.util.tokenenum.TokenTypes;
 import com.nimbusds.jose.JOSEException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
-import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;

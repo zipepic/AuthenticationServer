@@ -1,8 +1,5 @@
-package com.example.authenticationserver.util.newutil;
+package com.example.authenticationserver.util;
 
-import com.example.authenticationserver.util.jwk.KeyContainer;
-import com.project.core.events.user.JwkTokenInfoEvent;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 
 import java.security.NoSuchAlgorithmException;

@@ -28,6 +28,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import tokenlib.util.jwk.SimpleJWK;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
@@ -64,7 +65,8 @@ public class AuthenticationServerApplication {
       ValidateRefreshTokenForUserProfileQuery.class,
       JwkTokenInfoEvent.class,
       FetchJwkSet.class,
-      JWK.class);
+      JWK.class,
+      SimpleJWK.class);
     return xStream;
   }
 

@@ -8,7 +8,8 @@ import com.example.authenticationserver.security.filter.token.JwtRefreshFilter;
 import com.example.authenticationserver.security.filter.token.TokenGenerationFilter;
 import com.example.authenticationserver.security.filter.URIFilter;
 import com.example.authenticationserver.security.AuthUserProfileProviderImpl;
-import com.example.authenticationserver.security.service.UserProfileDetailsService;
+import com.example.authenticationserver.security.service.UserDetailsLoader;
+import com.example.authenticationserver.security.service.UserProfileDetailsLoaderService;
 import tokenlib.util.TokenFacade;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -33,18 +34,18 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SecurityConfig {
 
   private final AuthUserProfileProviderImpl authUserProfileProvider;
-  private final UserProfileDetailsService userProfileDetailsService;
+  private final UserDetailsLoader userDetailsLoader;
   private final QueryGateway queryGateway;
   private final CommandGateway commandGateway;
   private final TokenFacade tokenUtils;
   @Autowired
   public SecurityConfig(AuthUserProfileProviderImpl authUserProfileProvider,
-                        UserProfileDetailsService userProfileDetailsService,
+                        UserDetailsLoader userDetailsLoader,
                         QueryGateway queryGateway,
                         CommandGateway commandGateway,
                         TokenFacade tokenUtils) {
     this.authUserProfileProvider = authUserProfileProvider;
-    this.userProfileDetailsService = userProfileDetailsService;
+    this.userDetailsLoader = userDetailsLoader;
     this.queryGateway = queryGateway;
     this.commandGateway = commandGateway;
     this.tokenUtils = tokenUtils;
@@ -83,7 +84,7 @@ public class SecurityConfig {
       .addFilterBefore(new ErrorHandlingFilter(new ObjectMapper()), UsernamePasswordAuthenticationFilter.class)
       .addFilterAfter(new TokenRemoverFilter(), ErrorHandlingFilter.class)
       .addFilterAfter(new SignatureVerificationFilter(tokenUtils), TokenRemoverFilter.class)
-      .addFilterAfter(new LoadUserFromDatabaseFilterByJwt(userProfileDetailsService), SignatureVerificationFilter.class);
+      .addFilterAfter(new LoadUserFromDatabaseFilterByJwt(userDetailsLoader), SignatureVerificationFilter.class);
   }
   private void configureDefault(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
@@ -91,7 +92,6 @@ public class SecurityConfig {
       .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     }
-
   URIFilter tokenTypeFilter(){
     return new URIFilter(jwtRefreshFilter());
   }

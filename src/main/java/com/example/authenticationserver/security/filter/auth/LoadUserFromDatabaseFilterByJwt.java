@@ -1,6 +1,7 @@
 package com.example.authenticationserver.security.filter.auth;
 
-import com.example.authenticationserver.security.service.UserProfileDetailsService;
+import com.example.authenticationserver.security.service.UserDetailsLoader;
+import com.example.authenticationserver.security.service.UserProfileDetailsLoaderService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -14,10 +15,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 public class LoadUserFromDatabaseFilterByJwt extends OncePerRequestFilter {
-  private final UserProfileDetailsService userProfileDetailsService;
+  private final UserDetailsLoader userDetailsLoader;
 
-  public LoadUserFromDatabaseFilterByJwt(UserProfileDetailsService userProfileDetailsService) {
-    this.userProfileDetailsService = userProfileDetailsService;
+  public LoadUserFromDatabaseFilterByJwt(UserDetailsLoader userDetailsLoader) {
+    this.userDetailsLoader = userDetailsLoader;
   }
 
   @Override
@@ -26,7 +27,7 @@ public class LoadUserFromDatabaseFilterByJwt extends OncePerRequestFilter {
 
     String userId = claims.getSubject();
 
-    UserDetails userDetails = userProfileDetailsService.loadUserByUserId(userId);
+    UserDetails userDetails = userDetailsLoader.loadUserByUserId(userId);
 
     UsernamePasswordAuthenticationToken authenticationToken =
       new UsernamePasswordAuthenticationToken(userDetails, claims, userDetails.getAuthorities());

@@ -1,4 +1,4 @@
-package com.example.authenticationserver.command.api.aggregate.service;
+package com.example.authenticationserver.command.api.service;
 
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
 import com.example.authenticationserver.dto.TokenDTO;

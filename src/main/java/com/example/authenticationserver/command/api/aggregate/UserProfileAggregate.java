@@ -1,6 +1,6 @@
 package com.example.authenticationserver.command.api.aggregate;
 
-import com.example.authenticationserver.command.api.aggregate.service.UserProfileService;
+import com.example.authenticationserver.command.api.service.UserProfileService;
 import com.example.authenticationserver.dto.TokenDTO;
 import tokenlib.util.tokenenum.TokenFields;
 import com.project.core.commands.user.CreateUserProfileCommand;

@@ -7,8 +7,9 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.project.core.queries.user.*;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import tokenlib.util.jwk.Jwk;
+import tokenlib.util.jwk.SimpleJWK;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +20,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class UserProfileQueryHandler {
+  @Value("${app.jwk-file-path}")
+  private String filePath;
   private final UserProfileRepository userProfileRepository;
   @Autowired
   public UserProfileQueryHandler(UserProfileRepository userProfileRepository) {
@@ -72,12 +75,13 @@ public class UserProfileQueryHandler {
     UserProfileEntity userProfileEntity = optionalUserProfileEntity.get();
     return userProfileEntity.getTokenId().equals(query.getTokenId());
   }
-  @QueryHandler(queryName = "fetchJwkSet")
-  public List<String> fetchJwkSet(String path) throws IOException, ParseException {
-    //TODO optimize this
-    var jwkSet = JWKSet.load(new File("/Users/xzz1p/Documents/MySpring/TEST_PROJECT/AuthenticationServer/jwk.json"))
+  @QueryHandler
+  public List<SimpleJWK> fetchJwkSet(FetchJwkSet query) throws IOException, ParseException {
+
+    var jwkSet = JWKSet.load(new File(filePath))
       .getKeys().stream().map(x->
-        x.toJSONString()).collect(Collectors.toList());
+        SimpleJWK.parse(x.toString())).collect(Collectors.toList());
+
     return jwkSet;
   }
 }

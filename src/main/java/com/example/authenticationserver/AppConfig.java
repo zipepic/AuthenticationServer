@@ -1,4 +1,8 @@
 package com.example.authenticationserver;
+import com.nimbusds.jose.jwk.JWK;
+import com.project.core.queries.user.FetchJwkSet;
+import org.axonframework.messaging.responsetypes.ResponseTypes;
+import org.axonframework.queryhandling.GenericQueryMessage;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import tokenlib.util.TokenFacade;
@@ -9,6 +13,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
+import tokenlib.util.jwk.SimpleJWK;
+
+import java.util.List;
 
 
 @Configuration
@@ -40,7 +47,15 @@ public class AppConfig {
 
   @Bean
   public TokenProcessorFactory tokenProcessorFactory() {
-    return new TokenProcessorFactory(jwtSecret,queryGateway);
+    return new TokenProcessorFactory(queryGateway, (x->{
+
+//      GenericQueryMessage<String, List<JWK>> query
+//        = new GenericQueryMessage<>("fetchJwkSet",
+//        "fetchJwkSet", ResponseTypes.multipleInstancesOf(JWK.class));
+      FetchJwkSet query = FetchJwkSet.builder().build();
+
+      return queryGateway.query(query,ResponseTypes.multipleInstancesOf(SimpleJWK.class)).join();
+    }));
   }
 
   @Bean

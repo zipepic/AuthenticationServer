@@ -5,15 +5,13 @@ import com.project.core.events.user.UserProfileCreatedEvent;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.Instant;
 import java.util.Date;
-import java.util.UUID;
 import java.util.stream.Stream;
-
+//TODO Fix:
 public class UserProfileAggregateTest {
   private FixtureConfiguration<UserProfileAggregate> fixture;
   private Instant fixedTime;

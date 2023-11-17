@@ -2,9 +2,11 @@ package com.example.authenticationserver.command.api.aggregate;
 
 import com.project.core.commands.user.CreateUserProfileCommand;
 import com.project.core.events.user.UserProfileCreatedEvent;
+import org.axonframework.eventsourcing.IncompatibleAggregateException;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -70,6 +72,18 @@ public class UserProfileAggregateTest {
         // Fix: Use fixedTime for createdAt to ensure consistent testing
 //        state.getCreatedAt().equals(Date.from(fixedTime));
       });
+  }
+  @Test
+  public void exceptionWhenExpect() {
+    var command = CreateUserProfileCommand.builder()
+      .userId(null)
+      .userName(null)
+      .passwordHash(null)
+      .build();
+
+    fixture.givenNoPriorActivity()
+      .when(command)
+      .expectException(IncompatibleAggregateException.class);
   }
 
   private static Stream<String[]> userProfileTestData() {

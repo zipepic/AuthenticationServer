@@ -110,6 +110,7 @@ import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
 import com.project.core.commands.user.RefreshAccessTokenForUserProfileCommand;
 import com.project.core.events.user.JwtTokenInfoEvent;
 import com.project.core.events.user.UserProfileCreatedEvent;
+import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.CommandHandler;
@@ -123,6 +124,7 @@ import java.util.UUID;
 
 @Slf4j
 @Aggregate
+@Data
 public class UserProfileAggregate {
 
   @AggregateIdentifier

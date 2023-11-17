@@ -2,6 +2,7 @@ package com.example.authenticationserver.query.api.query;
 
 import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
 import com.example.authenticationserver.query.api.data.user.UserProfileRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.project.core.queries.user.*;
@@ -80,7 +81,13 @@ public class UserProfileQueryHandler {
 
     var jwkSet = JWKSet.load(new File(filePath))
       .getKeys().stream().map(x->
-        SimpleJWK.parse(x.toString())).collect(Collectors.toList());
+      {
+        try {
+          return SimpleJWK.parse(x.toString());
+        } catch (JsonProcessingException e) {
+          throw new RuntimeException(e);
+        }
+      }).collect(Collectors.toList());
 
     return jwkSet;
   }

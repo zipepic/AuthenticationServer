@@ -24,7 +24,7 @@ package com.example.authenticationserver.command.api.service;
  * <p>The {@code UserProfileService} is used by the {@code UserProfileAggregate} to handle token-related operations
  * for user profiles within the authentication server.</p>
  *
- * <p><strong>Author:</strong> XZZ1P</p>
+ * <p><strong>Author:</strong> Konstantin Kokoshnikov</p>
  *
  * <p><strong>See Also:</strong></p>
  * <ul>

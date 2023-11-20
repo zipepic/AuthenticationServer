@@ -89,7 +89,7 @@ package com.example.authenticationserver.command.api.aggregate;
  * }
  * </pre>
  *
- * <p><strong>Author:</strong> XZZ1P</p>
+ * <p><strong>Author:</strong> Konstantin Kokoshnikov</p>
  *
  * <p><strong>See Also:</strong></p>
  * <ul>

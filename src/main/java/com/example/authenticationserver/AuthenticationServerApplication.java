@@ -66,7 +66,8 @@ public class AuthenticationServerApplication {
       JwkTokenInfoEvent.class,
       FetchJwkSet.class,
       JWK.class,
-      SimpleJWK.class);
+      SimpleJWK.class,
+      UserProfileLookupQuery.class);
     return xStream;
   }
 

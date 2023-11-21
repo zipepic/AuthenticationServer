@@ -9,6 +9,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.project.core.events.user.JwkTokenInfoEvent;
 import com.project.core.events.user.JwtTokenInfoEvent;
 import com.project.core.events.user.UserProfileCreatedEvent;
+import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
+@ProcessingGroup("user-profile-group")
 public class UserProfileEventHandler {
   private final UserProfileRepository userProfileRepository;
   @Autowired

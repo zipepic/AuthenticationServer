@@ -23,13 +23,14 @@ public class Runner implements CommandLineRunner {
     public void run(String... args) throws Exception {
         System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 
-        UserProfileEntity userProfileEntity = new UserProfileEntity();
-        userProfileEntity.setUserId(UUID.randomUUID().toString());
-        userProfileEntity.setUserName("testuser2");
-        userProfileEntity.setUserStatus("status");
-        userProfileEntity.setRole("role");
-        userProfileEntity.setPasswordHash("11111");
-        userProfileEntityService.addUserProfileEntity(userProfileEntity);
+//        UserProfileEntity userProfileEntity = new UserProfileEntity();
+//        userProfileEntity.setUserId(UUID.randomUUID().toString());
+//        userProfileEntity.setUserName("testuser2");
+//        userProfileEntity.setUserStatus("status");
+//        userProfileEntity.setRole("role");
+//        userProfileEntity.setPasswordHash("11111");
+//        userProfileEntityService.addUserProfileEntity(userProfileEntity);
+        System.out.println(userProfileEntityService.findAllUserProfileEntity());
 
     }
 }

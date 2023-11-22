@@ -4,34 +4,23 @@ import com.example.authenticationserver.dto.TokenSummary;
 import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
 import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.JWKSet;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.commands.app.CreateApplicationCommand;
-import com.project.core.commands.user.CreateUserProfileCommand;
-import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
-import com.project.core.commands.user.RefreshAccessTokenForUserProfileCommand;
+import com.project.core.commands.user.*;
 import com.project.core.events.code.AuthorizationCodeGeneratedEvent;
 import com.project.core.events.code.AuthorizationCodeUsedEvent;
-import com.project.core.events.user.JwkTokenInfoEvent;
-import com.project.core.events.user.JwtTokenInfoEvent;
-import com.project.core.events.user.UserProfileCreatedEvent;
+import com.project.core.events.user.*;
 import com.project.core.events.app.ApplicationCreatedEvent;
 import com.project.core.queries.app.CheckLoginDataQuery;
 import com.project.core.queries.user.*;
 import com.thoughtworks.xstream.XStream;
-import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import tokenlib.util.jwk.SimpleJWK;
-
-import javax.crypto.spec.SecretKeySpec;
-import java.util.Base64;
 
 @SpringBootApplication
 public class AuthenticationServerApplication {
@@ -67,7 +56,11 @@ public class AuthenticationServerApplication {
       FetchJwkSet.class,
       JWK.class,
       SimpleJWK.class,
-      UserProfileLookupQuery.class);
+      UserProfileLookupQuery.class,
+      UpdateUserProfileCommand.class,
+      UserProfileUpdatedEvent.class,
+      ChangeUserProfilePasswordCommand.class,
+      UserProfilePasswordChangedEvent.class);
     return xStream;
   }
 

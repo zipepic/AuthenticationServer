@@ -75,5 +75,5 @@ public class UserProfileEventHandler {
 
     objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("/Users/xzz1p/Documents/MySpring/TEST_PROJECT/AuthenticationServer/jwk.json"), updatedJWKSet.toJSONObject());
   }
-
+  //TODO add event handler for UserProfileUpdatedEvent, UserProfilePasswordChangedEvent
 }

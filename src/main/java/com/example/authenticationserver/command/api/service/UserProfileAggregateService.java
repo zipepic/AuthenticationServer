@@ -1,7 +1,7 @@
 package com.example.authenticationserver.command.api.service;
 
 /**
- * The {@code UserProfileService} class provides functionality for handling user profile-related operations,
+ * The {@code UserProfileAggregateService} class provides functionality for handling user profile-related operations,
  * such as token generation and refresh, within the authentication server.
  *
  * <p><strong>Dependencies:</strong></p>
@@ -52,7 +52,7 @@ import java.util.Map;
 
 @Service
 @Scope("prototype")
-public class UserProfileService {
+public class UserProfileAggregateService {
   private final TokenFacade tokenFacade;
 
   /**
@@ -61,7 +61,7 @@ public class UserProfileService {
    * @param tokenFacade The {@code TokenFacade} providing token-related operations.
    */
   @Autowired
-  public UserProfileService(TokenFacade tokenFacade) {
+  public UserProfileAggregateService(TokenFacade tokenFacade) {
     this.tokenFacade = tokenFacade;
   }
 

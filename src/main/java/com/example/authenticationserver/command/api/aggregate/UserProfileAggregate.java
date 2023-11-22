@@ -93,7 +93,7 @@ package com.example.authenticationserver.command.api.aggregate;
  *
  * <p><strong>See Also:</strong></p>
  * <ul>
- *   <li>{@link com.example.authenticationserver.command.api.service.UserProfileService}</li>
+ *   <li>{@link com.example.authenticationserver.command.api.service.UserProfileAggregateService}</li>
  *   <li>{@link com.project.core.commands.user.CreateUserProfileCommand}</li>
  *   <li>{@link com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand}</li>
  *   <li>{@link com.project.core.commands.user.RefreshAccessTokenForUserProfileCommand}</li>
@@ -103,7 +103,7 @@ package com.example.authenticationserver.command.api.aggregate;
  * </ul>
  */
 
-import com.example.authenticationserver.command.api.service.UserProfileService;
+import com.example.authenticationserver.command.api.service.UserProfileAggregateService;
 import com.example.authenticationserver.dto.TokenDTO;
 import com.project.core.commands.user.CreateUserProfileCommand;
 import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
@@ -185,7 +185,7 @@ public class UserProfileAggregate {
    * @return The {@code TokenDTO} representing the generated tokens.
    */
   @CommandHandler
-  public TokenDTO handleGenerateTokenCommand(GenerateRefreshTokenForUserProfileCommand command, @NonNull UserProfileService service) {
+  public TokenDTO handleGenerateTokenCommand(GenerateRefreshTokenForUserProfileCommand command, @NonNull UserProfileAggregateService service) {
     UUID tokenId = UUID.randomUUID();
     var map = service.generateJwtTokensMap(command.getUserId(), tokenId.toString());
     AggregateLifecycle.apply(service.handleTokenInfoEvent(
@@ -206,7 +206,7 @@ public class UserProfileAggregate {
    * @return The {@code TokenDTO} representing the refreshed tokens.
    */
   @CommandHandler
-  public TokenDTO handleRefreshTokenCommand(RefreshAccessTokenForUserProfileCommand command, @NonNull UserProfileService service) {
+  public TokenDTO handleRefreshTokenCommand(RefreshAccessTokenForUserProfileCommand command, @NonNull UserProfileAggregateService service) {
     UUID tokenId = UUID.randomUUID();
     var map = service.refreshToken(command.getRefreshToken(), tokenId.toString());
     AggregateLifecycle.apply(service.handleTokenInfoEvent(

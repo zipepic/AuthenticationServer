@@ -1,5 +1,6 @@
 package com.example.authenticationserver.query.api.data.user;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,7 @@ import java.util.Optional;
 public class UserProfileEntityService {
     private final UserProfileRepository userProfileRepository;
 
+    @Autowired
     public UserProfileEntityService(UserProfileRepository userProfileRepository) {
         this.userProfileRepository = userProfileRepository;
     }

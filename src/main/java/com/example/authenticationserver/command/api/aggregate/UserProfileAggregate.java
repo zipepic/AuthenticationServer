@@ -105,11 +105,11 @@ package com.example.authenticationserver.command.api.aggregate;
 
 import com.example.authenticationserver.command.api.service.UserProfileAggregateService;
 import com.example.authenticationserver.dto.TokenDTO;
-import com.project.core.commands.user.CreateUserProfileCommand;
-import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
-import com.project.core.commands.user.RefreshAccessTokenForUserProfileCommand;
+import com.project.core.commands.user.*;
 import com.project.core.events.user.JwtTokenInfoEvent;
 import com.project.core.events.user.UserProfileCreatedEvent;
+import com.project.core.events.user.UserProfilePasswordChangedEvent;
+import com.project.core.events.user.UserProfileUpdatedEvent;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -226,5 +226,29 @@ public class UserProfileAggregate {
   @EventSourcingHandler
   public void on(JwtTokenInfoEvent event) {
     this.tokenId = event.getTokenId();
+  }
+  @CommandHandler
+  public void handle(UpdateUserProfileCommand command){
+    var event = UserProfileUpdatedEvent.builder()
+      .userId(command.getUserId())
+      .userName(command.getUserName())
+      .build();
+    AggregateLifecycle.apply(event);
+  }
+  @EventSourcingHandler
+  public void on(UserProfileUpdatedEvent event) {
+    this.userName = event.getUserName();
+  }
+  @CommandHandler
+  public void handle(ChangeUserProfilePasswordCommand command){
+    var event = UserProfilePasswordChangedEvent.builder()
+      .userId(command.getUserId())
+      .newPassword(command.getNewPassword())
+      .build();
+    AggregateLifecycle.apply(event);
+  }
+  @EventSourcingHandler
+  public void on(UserProfilePasswordChangedEvent event) {
+    this.passwordHash = event.getNewPassword();
   }
 }

@@ -1,5 +1,7 @@
-package com.example.authenticationserver.query.api.data.user;
+package com.example.authenticationserver.query.api.service;
 
+import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
+import com.example.authenticationserver.query.api.data.user.UserProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;

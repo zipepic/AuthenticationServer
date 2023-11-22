@@ -66,7 +66,8 @@ public class AuthenticationServerApplication {
       JwkTokenInfoEvent.class,
       FetchJwkSet.class,
       JWK.class,
-      SimpleJWK.class);
+      SimpleJWK.class,
+      UserProfileLookupQuery.class);
     return xStream;
   }
 
@@ -74,11 +75,6 @@ public class AuthenticationServerApplication {
     for (Class<?> clazz : classes) {
       xStream.allowTypeHierarchy(clazz);
     }
-  }
-  @Bean
-  public SecretKeySpec secretKeySpec(@NonNull @Value("${app.secret:#{null}}") String secret) {
-    byte[] secretKeyBytes = Base64.getDecoder().decode(secret);
-    return new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS256.getJcaName());
   }
   @Bean
   public PasswordEncoder passwordEncoder() {

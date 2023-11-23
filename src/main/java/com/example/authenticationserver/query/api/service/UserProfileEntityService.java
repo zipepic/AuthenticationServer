@@ -39,4 +39,10 @@ public class UserProfileEntityService {
         if (userProfileEntity.isEmpty()) throw new UsernameNotFoundException("User not found");
         return userProfileEntity.get();
     }
+
+    public UserProfileEntity findUserProfileEntityByUsername(String username){
+        Optional<UserProfileEntity> userProfileEntity=userProfileRepository.findByUserName(username);
+        if (userProfileEntity.isEmpty()) throw new UsernameNotFoundException("User not found");
+        return userProfileEntity.get();
+    }
 }

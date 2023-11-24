@@ -32,35 +32,53 @@ public class AuthenticationServerApplication {
   @Bean
   public XStream xStream() {
     XStream xStream = new XStream();
+    // Register classes for events
     registerClasses(xStream,
-      CreateUserProfileCommand.class,
-      UserProfileCreatedEvent.class,
-      CreateApplicationCommand.class,
-      ApplicationCreatedEvent.class,
-      TokenSummary.class,
-      FindUserIdByUserNameQuery.class,
-      CheckLoginDataQuery.class,
-      GenerateAuthorizationCodeCommand.class,
-      UseAuthorizationCodeCommand.class,
+      // Event classes from com.project.core.events.code package
       AuthorizationCodeGeneratedEvent.class,
       AuthorizationCodeUsedEvent.class,
-      UserProfileEntity.class,
+      // Event classes from com.project.core.events.user package
+      UserProfileCreatedEvent.class,
+      UserProfileUpdatedEvent.class,
+      UserProfilePasswordChangedEvent.class,
+      JwtTokenInfoEvent.class,
+      JwkTokenInfoEvent.class,
+      // Event classes from com.project.core.events.app package
+      ApplicationCreatedEvent.class);
+
+    // Register classes for queries
+    registerClasses(xStream,
+      // Query classes from com.project.core.queries.app package
+      CheckLoginDataQuery.class,
+      // Query classes from com.project.core.queries.user package
       FetchUserProfileByUserIdQuery.class,
       FetchUserProfileByUserNameQuery.class,
-      TokenAuthorizationCodeDTO.class,
-      GenerateRefreshTokenForUserProfileCommand.class,
-      JwtTokenInfoEvent.class,
-      RefreshAccessTokenForUserProfileCommand.class,
       ValidateRefreshTokenForUserProfileQuery.class,
-      JwkTokenInfoEvent.class,
       FetchJwkSet.class,
-      JWK.class,
-      SimpleJWK.class,
-      UserProfileLookupQuery.class,
+      UserProfileLookupQuery.class);
+
+    // Register classes for commands
+    registerClasses(xStream,
+      // Command classes from com.project.core.commands.code package
+      GenerateAuthorizationCodeCommand.class,
+      UseAuthorizationCodeCommand.class,
+      // Command classes from com.project.core.commands.user package
+      CreateUserProfileCommand.class,
       UpdateUserProfileCommand.class,
-      UserProfileUpdatedEvent.class,
       ChangeUserProfilePasswordCommand.class,
-      UserProfilePasswordChangedEvent.class);
+      GenerateRefreshTokenForUserProfileCommand.class,
+      RefreshAccessTokenForUserProfileCommand.class,
+      // Command classes from com.project.core.commands.app package
+      CreateApplicationCommand.class);
+
+    // Register other necessary classes
+    registerClasses(xStream,
+      TokenSummary.class,
+      UserProfileEntity.class,
+      TokenAuthorizationCodeDTO.class,
+      JWK.class,
+      SimpleJWK.class);
+
     return xStream;
   }
 

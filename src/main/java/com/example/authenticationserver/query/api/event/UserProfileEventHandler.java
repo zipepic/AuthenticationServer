@@ -6,9 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
-import com.project.core.events.user.JwkTokenInfoEvent;
-import com.project.core.events.user.JwtTokenInfoEvent;
-import com.project.core.events.user.UserProfileCreatedEvent;
+import com.project.core.events.user.*;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.beans.BeanUtils;
@@ -75,5 +73,12 @@ public class UserProfileEventHandler {
 
     objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("/Users/xzz1p/Documents/MySpring/TEST_PROJECT/AuthenticationServer/jwk.json"), updatedJWKSet.toJSONObject());
   }
-  //TODO add event handler for UserProfileUpdatedEvent, UserProfilePasswordChangedEvent
+  @EventHandler
+  void handle(UserProfileUpdatedEvent event){
+
+  }
+  @EventHandler
+  void handle(UserProfilePasswordChangedEvent event){
+
+  }
 }

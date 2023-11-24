@@ -19,7 +19,7 @@
  * }
  * </pre>
  *
- * <p><strong>Author:</strong> [Author Name]</p>
+ * <p><strong>Author:</strong> Konstantin Kokoshnikov</p>
  *
  * @see com.example.authenticationserver.query.api.consistency.UserProfileLookupEntity
  */

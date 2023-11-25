@@ -1,6 +1,7 @@
 package com.example.authenticationserver.security;
 
-import com.example.authenticationserver.security.service.UserProfileDetailsService;
+import com.example.authenticationserver.security.service.UserDetailsLoader;
+import com.example.authenticationserver.security.service.UserProfileDetailsLoaderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -13,11 +14,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AuthUserProfileProviderImpl implements AuthenticationProvider {
-  private final UserProfileDetailsService userProfileDetailsService;
+  private final UserDetailsLoader userDetailsLoader;
   private final PasswordEncoder passwordEncoder;
   @Autowired
-  public AuthUserProfileProviderImpl(UserProfileDetailsService userProfileDetailsService, PasswordEncoder passwordEncoder) {
-    this.userProfileDetailsService = userProfileDetailsService;
+  public AuthUserProfileProviderImpl(UserDetailsLoader userDetailsLoader, PasswordEncoder passwordEncoder) {
+    this.userDetailsLoader = userDetailsLoader;
     this.passwordEncoder = passwordEncoder;
   }
 
@@ -25,7 +26,7 @@ public class AuthUserProfileProviderImpl implements AuthenticationProvider {
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
     String userName = authentication.getName();
 
-    UserDetails userDetails = userProfileDetailsService.loadUserByUsername(userName);
+    UserDetails userDetails = userDetailsLoader.loadUserByUsername(userName);
 
     String password = authentication.getCredentials().toString();
 

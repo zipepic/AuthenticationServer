@@ -11,16 +11,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/user")
 public class UserProfileController {
-  private final CommandGateway commandGateway;
-  private final QueryGateway queryGateway;
-  private final PasswordEncoder passwordEncoder;
-
-  @Autowired
-  public UserProfileController(CommandGateway commandGateway, QueryGateway queryGateway, PasswordEncoder passwordEncoder) {
-    this.commandGateway = commandGateway;
-    this.queryGateway = queryGateway;
-    this.passwordEncoder = passwordEncoder;
-  }
   @GetMapping("/profile")
   public String userprofile(@AuthenticationPrincipal UserProfileDetails userProfileDetails){
     return userProfileDetails.getUserProfileEntity().toString();

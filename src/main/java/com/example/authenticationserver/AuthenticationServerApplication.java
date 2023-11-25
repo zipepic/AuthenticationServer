@@ -3,34 +3,24 @@ package com.example.authenticationserver;
 import com.example.authenticationserver.dto.TokenSummary;
 import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
 import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
+import com.nimbusds.jose.jwk.JWK;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
 import com.project.core.commands.app.CreateApplicationCommand;
-import com.project.core.commands.user.CreateUserProfileCommand;
-import com.project.core.commands.user.GenerateRefreshTokenForUserProfileCommand;
-import com.project.core.commands.user.RefreshAccessTokenForUserProfileCommand;
+import com.project.core.commands.user.*;
 import com.project.core.events.code.AuthorizationCodeGeneratedEvent;
 import com.project.core.events.code.AuthorizationCodeUsedEvent;
-import com.project.core.events.user.RefreshTokenForUserProfileGeneratedEvent;
-import com.project.core.events.user.UserProfileCreatedEvent;
+import com.project.core.events.user.*;
 import com.project.core.events.app.ApplicationCreatedEvent;
 import com.project.core.queries.app.CheckLoginDataQuery;
-import com.project.core.queries.user.FetchUserProfileByUserIdQuery;
-import com.project.core.queries.user.FetchUserProfileByUserNameQuery;
-import com.project.core.queries.user.FindUserIdByUserNameQuery;
-import com.project.core.queries.user.ValidateRefreshTokenForUserProfileQuery;
+import com.project.core.queries.user.*;
 import com.thoughtworks.xstream.XStream;
-import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import javax.crypto.spec.SecretKeySpec;
-import java.util.Base64;
+import tokenlib.util.jwk.SimpleJWK;
 
 @SpringBootApplication
 public class AuthenticationServerApplication {
@@ -42,26 +32,53 @@ public class AuthenticationServerApplication {
   @Bean
   public XStream xStream() {
     XStream xStream = new XStream();
+    // Register classes for events
     registerClasses(xStream,
-      CreateUserProfileCommand.class,
-      UserProfileCreatedEvent.class,
-      CreateApplicationCommand.class,
-      ApplicationCreatedEvent.class,
-      TokenSummary.class,
-      FindUserIdByUserNameQuery.class,
-      CheckLoginDataQuery.class,
-      GenerateAuthorizationCodeCommand.class,
-      UseAuthorizationCodeCommand.class,
+      // Event classes from com.project.core.events.code package
       AuthorizationCodeGeneratedEvent.class,
       AuthorizationCodeUsedEvent.class,
-      UserProfileEntity.class,
+      // Event classes from com.project.core.events.user package
+      UserProfileCreatedEvent.class,
+      UserProfileUpdatedEvent.class,
+      UserProfilePasswordChangedEvent.class,
+      JwtTokenInfoEvent.class,
+      JwkTokenInfoEvent.class,
+      // Event classes from com.project.core.events.app package
+      ApplicationCreatedEvent.class);
+
+    // Register classes for queries
+    registerClasses(xStream,
+      // Query classes from com.project.core.queries.app package
+      CheckLoginDataQuery.class,
+      // Query classes from com.project.core.queries.user package
       FetchUserProfileByUserIdQuery.class,
       FetchUserProfileByUserNameQuery.class,
-      TokenAuthorizationCodeDTO.class,
+      ValidateRefreshTokenForUserProfileQuery.class,
+      FetchJwkSet.class,
+      UserProfileLookupQuery.class);
+
+    // Register classes for commands
+    registerClasses(xStream,
+      // Command classes from com.project.core.commands.code package
+      GenerateAuthorizationCodeCommand.class,
+      UseAuthorizationCodeCommand.class,
+      // Command classes from com.project.core.commands.user package
+      CreateUserProfileCommand.class,
+      UpdateUserProfileCommand.class,
+      ChangeUserProfilePasswordCommand.class,
       GenerateRefreshTokenForUserProfileCommand.class,
-      RefreshTokenForUserProfileGeneratedEvent.class,
       RefreshAccessTokenForUserProfileCommand.class,
-      ValidateRefreshTokenForUserProfileQuery.class);
+      // Command classes from com.project.core.commands.app package
+      CreateApplicationCommand.class);
+
+    // Register other necessary classes
+    registerClasses(xStream,
+      TokenSummary.class,
+      UserProfileEntity.class,
+      TokenAuthorizationCodeDTO.class,
+      JWK.class,
+      SimpleJWK.class);
+
     return xStream;
   }
 
@@ -69,11 +86,6 @@ public class AuthenticationServerApplication {
     for (Class<?> clazz : classes) {
       xStream.allowTypeHierarchy(clazz);
     }
-  }
-  @Bean
-  public SecretKeySpec secretKeySpec(@NonNull @Value("${app.secret:#{null}}") String secret) {
-    byte[] secretKeyBytes = Base64.getDecoder().decode(secret);
-    return new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS256.getJcaName());
   }
   @Bean
   public PasswordEncoder passwordEncoder() {

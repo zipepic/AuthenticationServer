@@ -8,13 +8,12 @@ import com.example.authenticationserver.security.filter.token.JwtRefreshFilter;
 import com.example.authenticationserver.security.filter.token.TokenGenerationFilter;
 import com.example.authenticationserver.security.filter.URIFilter;
 import com.example.authenticationserver.security.AuthUserProfileProviderImpl;
-import com.example.authenticationserver.security.service.UserProfileDetailsService;
-import com.example.authenticationserver.util.TokenUtils;
+import com.example.authenticationserver.security.service.UserDetailsLoader;
+import tokenlib.util.TokenFacade;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -27,29 +26,57 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-
+/**
+ * Security configuration for the application.
+ *
+ * @author Konstantin Kokoshnikov
+ * @see AuthUserProfileProviderImpl
+ * @see UserDetailsLoader
+ * @see QueryGateway
+ * @see CommandGateway
+ * @see TokenFacade
+ * @since 1.0
+ */
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
   private final AuthUserProfileProviderImpl authUserProfileProvider;
-  private final UserProfileDetailsService userProfileDetailsService;
+  private final UserDetailsLoader userDetailsLoader;
   private final QueryGateway queryGateway;
   private final CommandGateway commandGateway;
-  private final TokenUtils tokenUtils;
+  private final TokenFacade tokenUtils;
+
+  /**
+   * Constructor for the class.
+   *
+   * @param authUserProfileProvider The provider for user profiles during authentication
+   * @param userDetailsLoader      Loader for user details
+   * @param queryGateway           Axon Framework query gateway
+   * @param commandGateway         Axon Framework command gateway
+   * @param tokenUtils             Utility for token operations
+   */
   @Autowired
   public SecurityConfig(AuthUserProfileProviderImpl authUserProfileProvider,
-                        UserProfileDetailsService userProfileDetailsService,
+                        UserDetailsLoader userDetailsLoader,
                         QueryGateway queryGateway,
                         CommandGateway commandGateway,
-                        @Qualifier("jwtManager")TokenUtils tokenUtils) {
+                        TokenFacade tokenUtils) {
     this.authUserProfileProvider = authUserProfileProvider;
-    this.userProfileDetailsService = userProfileDetailsService;
+    this.userDetailsLoader = userDetailsLoader;
     this.queryGateway = queryGateway;
     this.commandGateway = commandGateway;
     this.tokenUtils = tokenUtils;
   }
+
+  /**
+   * Configures the security filter chain for authentication.
+   *
+   * @param http The HttpSecurity object to configure
+   * @return The configured SecurityFilterChain
+   * @throws Exception If an error occurs during configuration
+   */
   @Bean
   protected SecurityFilterChain filterChainAuth(HttpSecurity http) throws Exception {
     http.securityMatcher(new AntPathRequestMatcher("/auth/**"));
@@ -64,6 +91,13 @@ public class SecurityConfig {
     return http.build();
   }
 
+  /**
+   * Configures the security filter chain for general use.
+   *
+   * @param http The HttpSecurity object to configure
+   * @return The configured SecurityFilterChain
+   * @throws Exception If an error occurs during configuration
+   */
   @Bean
   protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.securityMatcher(new AntPathRequestMatcher("/login"));
@@ -72,6 +106,12 @@ public class SecurityConfig {
     configureDefault(http);
     return http.build();
   }
+
+  /**
+   * Customizes web security settings.
+   *
+   * @return The WebSecurityCustomizer for additional customization
+   */
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
     return (web) -> web.ignoring()
@@ -79,27 +119,58 @@ public class SecurityConfig {
       .requestMatchers(new AntPathRequestMatcher("/auth/login"));
   }
 
+  /**
+   * Configures authentication filters for the security filter chain.
+   *
+   * @param http The HttpSecurity object to configure
+   * @throws Exception If an error occurs during configuration
+   */
   private void configureAuthFilters(HttpSecurity http) throws Exception {
     http
       .addFilterBefore(new ErrorHandlingFilter(new ObjectMapper()), UsernamePasswordAuthenticationFilter.class)
       .addFilterAfter(new TokenRemoverFilter(), ErrorHandlingFilter.class)
       .addFilterAfter(new SignatureVerificationFilter(tokenUtils), TokenRemoverFilter.class)
-      .addFilterAfter(new LoadUserFromDatabaseFilterByJwt(userProfileDetailsService), SignatureVerificationFilter.class);
+      .addFilterAfter(new LoadUserFromDatabaseFilterByJwt(userDetailsLoader), SignatureVerificationFilter.class);
   }
+
+  /**
+   * Configures default security settings for the HttpSecurity object.
+   *
+   * @param http The HttpSecurity object to configure
+   * @throws Exception If an error occurs during configuration
+   */
   private void configureDefault(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
       .formLogin(formLogin -> formLogin.disable())
       .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-    }
+  }
 
-  URIFilter tokenTypeFilter(){
+  /**
+   * Creates a URI filter based on token types.
+   *
+   * @return The URI filter
+   */
+  private URIFilter tokenTypeFilter() {
     return new URIFilter(jwtRefreshFilter());
   }
-  JwtRefreshFilter jwtRefreshFilter(){
+
+  /**
+   * Creates a JWT refresh filter.
+   *
+   * @return The JWT refresh filter
+   */
+  private JwtRefreshFilter jwtRefreshFilter() {
     return new JwtRefreshFilter(tokenGenerationFilter());
   }
-  TokenGenerationFilter tokenGenerationFilter() { return new TokenGenerationFilter(commandGateway, new ObjectMapper());}
+
+  /**
+   * Creates a token generation filter.
+   *
+   * @return The token generation filter
+   */
+  private TokenGenerationFilter tokenGenerationFilter() {
+    return new TokenGenerationFilter(commandGateway, new ObjectMapper());
+  }
 
 }
-

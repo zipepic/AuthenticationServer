@@ -1,0 +1,49 @@
+spring:
+  security:
+    oauth2:
+      authorizationserver:
+        client:
+          crm-client:
+            require-authorization-consent: true
+            registration:
+              client-id: crm
+              client-secret: "{bcrypt}$2a$10$wEZDKHDw7nntRVJTymEufeZY.F0C5GC1HxNTQgXxD0xcPDQe0Wf9a"
+              authorization-grant-types: client_credentials, authorization_code, refresh_token
+              redirect-uris: "http://127.0.0.1:8082/login/oauth2/code/spring"
+              scopes: user.read,user.write,openid
+              client-authentication-methods: "client_secret_basic"
+  datasource:
+    url: jdbc:h2:./authDB/authDB
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+
+    jpa:
+      databasePlatform: org.hibernate.dialect.H2Dialect
+      hibernate:
+        ddl-auto: update
+
+    h2:
+      console:
+        enabled: true
+        settings:
+          web-allow-others: true
+
+
+app:
+  secret: aM7l+SXuEgqITZT5JI9uZK9IRcuIMk9ww2K1udnSk1U=
+#0 - JWT, 1 - JWK
+  token-type: 1
+
+  jwk-file-path: /Users/xzz1p/Documents/MySpring/TEST_PROJECT/AuthenticationServer/jwk.json
+
+#1 час
+  refreshTokenExpTime: 3600000
+#10 минут
+  accessTokenExpTime: 600000
+  issuer: AUTH_SERVER
+
+server:
+  port: 8080
+
+#axon.eventhandling.processors.value.mode=subscribing

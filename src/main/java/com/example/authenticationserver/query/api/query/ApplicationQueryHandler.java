@@ -1,33 +1,30 @@
 package com.example.authenticationserver.query.api.query;
 
-import com.example.authenticationserver.query.api.data.application.ApplicationEntity;
-import com.example.authenticationserver.query.api.data.application.ApplicationRepository;
+import com.example.authenticationserver.query.api.service.ApplicationService;
 import com.project.core.queries.app.CheckLoginDataQuery;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import java.util.NoSuchElementException;
 
 @Component
 public class ApplicationQueryHandler {
-  private final ApplicationRepository applicationRepository;
   private final PasswordEncoder passwordEncoder;
+  private final ApplicationService applicationService;
   @Autowired
-  public ApplicationQueryHandler(ApplicationRepository applicationRepository, PasswordEncoder passwordEncoder) {
-    this.applicationRepository = applicationRepository;
+  public ApplicationQueryHandler(PasswordEncoder passwordEncoder, ApplicationService applicationService) {
     this.passwordEncoder = passwordEncoder;
+    this.applicationService = applicationService;
   }
   @QueryHandler
   public boolean on(CheckLoginDataQuery query){
-    Optional<ApplicationEntity> optionalApplicationEntity =
-      applicationRepository.findById(query.getClientId());
-    if(optionalApplicationEntity.isPresent())
-    {
-      ApplicationEntity applicationEntity = optionalApplicationEntity.get();
-      return passwordEncoder.matches(query.getSecret(),applicationEntity.getSecret());
+    try {
+      return passwordEncoder.matches(query.getSecret(), applicationService.findById(query.getClientId()).getSecret());
+    } catch (NoSuchElementException e) {
+      throw new NoSuchElementException("Not found");
+//      return false;
     }
-    return false;
   }
 }

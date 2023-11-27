@@ -86,11 +86,11 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>com.nimbusds</groupId>
-      <artifactId>nimbus-jose-jwt</artifactId>
-      <version>7.9</version>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>com.nimbusds</groupId>-->
+<!--      <artifactId>nimbus-jose-jwt</artifactId>-->
+<!--      <version>7.9</version>-->
+<!--    </dependency>-->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -115,7 +115,10 @@
       <artifactId>hibernate-validator</artifactId>
       <version>8.0.1.Final</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-oauth2-authorization-server</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

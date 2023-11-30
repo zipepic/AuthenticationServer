@@ -19,14 +19,17 @@ public class UserProfileEntityService {
         this.userProfileRepository = userProfileRepository;
     }
 
+    @Transactional
     public void deleteUserProfileEntityById(String id) {
         userProfileRepository.deleteById(id);
     }
 
+    @Transactional
     public void addUserProfileEntity(UserProfileEntity userProfileEntity) {
         userProfileRepository.save(userProfileEntity);
     }
 
+    @Transactional
     public void updateUserProfileEntity(UserProfileEntity userProfileEntity) {
         userProfileRepository.save(userProfileEntity);
     }

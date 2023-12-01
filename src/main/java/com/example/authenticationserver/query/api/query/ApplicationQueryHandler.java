@@ -1,33 +1,28 @@
 package com.example.authenticationserver.query.api.query;
 
-import com.example.authenticationserver.query.api.data.application.ApplicationEntity;
-import com.example.authenticationserver.query.api.data.application.ApplicationRepository;
+import com.example.authenticationserver.query.api.service.ApplicationService;
 import com.project.core.queries.app.CheckLoginDataQuery;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import java.util.NoSuchElementException;
 
 @Component
 public class ApplicationQueryHandler {
-  private final ApplicationRepository applicationRepository;
-  private final PasswordEncoder passwordEncoder;
-  @Autowired
-  public ApplicationQueryHandler(ApplicationRepository applicationRepository, PasswordEncoder passwordEncoder) {
-    this.applicationRepository = applicationRepository;
-    this.passwordEncoder = passwordEncoder;
-  }
-  @QueryHandler
-  public boolean on(CheckLoginDataQuery query){
-    Optional<ApplicationEntity> optionalApplicationEntity =
-      applicationRepository.findById(query.getClientId());
-    if(optionalApplicationEntity.isPresent())
-    {
-      ApplicationEntity applicationEntity = optionalApplicationEntity.get();
-      return passwordEncoder.matches(query.getSecret(),applicationEntity.getSecret());
+    private final ApplicationService applicationService;
+
+    @Autowired
+    public ApplicationQueryHandler(ApplicationService applicationService) {
+        this.applicationService = applicationService;
     }
-    return false;
-  }
+
+    @QueryHandler
+    public boolean on(CheckLoginDataQuery query) {
+        try {
+            return applicationService.checkPassword(query.getSecret(), query.getClientId());
+        } catch (NoSuchElementException e) {
+            throw new NoSuchElementException("Not found");
+        }
+    }
 }

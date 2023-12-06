@@ -53,7 +53,7 @@ public class UserProfileEventHandler {
   @EventHandler
   void handle(JwkTokenInfoEvent event) throws IOException, ParseException {
     ObjectMapper objectMapper = new ObjectMapper();
-    JWKSet jwkSet = JWKSet.load(new File("/Users/xzz1p/Documents/MySpring/TEST_PROJECT/AuthenticationServer/jwk.json"));
+    JWKSet jwkSet = JWKSet.load(new File("/Users/xzz1p/Documents/TEST_PROJECT/AuthenticationServer/jwk.json"));
 
     List<JWK> keys = new ArrayList<>(jwkSet.getKeys());
 
@@ -71,7 +71,7 @@ public class UserProfileEventHandler {
     userProfileEntity.setTokenId(event.getKid());
     userProfileRepository.save(userProfileEntity);
 
-    objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("/Users/xzz1p/Documents/MySpring/TEST_PROJECT/AuthenticationServer/jwk.json"), updatedJWKSet.toJSONObject());
+    objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("/Users/xzz1p/Documents/TEST_PROJECT/AuthenticationServer/jwk.json"), updatedJWKSet.toJSONObject());
   }
   @EventHandler
   void handle(UserProfileUpdatedEvent event){

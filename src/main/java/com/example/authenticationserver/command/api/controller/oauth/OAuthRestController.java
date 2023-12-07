@@ -1,8 +1,8 @@
 package com.example.authenticationserver.command.api.controller.oauth;
 
-import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
-import com.example.authenticationserver.dto.TokenDTO;
-import com.example.authenticationserver.dto.TokenSummary;
+import com.project.core.dto.TokenAuthorizationCodeDTO;
+import com.project.core.dto.TokenDTO;
+import com.project.core.dto.TokenSummary;
 import tokenlib.util.jwk.AppConstants;
 import tokenlib.util.TokenFacade;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;

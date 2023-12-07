@@ -104,7 +104,7 @@ package com.example.authenticationserver.command.api.aggregate;
  */
 
 import com.example.authenticationserver.command.api.service.UserProfileAggregateService;
-import com.example.authenticationserver.dto.TokenDTO;
+import com.project.core.dto.TokenDTO;
 import com.project.core.commands.user.*;
 import com.project.core.events.user.*;
 import lombok.Data;
@@ -205,6 +205,17 @@ public class UserProfileAggregate {
       command.getUserId(),
       map,
       tokenId.toString()
+    ));
+    return service.makeTokenDTO(map, tokenId.toString());
+  }
+  @CommandHandler
+  public TokenDTO handle(GenerateTokenByProviderIdCommand command, @NonNull UserProfileAggregateService service){
+    UUID tokenId = UUID.randomUUID();
+    var map = service.generateJwtTokensMap(command.getUserId(), tokenId.toString());
+    AggregateLifecycle.apply(service.handleTokenInfoEvent(
+            command.getUserId(),
+            map,
+            tokenId.toString()
     ));
     return service.makeTokenDTO(map, tokenId.toString());
   }

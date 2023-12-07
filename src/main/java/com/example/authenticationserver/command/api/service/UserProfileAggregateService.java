@@ -29,7 +29,7 @@ package com.example.authenticationserver.command.api.service;
  * <p><strong>See Also:</strong></p>
  * <ul>
  *   <li>{@link com.example.authenticationserver.command.api.aggregate.UserProfileAggregate}</li>
- *   <li>{@link com.example.authenticationserver.dto.TokenAuthorizationCodeDTO}</li>
+ *   <li>{@link com.project.core.dto.TokenAuthorizationCodeDTO}</li>
  *   <li>{@link com.project.core.events.user.JwkTokenInfoEvent}</li>
  *   <li>{@link com.project.core.events.user.JwtTokenInfoEvent}</li>
  *   <li>{@link tokenlib.util.TokenFacade}</li>
@@ -37,8 +37,8 @@ package com.example.authenticationserver.command.api.service;
  *   <li>{@link tokenlib.util.tokenenum.TokenFields}</li>
  * </ul>
  */
-import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
-import com.example.authenticationserver.dto.TokenDTO;
+import com.project.core.dto.TokenAuthorizationCodeDTO;
+import com.project.core.dto.TokenDTO;
 import com.project.core.events.user.JwkTokenInfoEvent;
 import com.project.core.events.user.JwtTokenInfoEvent;
 import org.springframework.context.annotation.Scope;

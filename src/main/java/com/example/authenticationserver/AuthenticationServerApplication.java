@@ -70,6 +70,13 @@ public class AuthenticationServerApplication {
       RefreshAccessTokenForUserProfileCommand.class,
       // Command classes from com.project.core.commands.app package
       CreateApplicationCommand.class);
+    registerClasses(xStream,
+      // Command classes from com.project.core.commands.user package
+      BindProviderIdToUserCommand.class,
+      CreateUserFromProviderIdCommand.class,
+            ProviderIdBoundToUserEvent.class,
+            UserCreatedFromProviderIdEvent.class,
+            CheckUserProfileByProviderIdQuery.class);
 
     // Register other necessary classes
     registerClasses(xStream,

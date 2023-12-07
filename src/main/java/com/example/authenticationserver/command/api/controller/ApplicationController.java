@@ -1,6 +1,6 @@
 package com.example.authenticationserver.command.api.controller;
 
-import com.example.authenticationserver.dto.application.ApplicationCreateRestModel;
+import com.project.core.dto.application.ApplicationCreateRestModel;
 import com.project.core.commands.app.CreateApplicationCommand;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;

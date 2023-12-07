@@ -106,10 +106,7 @@ package com.example.authenticationserver.command.api.aggregate;
 import com.example.authenticationserver.command.api.service.UserProfileAggregateService;
 import com.example.authenticationserver.dto.TokenDTO;
 import com.project.core.commands.user.*;
-import com.project.core.events.user.JwtTokenInfoEvent;
-import com.project.core.events.user.UserProfileCreatedEvent;
-import com.project.core.events.user.UserProfilePasswordChangedEvent;
-import com.project.core.events.user.UserProfileUpdatedEvent;
+import com.project.core.events.user.*;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -133,6 +130,8 @@ public class UserProfileAggregate {
   private String passwordHash;
   private String userStatus;
   private String role;
+  private String githubId;
+  private String googleId;
   private String tokenId;
   private Date createdAt;
 
@@ -156,6 +155,20 @@ public class UserProfileAggregate {
       .role("ROLE_USER")
       .createdAt(new Date())
       .build();
+    AggregateLifecycle.apply(event);
+  }
+
+  @CommandHandler
+  public UserProfileAggregate(CreateUserFromProviderIdCommand command){
+    var event = UserCreatedFromProviderIdEvent.builder()
+            .userId(command.getUserId())
+            .userName(command.getUserName())
+            .providerId(command.getProviderId())
+            .providerType(command.getProviderType())
+            .userStatus("CREATED")
+            .role("ROLE_USER")
+            .createdAt(new Date())
+            .build();
     AggregateLifecycle.apply(event);
   }
 
@@ -251,4 +264,31 @@ public class UserProfileAggregate {
   public void on(UserProfilePasswordChangedEvent event) {
     this.passwordHash = event.getNewPassword();
   }
+  @CommandHandler
+  public void handle(BindProviderIdToUserCommand command){
+    var event = ProviderIdBoundToUserEvent.builder()
+      .userId(command.getUserId())
+      .providerId(command.getProviderId())
+      .providerType(command.getProviderType())
+      .build();
+    AggregateLifecycle.apply(event);
+  }
+  @EventSourcingHandler
+  public void on(ProviderIdBoundToUserEvent event) {
+    if(event.getProviderType().equals("github")){
+      this.setGithubId(event.getProviderId());
+    }else if(event.getProviderType().equals("google")){
+      this.setGoogleId(event.getProviderId());
+    }
+  }
+    @EventSourcingHandler
+    public void on(UserCreatedFromProviderIdEvent event) {
+        this.userId = event.getUserId();
+        this.userName = event.getUserName();
+        if(event.getProviderType().equals("github")){
+            this.setGithubId(event.getProviderId());
+        }else if(event.getProviderType().equals("google")){
+            this.setGoogleId(event.getProviderId());
+        }
+    }
 }

@@ -1,8 +1,8 @@
 package com.example.authenticationserver;
 
-import com.example.authenticationserver.dto.TokenSummary;
+import com.project.core.dto.TokenSummary;
 import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
-import com.example.authenticationserver.dto.TokenAuthorizationCodeDTO;
+import com.project.core.dto.TokenAuthorizationCodeDTO;
 import com.nimbusds.jose.jwk.JWK;
 import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import com.project.core.commands.code.UseAuthorizationCodeCommand;
@@ -76,7 +76,8 @@ public class AuthenticationServerApplication {
       CreateUserFromProviderIdCommand.class,
             ProviderIdBoundToUserEvent.class,
             UserCreatedFromProviderIdEvent.class,
-            CheckUserProfileByProviderIdQuery.class);
+            CheckUserProfileByProviderIdQuery.class,
+            GenerateTokenByProviderIdCommand.class);
 
     // Register other necessary classes
     registerClasses(xStream,

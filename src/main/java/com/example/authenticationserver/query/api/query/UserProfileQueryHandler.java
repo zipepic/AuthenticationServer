@@ -66,6 +66,17 @@ public class UserProfileQueryHandler {
             throw new UsernameNotFoundException("User not found");
         }
     }
+    @QueryHandler
+    public String findUserIdByProviderId(CheckUserProfileByProviderIdQuery query) {
+        if(query.getProviderType().equals("github")){
+            var user = userProfileEntityService.findUserProfileEntityByGithubId(query.getProviderId());
+            return user == null ? null : user.getUserId();
+        }else if(query.getProviderType().equals("google")){
+            var user = userProfileEntityService.findUserProfileEntityByGoogleId(query.getProviderId());
+            return user == null ? null : user.getUserId();
+        }
+        return null;
+    }
 
     @QueryHandler
     public List<SimpleJWK> fetchJwkSet(FetchJwkSet query) throws IOException, ParseException {

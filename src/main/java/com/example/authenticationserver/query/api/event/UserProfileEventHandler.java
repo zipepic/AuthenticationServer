@@ -40,6 +40,20 @@ public class UserProfileEventHandler {
     userProfileRepository.save(userProfileEntity);
   }
   @EventHandler
+  public void handle(UserCreatedFromProviderIdEvent event){
+    UserProfileEntity userProfileEntity =
+      new UserProfileEntity();
+
+    BeanUtils.copyProperties(event,userProfileEntity);
+    if(event.getProviderType().equals("github")){
+      userProfileEntity.setGithubId(event.getProviderId());
+    }else if(event.getProviderType().equals("google")){
+        userProfileEntity.setGoogleId(event.getProviderId());
+    }
+
+    userProfileRepository.save(userProfileEntity);
+  }
+  @EventHandler
   void on(JwtTokenInfoEvent event){
     Optional<UserProfileEntity> userProfileEntityOptional =
       userProfileRepository.findById(event.getUserId());
@@ -81,4 +95,19 @@ public class UserProfileEventHandler {
   void handle(UserProfilePasswordChangedEvent event){
 
   }
+  @EventHandler
+    void handle(ProviderIdBoundToUserEvent event){
+        Optional<UserProfileEntity> userProfileEntityOptional =
+            userProfileRepository.findById(event.getUserId());
+        if(userProfileEntityOptional.isEmpty()){
+            throw new RuntimeException("User not found");
+        }
+        UserProfileEntity userProfileEntity = userProfileEntityOptional.get();
+        if(event.getProviderType().equals("github")){
+            userProfileEntity.setGithubId(event.getProviderId());
+        }else if(event.getProviderType().equals("google")){
+            userProfileEntity.setGoogleId(event.getProviderId());
+        }
+        userProfileRepository.save(userProfileEntity);
+    }
 }

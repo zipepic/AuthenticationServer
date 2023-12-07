@@ -1,6 +1,5 @@
 package com.example.authenticationserver.command.api.controller.oauth;
 
-import com.nimbusds.jose.jwk.JWKSet;
 import com.project.core.queries.user.FetchJwkSet;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;

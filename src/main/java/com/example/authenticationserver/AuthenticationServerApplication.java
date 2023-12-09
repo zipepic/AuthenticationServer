@@ -1,5 +1,7 @@
 package com.example.authenticationserver;
 
+import com.project.core.commands.token.CancelTokenCreationCommand;
+import com.project.core.commands.token.CreateTokenCommand;
 import com.project.core.dto.TokenSummary;
 import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
 import com.project.core.dto.TokenAuthorizationCodeDTO;
@@ -10,6 +12,8 @@ import com.project.core.commands.app.CreateApplicationCommand;
 import com.project.core.commands.user.*;
 import com.project.core.events.code.AuthorizationCodeGeneratedEvent;
 import com.project.core.events.code.AuthorizationCodeUsedEvent;
+import com.project.core.events.token.TokenCanceledEvent;
+import com.project.core.events.token.TokenCreatedEvent;
 import com.project.core.events.user.*;
 import com.project.core.events.app.ApplicationCreatedEvent;
 import com.project.core.queries.app.CheckLoginDataQuery;
@@ -20,6 +24,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import tokenlib.util.jwk.AuthProvider;
 import tokenlib.util.jwk.SimpleJWK;
 
 @SpringBootApplication
@@ -77,7 +82,16 @@ public class AuthenticationServerApplication {
             ProviderIdBoundToUserEvent.class,
             UserCreatedFromProviderIdEvent.class,
             CheckUserProfileByProviderIdQuery.class,
-            GenerateTokenByProviderIdCommand.class);
+            GenerateTokenByProviderIdCommand.class,
+            UserProfileProviderMappingLookUpCreatedEvent.class,
+            CancelTokenCreationCommand.class,
+            CreateTokenCommand.class,
+            CancelUserCreationCommand.class,
+            CompleteWereUserCreationCommand.class,
+            TokenCanceledEvent.class,
+            TokenCreatedEvent.class,
+            UserCanceledCreationEvent.class,
+            UserWereCompletedEvent.class);
 
     // Register other necessary classes
     registerClasses(xStream,
@@ -85,7 +99,8 @@ public class AuthenticationServerApplication {
       UserProfileEntity.class,
       TokenAuthorizationCodeDTO.class,
       JWK.class,
-      SimpleJWK.class);
+      SimpleJWK.class,
+            AuthProvider.class);
 
     return xStream;
   }

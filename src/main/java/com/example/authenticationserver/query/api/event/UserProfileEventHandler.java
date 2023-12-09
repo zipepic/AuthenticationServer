@@ -12,6 +12,7 @@ import org.axonframework.eventhandling.EventHandler;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tokenlib.util.jwk.AuthProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,9 +46,9 @@ public class UserProfileEventHandler {
       new UserProfileEntity();
 
     BeanUtils.copyProperties(event,userProfileEntity);
-    if(event.getProviderType().equals("github")){
+    if(event.getAuthProvider() == AuthProvider.GITHUB){
       userProfileEntity.setGithubId(event.getProviderId());
-    }else if(event.getProviderType().equals("google")){
+    }else if(event.getAuthProvider() == AuthProvider.GOOGLE){
         userProfileEntity.setGoogleId(event.getProviderId());
     }
 

@@ -115,6 +115,7 @@ import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
+import tokenlib.util.jwk.AuthProvider;
 
 import java.util.Date;
 import java.util.UUID;
@@ -155,7 +156,11 @@ public class UserProfileAggregate {
       .role("ROLE_USER")
       .createdAt(new Date())
       .build();
+    var lookUpEvent = UserProfileProviderMappingLookUpCreatedEvent.builder()
+      .userId(command.getUserId())
+            .build();
     AggregateLifecycle.apply(event);
+    AggregateLifecycle.apply(lookUpEvent);
   }
 
   @CommandHandler
@@ -164,14 +169,30 @@ public class UserProfileAggregate {
             .userId(command.getUserId())
             .userName(command.getUserName())
             .providerId(command.getProviderId())
-            .providerType(command.getProviderType())
+            .authProvider(command.getAuthProvider())
             .userStatus("CREATED")
             .role("ROLE_USER")
             .createdAt(new Date())
             .build();
+    var lookUpEvent = UserProfileProviderMappingLookUpCreatedEvent.builder()
+            .userId(command.getUserId())
+            .providerId(command.getProviderId())
+            .authProvider(command.getAuthProvider())
+            .build();
+    AggregateLifecycle.apply(event);
+    AggregateLifecycle.apply(lookUpEvent);
+  }
+  @CommandHandler
+  public void handle(CancelUserCreationCommand command){
+    var event = UserCanceledCreationEvent.builder()
+      .userId(command.getUserId())
+      .build();
     AggregateLifecycle.apply(event);
   }
-
+  @EventSourcingHandler
+    public void on(UserCanceledCreationEvent event) {
+        this.userStatus = "CANCELLED";
+    }
   /**
    * Event handler for the {@code UserProfileCreatedEvent}. Updates the aggregate's properties
    * based on the information provided in the event.
@@ -296,9 +317,9 @@ public class UserProfileAggregate {
     public void on(UserCreatedFromProviderIdEvent event) {
         this.userId = event.getUserId();
         this.userName = event.getUserName();
-        if(event.getProviderType().equals("github")){
+        if(event.getAuthProvider() == AuthProvider.GITHUB){
             this.setGithubId(event.getProviderId());
-        }else if(event.getProviderType().equals("google")){
+        }else if(event.getAuthProvider() == AuthProvider.GOOGLE){
             this.setGoogleId(event.getProviderId());
         }
     }

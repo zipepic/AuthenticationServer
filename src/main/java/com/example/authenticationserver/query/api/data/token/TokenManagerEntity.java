@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Entity
 @Data
-public class TokenEntity {
+public class TokenManagerEntity {
     @Id
     private String userId;
     private String githubId;

@@ -1,5 +1,7 @@
 package com.example.authenticationserver.command.api.controller.oauth;
 
+import com.project.core.dto.JwksDTO;
+import com.project.core.queries.FetchJwksQuery;
 import com.project.core.queries.user.FetchJwkSet;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
@@ -29,9 +31,9 @@ public class OAuthWellKnowController {
         return createOpenIdConfiguration();
     }
     @GetMapping("/jwks.json")
-    public SimpleJWKSet getJson(){
-        var query = FetchJwkSet.builder().build();
-        return new SimpleJWKSet(queryGateway.query(query, ResponseTypes.multipleInstancesOf(SimpleJWK.class)).join());
+    public JwksDTO getJson(){
+        var query = FetchJwksQuery.builder().build();
+        return new JwksDTO( queryGateway.query(query, ResponseTypes.multipleInstancesOf(String.class)).join());
     }
     private static Map<String, Object> createOpenIdConfiguration() {
         Map<String, Object> configuration = new HashMap<>();

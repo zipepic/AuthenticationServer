@@ -1,6 +1,4 @@
 package com.example.authenticationserver;
-import com.project.core.events.user.JwkTokenInfoEvent;
-import com.project.core.queries.user.FetchJwkSet;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import tokenlib.util.jwk.SimpleJWK;
+
+import java.util.Collections;
 
 
 @Configuration
@@ -43,17 +43,9 @@ public class TokenManagementConfig {
 
   @Bean
   public AbstractTokenFactory tokenProcessorFactory() {
-    var factory = new TokenProcessorFactory(jwtSecret,queryGateway, (x->{
-
-//      GenericQueryMessage<String, List<JWK>> query
-//        = new GenericQueryMessage<>("fetchJwkSet",
-//        "fetchJwkSet", ResponseTypes.multipleInstancesOf(JWK.class));
-      FetchJwkSet query = FetchJwkSet.builder().build();
-
-      return queryGateway.query(query,ResponseTypes.multipleInstancesOf(SimpleJWK.class)).join();
-    }));
-    factory.setEventClassForJwk(JwkTokenInfoEvent.class);
-    factory.setEventClassForJwt(JwkTokenInfoEvent.class);
+    var factory = new TokenProcessorFactory(jwtSecret,queryGateway, (x->{return Collections.emptyList();}));
+    factory.setEventClassForJwk(Object.class);
+    factory.setEventClassForJwt(Object.class);
     return factory;
   }
 

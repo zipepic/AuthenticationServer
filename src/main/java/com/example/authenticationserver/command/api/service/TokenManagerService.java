@@ -2,8 +2,6 @@ package com.example.authenticationserver.command.api.service;
 
 import com.project.core.dto.TokenAuthorizationCodeDTO;
 import com.project.core.dto.TokenDTO;
-import com.project.core.events.user.JwkTokenInfoEvent;
-import com.project.core.events.user.JwtTokenInfoEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tokenlib.util.TokenFacade;
@@ -48,29 +46,5 @@ public class TokenManagerService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public Class<?> getEventClass() {
-        return tokenFacade.getEventClass();
-    }
-
-    public Object handleTokenInfoEvent(String userId, Map<String, String> map, String tokenId) {
-        var eventClass = getEventClass();
-        if (eventClass.equals(JwkTokenInfoEvent.class)) {
-            var jwkTokenInfoEvent = JwkTokenInfoEvent.builder()
-                    .userId(userId)
-                    .publicKey(map.get(TokenFields.PUBLIC_KEY.getValue()))
-                    .kid(tokenId.toString())
-                    .lastTokenId(map.get("last_token_id"))
-                    .build();
-            return jwkTokenInfoEvent;
-        } else if (eventClass.equals(JwtTokenInfoEvent.class)) {
-            var jwtTokenInfoEvent = JwtTokenInfoEvent.builder()
-                    .userId(userId)
-                    .tokenId(tokenId.toString())
-                    .build();
-            return jwtTokenInfoEvent;
-        }
-        throw new IllegalArgumentException("Invalid event class");
     }
 }

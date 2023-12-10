@@ -55,40 +55,6 @@ public class UserProfileEventHandler {
     userProfileRepository.save(userProfileEntity);
   }
   @EventHandler
-  void on(JwtTokenInfoEvent event){
-    Optional<UserProfileEntity> userProfileEntityOptional =
-      userProfileRepository.findById(event.getUserId());
-    if(userProfileEntityOptional.isEmpty()){
-      throw new RuntimeException("User not found");
-    }
-    UserProfileEntity userProfileEntity = userProfileEntityOptional.get();
-    userProfileEntity.setTokenId(event.getTokenId());
-    userProfileRepository.save(userProfileEntity);
-  }
-  @EventHandler
-  void handle(JwkTokenInfoEvent event) throws IOException, ParseException {
-    ObjectMapper objectMapper = new ObjectMapper();
-    JWKSet jwkSet = JWKSet.load(new File("/Users/xzz1p/Documents/TEST_PROJECT/AuthenticationServer/jwk.json"));
-
-    List<JWK> keys = new ArrayList<>(jwkSet.getKeys());
-
-    keys = keys.stream().filter(key -> !key.getKeyID().equals(event.getLastTokenId())).collect(Collectors.toList());
-
-    keys.add(RSAKey.parse(event.getPublicKey()));
-
-    JWKSet updatedJWKSet = new JWKSet(keys);
-    Optional<UserProfileEntity> userProfileEntityOptional =
-      userProfileRepository.findById(event.getUserId());
-    if(userProfileEntityOptional.isEmpty()){
-      throw new RuntimeException("User not found");
-    }
-    UserProfileEntity userProfileEntity = userProfileEntityOptional.get();
-    userProfileEntity.setTokenId(event.getKid());
-    userProfileRepository.save(userProfileEntity);
-
-    objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("/Users/xzz1p/Documents/TEST_PROJECT/AuthenticationServer/jwk.json"), updatedJWKSet.toJSONObject());
-  }
-  @EventHandler
   void handle(UserProfileUpdatedEvent event){
 
   }

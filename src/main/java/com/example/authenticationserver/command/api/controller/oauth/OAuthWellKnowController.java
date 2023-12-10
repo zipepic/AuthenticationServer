@@ -2,15 +2,12 @@ package com.example.authenticationserver.command.api.controller.oauth;
 
 import com.project.core.dto.JwksDTO;
 import com.project.core.queries.FetchJwksQuery;
-import com.project.core.queries.user.FetchJwkSet;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tokenlib.util.jwk.SimpleJWK;
-import tokenlib.util.jwk.SimpleJWKSet;
 
 import java.util.Arrays;
 import java.util.HashMap;

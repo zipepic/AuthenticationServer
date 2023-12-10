@@ -22,8 +22,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class UserProfileQueryHandler {
-    @Value("${app.jwk-file-path}")
-    private String filePath;
     private final UserProfileEntityService userProfileEntityService;
 
     @Autowired
@@ -59,14 +57,6 @@ public class UserProfileQueryHandler {
     }
 
     @QueryHandler
-    public boolean validateRefreshToken(ValidateRefreshTokenForUserProfileQuery query) {
-        try {
-            return userProfileEntityService.findUserProfileEntityByUsername(query.getUserId()).getTokenId().equals(query.getTokenId());
-        } catch (UsernameNotFoundException e) {
-            throw new UsernameNotFoundException("User not found");
-        }
-    }
-    @QueryHandler
     public String findUserIdByProviderId(CheckUserProfileByProviderIdQuery query) {
         if(query.getProviderType().equals("github")){
             var user = userProfileEntityService.findUserProfileEntityByGithubId(query.getProviderId());
@@ -76,21 +66,5 @@ public class UserProfileQueryHandler {
             return user == null ? null : user.getUserId();
         }
         return null;
-    }
-
-    @QueryHandler
-    public List<SimpleJWK> fetchJwkSet(FetchJwkSet query) throws IOException, ParseException {
-
-        var jwkSet = JWKSet.load(new File(filePath))
-                .getKeys().stream().map(x ->
-                {
-                    try {
-                        return SimpleJWK.parse(x.toString());
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).toList();
-
-        return jwkSet;
     }
 }

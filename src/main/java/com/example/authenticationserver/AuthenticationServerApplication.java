@@ -1,7 +1,11 @@
 package com.example.authenticationserver;
 
+import com.example.authenticationserver.saga.UserCreationSaga;
 import com.project.core.commands.token.CancelTokenCreationCommand;
 import com.project.core.commands.token.CreateTokenCommand;
+import com.project.core.commands.token.GenerateJwtTokenCommand;
+import com.project.core.commands.token.RefreshJwtTokenCommand;
+import com.project.core.dto.JwksDTO;
 import com.project.core.dto.TokenSummary;
 import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
 import com.project.core.dto.TokenAuthorizationCodeDTO;
@@ -14,8 +18,10 @@ import com.project.core.events.code.AuthorizationCodeGeneratedEvent;
 import com.project.core.events.code.AuthorizationCodeUsedEvent;
 import com.project.core.events.token.TokenCanceledEvent;
 import com.project.core.events.token.TokenCreatedEvent;
+import com.project.core.events.token.TokenGeneratedEvent;
 import com.project.core.events.user.*;
 import com.project.core.events.app.ApplicationCreatedEvent;
+import com.project.core.queries.FetchJwksQuery;
 import com.project.core.queries.app.CheckLoginDataQuery;
 import com.project.core.queries.user.*;
 import com.thoughtworks.xstream.XStream;
@@ -91,7 +97,12 @@ public class AuthenticationServerApplication {
             TokenCanceledEvent.class,
             TokenCreatedEvent.class,
             UserCanceledCreationEvent.class,
-            UserWereCompletedEvent.class);
+            UserWereCompletedEvent.class,
+            GenerateJwtTokenCommand.class,
+            TokenGeneratedEvent.class,
+            FetchJwksQuery.class,
+            JwksDTO.class,
+            RefreshJwtTokenCommand.class);
 
     // Register other necessary classes
     registerClasses(xStream,
@@ -100,7 +111,8 @@ public class AuthenticationServerApplication {
       TokenAuthorizationCodeDTO.class,
       JWK.class,
       SimpleJWK.class,
-            AuthProvider.class);
+            AuthProvider.class,
+            UserCreationSaga.class);
 
     return xStream;
   }

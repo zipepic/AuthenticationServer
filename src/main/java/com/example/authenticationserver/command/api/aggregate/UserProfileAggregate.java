@@ -120,7 +120,6 @@ import tokenlib.util.jwk.AuthProvider;
 import java.util.Date;
 import java.util.UUID;
 
-@Slf4j
 @Aggregate
 @Data
 public class UserProfileAggregate {
@@ -153,7 +152,7 @@ public class UserProfileAggregate {
       .userName(command.getUserName())
       .passwordHash(command.getPasswordHash())
       .userStatus("CREATED")
-      .role("ROLE_USER")
+      .role("ROLE_USER_MAIN")
       .createdAt(new Date())
       .build();
     var lookUpEvent = UserProfileProviderMappingLookUpCreatedEvent.builder()
@@ -171,16 +170,26 @@ public class UserProfileAggregate {
             .providerId(command.getProviderId())
             .authProvider(command.getAuthProvider())
             .userStatus("CREATED")
-            .role("ROLE_USER")
+            .role("ROLE_USER_TEST")
             .createdAt(new Date())
             .build();
-    var lookUpEvent = UserProfileProviderMappingLookUpCreatedEvent.builder()
-            .userId(command.getUserId())
-            .providerId(command.getProviderId())
-            .authProvider(command.getAuthProvider())
-            .build();
+//    var lookUpEvent = UserProfileProviderMappingLookUpCreatedEvent.builder()
+//            .userId(command.getUserId())
+//            .providerId(command.getProviderId())
+//            .authProvider(command.getAuthProvider())
+//            .build();
     AggregateLifecycle.apply(event);
-    AggregateLifecycle.apply(lookUpEvent);
+//    AggregateLifecycle.apply(lookUpEvent);
+  }
+  @EventSourcingHandler
+  public void on(UserCreatedFromProviderIdEvent event) {
+    this.userId = event.getUserId();
+    this.userName = event.getUserName();
+    if(event.getAuthProvider() == AuthProvider.GITHUB){
+      this.setGithubId(event.getProviderId());
+    }else if(event.getAuthProvider() == AuthProvider.GOOGLE){
+      this.setGoogleId(event.getProviderId());
+    }
   }
   @CommandHandler
   public void handle(CancelUserCreationCommand command){
@@ -313,14 +322,18 @@ public class UserProfileAggregate {
       this.setGoogleId(event.getProviderId());
     }
   }
+  @CommandHandler
+  public void handle(CompleteWereUserCreationCommand command){
+    var event = UserWereCompletedEvent.builder()
+      .userId(command.getUserId())
+            .providerId(this.githubId)
+            .authProvider(AuthProvider.GITHUB)
+            .status(command.getStatus())
+      .build();
+    AggregateLifecycle.apply(event);
+  }
     @EventSourcingHandler
-    public void on(UserCreatedFromProviderIdEvent event) {
-        this.userId = event.getUserId();
-        this.userName = event.getUserName();
-        if(event.getAuthProvider() == AuthProvider.GITHUB){
-            this.setGithubId(event.getProviderId());
-        }else if(event.getAuthProvider() == AuthProvider.GOOGLE){
-            this.setGoogleId(event.getProviderId());
-        }
+    public void on(UserWereCompletedEvent event) {
+        this.userStatus = event.getStatus();
     }
 }

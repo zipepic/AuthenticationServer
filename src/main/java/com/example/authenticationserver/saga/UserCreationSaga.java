@@ -4,7 +4,7 @@ import com.project.core.commands.token.CancelTokenCreationCommand;
 import com.project.core.commands.token.CreateTokenCommand;
 import com.project.core.commands.user.CancelUserCreationCommand;
 import com.project.core.commands.user.CompleteWereUserCreationCommand;
-import com.project.core.commands.user.CreateUserFromProviderIdCommand;
+import com.project.core.dto.TokenId;
 import com.project.core.events.token.TokenCanceledEvent;
 import com.project.core.events.token.TokenCreatedEvent;
 import com.project.core.events.user.UserCanceledCreationEvent;
@@ -27,26 +27,31 @@ public class UserCreationSaga {
     @SagaEventHandler(associationProperty = "userId")
     public void handle(UserCreatedFromProviderIdEvent event){
         log.info("Saga invoked by UserCreatedFromProviderIdEvent {}", event.getUserId());
+        try {
         var command = CreateTokenCommand.builder()
-                .userId(event.getUserId()+"token")
+                .tokenFromUserId(new TokenId(event.getUserId()))
                 .providerId(event.getProviderId())
                 .authProvider(event.getAuthProvider())
                 .role(event.getRole())
                 .build();
-        try {
+
             commandGateway.sendAndWait(command);
         } catch (Exception e) {
-            e.printStackTrace();
+            cancelUserCommand(event);
+            System.out.println(e.getMessage());;
         }
     }
+
     @SagaEventHandler(associationProperty = "userId")
     public void handle(TokenCreatedEvent event) {
-        log.info("Saga invoked by TokenCreatedEvent {}", event.getUserId());
+        log.info("Saga invoked by TokenCreatedEvent {}", event.getTokenFromUserId());
         var command = CompleteWereUserCreationCommand.builder()
-                .userId(event.getUserId().replace("token",""))
+                .userId(event.getTokenFromUserId().getUserId())
                 .status("COMPLETED")
                 .build();
         try {
+//            if (true)
+//                throw new Exception("test");
             commandGateway.sendAndWait(command);
         } catch (Exception e) {
             cancelTokenCreation(event);
@@ -55,11 +60,17 @@ public class UserCreationSaga {
     }
     @SagaEventHandler(associationProperty = "userId")
     public void handle(TokenCanceledEvent event) {
-        log.info("Saga invoked by TokenCanceledEvent {}", event.getUserId());
+        log.info("Saga invoked by TokenCanceledEvent {}", event.getTokenFromUserId());
         cancelUserCommand(event);
     }
 
     private void cancelUserCommand(TokenCanceledEvent event) {
+        var command = CancelUserCreationCommand.builder()
+                .userId(event.getTokenFromUserId().getUserId())
+                .build();
+        commandGateway.sendAndWait(command);
+    }
+    private void cancelUserCommand(UserCreatedFromProviderIdEvent event) {
         var command = CancelUserCreationCommand.builder()
                 .userId(event.getUserId())
                 .build();
@@ -68,7 +79,7 @@ public class UserCreationSaga {
 
     private void cancelTokenCreation(TokenCreatedEvent event) {
         var command = CancelTokenCreationCommand.builder()
-                .userId(event.getUserId())
+                .tokenFromUserId(event.getTokenFromUserId())
                 .build();
         commandGateway.sendAndWait(command);
     }
@@ -83,5 +94,7 @@ public class UserCreationSaga {
     public void handle(UserCanceledCreationEvent event) {
         log.info("Saga cancelled {}", event.getUserId());
     }
-
+    public String tokenFromUserIdM(TokenId tokenId){
+        return tokenId.getUserId();
+    }
 }

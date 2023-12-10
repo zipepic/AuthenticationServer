@@ -111,4 +111,17 @@ public class UserProfileEventHandler {
         }
         userProfileRepository.save(userProfileEntity);
     }
+    @EventHandler
+    void handle(UserCanceledCreationEvent event){
+    System.out.println("UserCanceledCreationEvent" + event.getUserId());
+        userProfileRepository.deleteById(event.getUserId());
+    }
+    @EventHandler
+    void handle(UserWereCompletedEvent event){
+      System.out.println("UserWereCompletedEvent" + event.getUserId());
+      userProfileRepository.findById(event.getUserId()).ifPresent(userProfileEntity -> {
+        userProfileEntity.setUserStatus(event.getStatus());
+        userProfileRepository.save(userProfileEntity);
+      });
+    }
 }

@@ -150,11 +150,8 @@ public class UserProfileAggregate {
       .role("ROLE_USER_MAIN")
       .createdAt(new Date())
       .build();
-    var lookUpEvent = UserProfileProviderMappingLookUpCreatedEvent.builder()
-      .userId(command.getUserId())
-            .build();
+
     AggregateLifecycle.apply(event);
-    AggregateLifecycle.apply(lookUpEvent);
   }
 
   @CommandHandler

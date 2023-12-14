@@ -26,9 +26,9 @@ public class TokenEventHandler {
         tokenEntity.setUserId(event.getTokenFromUserId().getUserId());
         tokenEntity.setUserRole(event.getRole());
         tokenEntity.setStatus(event.getStatus());
-        if(event.getAuthProvider().equals("GITHUB"))
+        if( event.getProviderId() != null&&event.getAuthProvider().equals("GITHUB"))
             tokenEntity.setGithubId(event.getProviderId());
-        else if(event.getAuthProvider().equals("GOOGLE"))
+        else if(event.getProviderId() != null&&event.getAuthProvider().equals("GOOGLE"))
             tokenEntity.setGoogleId(event.getProviderId());
         tokenRepository.save(tokenEntity);
     }

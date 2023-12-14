@@ -53,9 +53,9 @@ public class TokenManagerForUserAggregate {
     public void on(TokenCreatedEvent event){
         this.tokenFromUserId = event.getTokenFromUserId().toString();
         this.userRole = event.getRole();
-        if(event.getAuthProvider() == AuthProvider.GITHUB)
+        if(event.getProviderId() != null&&event.getAuthProvider() == AuthProvider.GITHUB)
             this.githubId = event.getProviderId();
-        else if(event.getAuthProvider() == AuthProvider.GOOGLE)
+        else if(event.getProviderId() != null&&event.getAuthProvider() == AuthProvider.GOOGLE)
             this.googleId = event.getProviderId();
         this.status = "CREATED";
         System.out.println("Send TokenCreatedEvent");

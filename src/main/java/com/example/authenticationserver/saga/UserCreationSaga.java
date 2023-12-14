@@ -9,6 +9,7 @@ import com.project.core.events.token.TokenCanceledEvent;
 import com.project.core.events.token.TokenCreatedEvent;
 import com.project.core.events.user.UserCanceledCreationEvent;
 import com.project.core.events.user.UserCreatedFromProviderIdEvent;
+import com.project.core.events.user.UserProfileCreatedEvent;
 import com.project.core.events.user.UserWereCompletedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -41,6 +42,24 @@ public class UserCreationSaga {
             System.out.println(e.getMessage());;
         }
     }
+    @StartSaga
+    @SagaEventHandler(associationProperty = "userId")
+    public void handle(UserProfileCreatedEvent event){
+        log.info("Saga invoked by UserCreatedFromProviderIdEvent {}", event.getUserId());
+        try {
+            var command = CreateTokenCommand.builder()
+                    .tokenFromUserId(new TokenId(event.getUserId()))
+                    .providerId(null)
+                    .authProvider(null)
+                    .role(event.getRole())
+                    .build();
+
+            commandGateway.sendAndWait(command);
+        } catch (Exception e) {
+            cancelUserCommand(event);
+            System.out.println(e.getMessage());;
+        }
+    }
 
     @SagaEventHandler(associationProperty = "userId")
     public void handle(TokenCreatedEvent event) {
@@ -63,7 +82,12 @@ public class UserCreationSaga {
         log.info("Saga invoked by TokenCanceledEvent {}", event.getTokenFromUserId());
         cancelUserCommand(event);
     }
-
+    private void cancelUserCommand(UserProfileCreatedEvent event) {
+        var command = CancelUserCreationCommand.builder()
+                .userId(event.getUserId())
+                .build();
+        commandGateway.sendAndWait(command);
+    }
     private void cancelUserCommand(TokenCanceledEvent event) {
         var command = CancelUserCreationCommand.builder()
                 .userId(event.getTokenFromUserId().getUserId())

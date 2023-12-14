@@ -11,6 +11,7 @@ import com.example.authenticationserver.query.api.data.user.UserProfileEntity;
 import com.project.core.dto.TokenAuthorizationCodeDTO;
 import com.nimbusds.jose.jwk.JWK;
 import com.project.core.commands.user.*;
+import com.project.core.dto.UserProfileDTO;
 import com.project.core.events.token.TokenCanceledEvent;
 import com.project.core.events.token.TokenCreatedEvent;
 import com.project.core.events.token.TokenGeneratedEvent;
@@ -76,7 +77,9 @@ public class AuthenticationServerApplication {
             TokenGeneratedEvent.class,
             FetchJwksQuery.class,
             JwksDTO.class,
-            RefreshJwtTokenCommand.class);
+            RefreshJwtTokenCommand.class,
+            FetchUserProfileDTOByUserIdQuery.class,
+            FindUserIdByUserNameAndValidatePasswordQuery.class);
 
     // Register other necessary classes
     registerClasses(xStream,
@@ -86,7 +89,8 @@ public class AuthenticationServerApplication {
       JWK.class,
       SimpleJWK.class,
             AuthProvider.class,
-            UserCreationSaga.class);
+            UserCreationSaga.class,
+            UserProfileDTO.class);
 
     return xStream;
   }

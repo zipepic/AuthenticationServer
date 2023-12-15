@@ -75,7 +75,7 @@
     <dependency>
       <groupId>com.project</groupId>
       <artifactId>Core</artifactId>
-      <version>0.0.3-SNAPSHOT</version>
+      <version>0.0.7</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -89,17 +89,11 @@
     <dependency>
       <groupId>com.nimbusds</groupId>
       <artifactId>nimbus-jose-jwt</artifactId>
-      <version>7.9</version>
+      <version>9.37.2</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
-      <version>RELEASE</version>
       <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.axonframework/axon-test -->
@@ -114,6 +108,12 @@
       <groupId>org.hibernate.validator</groupId>
       <artifactId>hibernate-validator</artifactId>
       <version>8.0.1.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>com.project</groupId>
+      <artifactId>Core</artifactId>
+      <version>0.0.7</version>
+      <scope>compile</scope>
     </dependency>
 
   </dependencies>

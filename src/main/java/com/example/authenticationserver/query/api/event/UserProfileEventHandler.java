@@ -12,6 +12,7 @@ import org.axonframework.eventhandling.EventHandler;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tokenlib.util.jwk.AuthProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,38 +41,18 @@ public class UserProfileEventHandler {
     userProfileRepository.save(userProfileEntity);
   }
   @EventHandler
-  void on(JwtTokenInfoEvent event){
-    Optional<UserProfileEntity> userProfileEntityOptional =
-      userProfileRepository.findById(event.getUserId());
-    if(userProfileEntityOptional.isEmpty()){
-      throw new RuntimeException("User not found");
+  public void handle(UserCreatedFromProviderIdEvent event){
+    UserProfileEntity userProfileEntity =
+      new UserProfileEntity();
+
+    BeanUtils.copyProperties(event,userProfileEntity);
+    if(event.getAuthProvider() == AuthProvider.GITHUB){
+      userProfileEntity.setGithubId(event.getProviderId());
+    }else if(event.getAuthProvider() == AuthProvider.GOOGLE){
+        userProfileEntity.setGoogleId(event.getProviderId());
     }
-    UserProfileEntity userProfileEntity = userProfileEntityOptional.get();
-    userProfileEntity.setTokenId(event.getTokenId());
+
     userProfileRepository.save(userProfileEntity);
-  }
-  @EventHandler
-  void handle(JwkTokenInfoEvent event) throws IOException, ParseException {
-    ObjectMapper objectMapper = new ObjectMapper();
-    JWKSet jwkSet = JWKSet.load(new File("/Users/xzz1p/Documents/MySpring/TEST_PROJECT/AuthenticationServer/jwk.json"));
-
-    List<JWK> keys = new ArrayList<>(jwkSet.getKeys());
-
-    keys = keys.stream().filter(key -> !key.getKeyID().equals(event.getLastTokenId())).collect(Collectors.toList());
-
-    keys.add(RSAKey.parse(event.getPublicKey()));
-
-    JWKSet updatedJWKSet = new JWKSet(keys);
-    Optional<UserProfileEntity> userProfileEntityOptional =
-      userProfileRepository.findById(event.getUserId());
-    if(userProfileEntityOptional.isEmpty()){
-      throw new RuntimeException("User not found");
-    }
-    UserProfileEntity userProfileEntity = userProfileEntityOptional.get();
-    userProfileEntity.setTokenId(event.getKid());
-    userProfileRepository.save(userProfileEntity);
-
-    objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("/Users/xzz1p/Documents/MySpring/TEST_PROJECT/AuthenticationServer/jwk.json"), updatedJWKSet.toJSONObject());
   }
   @EventHandler
   void handle(UserProfileUpdatedEvent event){
@@ -81,4 +62,32 @@ public class UserProfileEventHandler {
   void handle(UserProfilePasswordChangedEvent event){
 
   }
+  @EventHandler
+    void handle(ProviderIdBoundToUserEvent event){
+        Optional<UserProfileEntity> userProfileEntityOptional =
+            userProfileRepository.findById(event.getUserId());
+        if(userProfileEntityOptional.isEmpty()){
+            throw new RuntimeException("User not found");
+        }
+        UserProfileEntity userProfileEntity = userProfileEntityOptional.get();
+        if(event.getProviderType().equals("github")){
+            userProfileEntity.setGithubId(event.getProviderId());
+        }else if(event.getProviderType().equals("google")){
+            userProfileEntity.setGoogleId(event.getProviderId());
+        }
+        userProfileRepository.save(userProfileEntity);
+    }
+    @EventHandler
+    void handle(UserCanceledCreationEvent event){
+    System.out.println("UserCanceledCreationEvent" + event.getUserId());
+        userProfileRepository.deleteById(event.getUserId());
+    }
+    @EventHandler
+    void handle(UserWereCompletedEvent event){
+      System.out.println("UserWereCompletedEvent" + event.getUserId());
+      userProfileRepository.findById(event.getUserId()).ifPresent(userProfileEntity -> {
+        userProfileEntity.setUserStatus(event.getStatus());
+        userProfileRepository.save(userProfileEntity);
+      });
+    }
 }

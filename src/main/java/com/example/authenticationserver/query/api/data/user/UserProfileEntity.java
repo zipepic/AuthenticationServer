@@ -16,6 +16,8 @@ public class UserProfileEntity {
   private String userStatus;
   private String role;
   private String tokenId;
+  private String githubId;
+  private String googleId;
   private Date createdAt;
   private Date lastUpdatedAt;
   private Date deleteAt;

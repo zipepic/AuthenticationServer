@@ -52,4 +52,14 @@ public class UserProfileEntityService {
         if (userProfileEntity.isEmpty()) throw new UsernameNotFoundException("User not found");
         return userProfileEntity.get();
     }
+    public UserProfileEntity findUserProfileEntityByGithubId(String githubId) {
+        Optional<UserProfileEntity> userProfileEntity = userProfileRepository.findByGithubId(githubId);
+        if (userProfileEntity.isEmpty()) return null;
+        return userProfileEntity.get();
+    }
+    public UserProfileEntity findUserProfileEntityByGoogleId(String googleId) {
+        Optional<UserProfileEntity> userProfileEntity = userProfileRepository.findByGoogleId(googleId);
+        if (userProfileEntity.isEmpty()) return null;
+        return userProfileEntity.get();
+    }
 }

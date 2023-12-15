@@ -5,5 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface UserProfileRepository extends JpaRepository<UserProfileEntity, String> {
-  public Optional<UserProfileEntity> findByUserName(String userName);
+  Optional<UserProfileEntity> findByUserName(String userName);
+  Optional<UserProfileEntity> findByGithubId(String githubId);
+  Optional<UserProfileEntity> findByGoogleId(String googleId);
+
 }

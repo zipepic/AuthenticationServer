@@ -103,26 +103,18 @@ package com.example.authenticationserver.command.api.aggregate;
  * </ul>
  */
 
-import com.example.authenticationserver.command.api.service.UserProfileAggregateService;
-import com.example.authenticationserver.dto.TokenDTO;
 import com.project.core.commands.user.*;
-import com.project.core.events.user.JwtTokenInfoEvent;
-import com.project.core.events.user.UserProfileCreatedEvent;
-import com.project.core.events.user.UserProfilePasswordChangedEvent;
-import com.project.core.events.user.UserProfileUpdatedEvent;
+import com.project.core.events.user.*;
 import lombok.Data;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
+import tokenlib.util.jwk.AuthProvider;
 
 import java.util.Date;
-import java.util.UUID;
 
-@Slf4j
 @Aggregate
 @Data
 public class UserProfileAggregate {
@@ -133,6 +125,8 @@ public class UserProfileAggregate {
   private String passwordHash;
   private String userStatus;
   private String role;
+  private String githubId;
+  private String googleId;
   private String tokenId;
   private Date createdAt;
 
@@ -153,12 +147,47 @@ public class UserProfileAggregate {
       .userName(command.getUserName())
       .passwordHash(command.getPasswordHash())
       .userStatus("CREATED")
-      .role("ROLE_USER")
+      .role("ROLE_USER_MAIN")
       .createdAt(new Date())
       .build();
+
     AggregateLifecycle.apply(event);
   }
 
+  @CommandHandler
+  public UserProfileAggregate(CreateUserFromProviderIdCommand command){
+    var event = UserCreatedFromProviderIdEvent.builder()
+            .userId(command.getUserId())
+            .userName(command.getUserName())
+            .providerId(command.getProviderId())
+            .authProvider(command.getAuthProvider())
+            .userStatus("CREATED")
+            .role("ROLE_USER_TEST")
+            .createdAt(new Date())
+            .build();
+    AggregateLifecycle.apply(event);
+  }
+  @EventSourcingHandler
+  public void on(UserCreatedFromProviderIdEvent event) {
+    this.userId = event.getUserId();
+    this.userName = event.getUserName();
+    if(event.getAuthProvider() == AuthProvider.GITHUB){
+      this.setGithubId(event.getProviderId());
+    }else if(event.getAuthProvider() == AuthProvider.GOOGLE){
+      this.setGoogleId(event.getProviderId());
+    }
+  }
+  @CommandHandler
+  public void handle(CancelUserCreationCommand command){
+    var event = UserCanceledCreationEvent.builder()
+      .userId(command.getUserId())
+      .build();
+    AggregateLifecycle.apply(event);
+  }
+  @EventSourcingHandler
+    public void on(UserCanceledCreationEvent event) {
+        this.userStatus = "CANCELLED";
+    }
   /**
    * Event handler for the {@code UserProfileCreatedEvent}. Updates the aggregate's properties
    * based on the information provided in the event.
@@ -173,59 +202,6 @@ public class UserProfileAggregate {
     this.userStatus = event.getUserStatus();
     this.role = event.getRole();
     this.createdAt = event.getCreatedAt();
-  }
-
-  /**
-   * Handles the generation of a new authentication token based on the
-   * {@code GenerateRefreshTokenForUserProfileCommand}. Invokes the {@code UserProfileService} to generate tokens
-   * and applies the relevant token information event.
-   *
-   * @param command The command containing information to generate a new authentication token.
-   * @param service The {@code UserProfileService} for token-related operations.
-   * @return The {@code TokenDTO} representing the generated tokens.
-   */
-  @CommandHandler
-  public TokenDTO handleGenerateTokenCommand(GenerateRefreshTokenForUserProfileCommand command, @NonNull UserProfileAggregateService service) {
-    UUID tokenId = UUID.randomUUID();
-    var map = service.generateJwtTokensMap(command.getUserId(), tokenId.toString());
-    AggregateLifecycle.apply(service.handleTokenInfoEvent(
-      command.getUserId(),
-      map,
-      tokenId.toString()
-    ));
-    return service.makeTokenDTO(map, tokenId.toString());
-  }
-
-  /**
-   * Handles the refreshment of the authentication token based on the
-   * {@code RefreshAccessTokenForUserProfileCommand}. Invokes the {@code UserProfileService} to refresh tokens
-   * and applies the relevant token information event.
-   *
-   * @param command The command containing information to refresh the authentication token.
-   * @param service The {@code UserProfileService} for token-related operations.
-   * @return The {@code TokenDTO} representing the refreshed tokens.
-   */
-  @CommandHandler
-  public TokenDTO handleRefreshTokenCommand(RefreshAccessTokenForUserProfileCommand command, @NonNull UserProfileAggregateService service) {
-    UUID tokenId = UUID.randomUUID();
-    var map = service.refreshToken(command.getRefreshToken(), tokenId.toString());
-    AggregateLifecycle.apply(service.handleTokenInfoEvent(
-      command.getUserId(),
-      map,
-      tokenId.toString()
-    ));
-    return service.makeTokenDTO(map, tokenId.toString());
-  }
-
-  /**
-   * Event handler for the {@code JwtTokenInfoEvent}. Updates the {@code tokenId} property
-   * based on the information provided in the event.
-   *
-   * @param event The event containing information about the JWT token.
-   */
-  @EventSourcingHandler
-  public void on(JwtTokenInfoEvent event) {
-    this.tokenId = event.getTokenId();
   }
   @CommandHandler
   public void handle(UpdateUserProfileCommand command){
@@ -251,4 +227,35 @@ public class UserProfileAggregate {
   public void on(UserProfilePasswordChangedEvent event) {
     this.passwordHash = event.getNewPassword();
   }
+  @CommandHandler
+  public void handle(BindProviderIdToUserCommand command){
+    var event = ProviderIdBoundToUserEvent.builder()
+      .userId(command.getUserId())
+      .providerId(command.getProviderId())
+      .providerType(command.getProviderType())
+      .build();
+    AggregateLifecycle.apply(event);
+  }
+  @EventSourcingHandler
+  public void on(ProviderIdBoundToUserEvent event) {
+    if(event.getProviderType().equals("github")){
+      this.setGithubId(event.getProviderId());
+    }else if(event.getProviderType().equals("google")){
+      this.setGoogleId(event.getProviderId());
+    }
+  }
+  @CommandHandler
+  public void handle(CompleteWereUserCreationCommand command){
+    var event = UserWereCompletedEvent.builder()
+      .userId(command.getUserId())
+            .providerId(this.githubId)
+            .authProvider(AuthProvider.GITHUB)
+            .status(command.getStatus())
+      .build();
+    AggregateLifecycle.apply(event);
+  }
+    @EventSourcingHandler
+    public void on(UserWereCompletedEvent event) {
+        this.userStatus = event.getStatus();
+    }
 }

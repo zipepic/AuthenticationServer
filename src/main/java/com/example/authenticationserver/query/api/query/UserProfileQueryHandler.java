@@ -5,8 +5,10 @@ import com.example.authenticationserver.query.api.data.user.UserProfileRepositor
 import com.example.authenticationserver.query.api.service.UserProfileEntityService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nimbusds.jose.jwk.JWKSet;
+import com.project.core.dto.UserProfileDTO;
 import com.project.core.queries.user.*;
 import org.axonframework.queryhandling.QueryHandler;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,8 +24,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class UserProfileQueryHandler {
-    @Value("${app.jwk-file-path}")
-    private String filePath;
     private final UserProfileEntityService userProfileEntityService;
 
     @Autowired
@@ -48,6 +48,17 @@ public class UserProfileQueryHandler {
             throw new UsernameNotFoundException("User not found");
         }
     }
+    @QueryHandler
+    public UserProfileDTO findUserProfile(FetchUserProfileDTOByUserIdQuery query) {
+        try {
+            var user = userProfileEntityService.findUserProfileEntityById(query.getUserId());
+            var userProfileDTO = UserProfileDTO.builder().build();
+            BeanUtils.copyProperties(user, userProfileDTO);
+            return userProfileDTO;
+        } catch (UsernameNotFoundException e) {
+            throw new UsernameNotFoundException("User not found");
+        }
+    }
 
     @QueryHandler
     public UserProfileEntity findUserProfileByUserName(FetchUserProfileByUserNameQuery query) {
@@ -59,27 +70,14 @@ public class UserProfileQueryHandler {
     }
 
     @QueryHandler
-    public boolean validateRefreshToken(ValidateRefreshTokenForUserProfileQuery query) {
-        try {
-            return userProfileEntityService.findUserProfileEntityByUsername(query.getUserId()).getTokenId().equals(query.getTokenId());
-        } catch (UsernameNotFoundException e) {
-            throw new UsernameNotFoundException("User not found");
+    public String findUserIdByProviderId(CheckUserProfileByProviderIdQuery query) {
+        if(query.getProviderType().equals("github")){
+            var user = userProfileEntityService.findUserProfileEntityByGithubId(query.getProviderId());
+            return user == null ? null : user.getUserId();
+        }else if(query.getProviderType().equals("google")){
+            var user = userProfileEntityService.findUserProfileEntityByGoogleId(query.getProviderId());
+            return user == null ? null : user.getUserId();
         }
-    }
-
-    @QueryHandler
-    public List<SimpleJWK> fetchJwkSet(FetchJwkSet query) throws IOException, ParseException {
-
-        var jwkSet = JWKSet.load(new File(filePath))
-                .getKeys().stream().map(x ->
-                {
-                    try {
-                        return SimpleJWK.parse(x.toString());
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).toList();
-
-        return jwkSet;
+        return null;
     }
 }

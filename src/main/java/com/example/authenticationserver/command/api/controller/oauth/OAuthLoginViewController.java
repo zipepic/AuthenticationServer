@@ -2,7 +2,6 @@ package com.example.authenticationserver.command.api.controller.oauth;
 
 import com.example.authenticationserver.command.api.service.UserProfileCommandService;
 import com.example.authenticationserver.security.UserProfileDetails;
-import com.project.core.commands.code.GenerateAuthorizationCodeCommand;
 import jakarta.servlet.http.HttpSession;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.concurrent.CompletableFuture;
 
 @Controller
 @RequestMapping("/login/oauth2/authorization")
@@ -57,18 +54,12 @@ public class OAuthLoginViewController {
       UserProfileDetails userProfileDetails
         = userProfileCommandService.authenticationUser(new UsernamePasswordAuthenticationToken(username,password));
 
-      var codeCommand = GenerateAuthorizationCodeCommand.builder()
-        .userId(userProfileDetails.getUserProfileEntity().getUserId())
-        .clientId(clientId)
-        .scope(scope)
-        .sessionId(session.getId())
-        .build();
-
-      CompletableFuture<String> code = commandGateway.send(codeCommand);
+      if(true)
+        throw new RuntimeException("Unsupoorted method");
 
       UriComponentsBuilder builder = UriComponentsBuilder.fromPath(redirectUrl)
-        .queryParam("state", state)
-        .queryParam("code", code.join());
+        .queryParam("state", state);
+//        .queryParam("code", code.join());
 
       return "redirect:" + builder.toUriString();
     } catch (Exception e) {

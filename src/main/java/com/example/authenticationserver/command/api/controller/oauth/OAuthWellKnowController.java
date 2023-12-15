@@ -1,15 +1,13 @@
 package com.example.authenticationserver.command.api.controller.oauth;
 
-import com.nimbusds.jose.jwk.JWKSet;
-import com.project.core.queries.user.FetchJwkSet;
+import com.project.core.dto.JwksDTO;
+import com.project.core.queries.FetchJwksQuery;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tokenlib.util.jwk.SimpleJWK;
-import tokenlib.util.jwk.SimpleJWKSet;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,9 +28,9 @@ public class OAuthWellKnowController {
         return createOpenIdConfiguration();
     }
     @GetMapping("/jwks.json")
-    public SimpleJWKSet getJson(){
-        var query = FetchJwkSet.builder().build();
-        return new SimpleJWKSet(queryGateway.query(query, ResponseTypes.multipleInstancesOf(SimpleJWK.class)).join());
+    public JwksDTO getJson(){
+        var query = FetchJwksQuery.builder().build();
+        return new JwksDTO( queryGateway.query(query, ResponseTypes.multipleInstancesOf(String.class)).join());
     }
     private static Map<String, Object> createOpenIdConfiguration() {
         Map<String, Object> configuration = new HashMap<>();

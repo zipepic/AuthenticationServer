@@ -2,13 +2,10 @@ package com.example.authenticationserver.command.api.controller;
 
 import com.example.authenticationserver.command.api.service.UserProfileCommandService;
 import com.example.authenticationserver.security.UserProfileDetails;
-import com.project.core.queries.user.ValidateRefreshTokenForUserProfileQuery;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
